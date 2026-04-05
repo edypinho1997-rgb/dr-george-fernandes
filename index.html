@@ -1,0 +1,1501 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dr. George Fernandes</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+    <header class="hero">
+        <nav class="topbar">
+            <div class="brand">
+                <span class="brand-mark">P</span>
+                <div>
+                    <p class="brand-name">Dr. George Fernandes</p>
+                    <small class="brand-sub">Fisioterapia & Bem-estar</small>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="#servicos">Servicos</a>
+                <a href="#agenda">Agenda</a>
+                <a href="#pagamentos">Pagamentos</a>
+                <a href="#historico">Historico</a>
+                <a href="#contato">Contato</a>
+            </div>
+            <a class="btn primary" href="#contato">Agendar</a>
+        </nav>
+
+        <div class="hero-grid">
+            <div class="hero-text">
+                <p class="eyebrow">Atendimento humanizado</p>
+                <h1>Fisioterapia com carinho, tecnica e resultados.</h1>
+                <p class="lead">
+                    Acompanhamento personalizado para dores, reabilitacao e qualidade de vida.
+                    Atendimentos individuais com plano de cuidado claro e acompanhamento real.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn primary" href="#agenda">Ver agenda</a>
+                    <a class="btn ghost" href="#pagamentos">Ver pagamentos</a>
+                </div>
+                <div class="hero-badges">
+                    <span>Atendimento por horario marcado</span>
+                    <span>Planos mensais e por sessao</span>
+                    <span>Pix, credito e dinheiro</span>
+                </div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-card-top">
+                    <h3>Resumo rapido</h3>
+                    <p>Confira os atendimentos e recebimentos do mes em um unico lugar.</p>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <strong id="patients-active">0</strong>
+                        <small>Pacientes ativos</small>
+                    </div>
+                    <div>
+                        <strong id="sessions-month">0</strong>
+                        <small>Sessoes no mes</small>
+                    </div>
+                    <div>
+                        <strong id="receipts-total">R$ 0,00</strong>
+                        <small>Recebimentos</small>
+                    </div>
+                </div>
+                <a class="btn secondary" href="#contato">Falar no WhatsApp</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="section" id="servicos">
+        <div class="section-head">
+            <h2>Servicos</h2>
+            <p>Atendimentos personalizados para cada fase da sua rotina.</p>
+        </div>
+        <div class="service-actions">
+            <a class="service-action" href="#agenda">Agenda semanal</a>
+            <a class="service-action" href="#avaliacao">Avaliacao</a>
+            <a class="service-action" href="#pagamentos">Pagamento</a>
+        </div>
+    </section>
+
+        <section class="section accent" id="agenda">
+            <div class="section-head">
+                <h2>Agenda semanal</h2>
+                <p>Organizacao clara por horario, dia e paciente.</p>
+            </div>
+        <div class="schedule-tools">
+            <div class="add-patient">
+                <input id="patient-input" type="text" placeholder="Adicionar paciente">
+                <button id="patient-add" type="button">Adicionar</button>
+            </div>
+            <button class="print-selected" type="button">Imprimir mes</button>
+            <div class="month-picker">
+                <input id="view-month" type="month">
+                <button id="view-month-btn" type="button">Selecionar mes</button>
+            </div>
+            <div class="color-palette" aria-label="Paleta de cores">
+                <button class="color-btn black active" type="button" data-color="black">Preto</button>
+                <button class="color-btn green" type="button" data-color="green">Verde</button>
+                <button class="color-btn blue" type="button" data-color="blue">Azul</button>
+                <button class="color-btn orange" type="button" data-color="orange">Laranja</button>
+                <button class="color-btn clear" type="button" data-clear="true">Limpar cor</button>
+            </div>
+            <small>1) Clique no quadrado. 2) Digite o nome e clique em Adicionar. 3) Clique no nome e escolha a cor. O resumo rapido mostra o mes selecionado.</small>
+        </div>
+        <div class="legend">
+            <span><i class="dot black"></i>Antes do atendimento</span>
+            <span><i class="dot green"></i>Edy</span>
+            <span><i class="dot blue"></i>George</span>
+            <span><i class="dot orange"></i>Os dois</span>
+        </div>
+
+        <div class="month">
+            <div class="week-header">
+                <label class="week-check"><input type="checkbox" class="week-select"> Selecionar</label>
+                <div class="week-title" contenteditable="true">ATENDIMENTO MAIO 01/05</div>
+                <button class="week-print" type="button">Imprimir semana</button>
+            </div>
+            <div class="schedule">
+                <div class="schedule-header">
+                    <span>Horario</span>
+                    <span>Segunda</span>
+                    <span>Terca</span>
+                    <span>Quarta</span>
+                    <span>Quinta</span>
+                    <span>Sexta</span>
+                    <span>Sabado</span>
+                </div>
+                <div class="schedule-row">
+                    <span>08:30</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>09:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>10:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>11:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row break">
+                    <span>14:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>15:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>16:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>17:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>18:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="month">
+            <div class="week-header">
+                <label class="week-check"><input type="checkbox" class="week-select"> Selecionar</label>
+                <div class="week-title" contenteditable="true">ATENDIMENTO MAIO 08/12</div>
+                <button class="week-print" type="button">Imprimir semana</button>
+            </div>
+            <div class="schedule">
+                <div class="schedule-header">
+                    <span>Horario</span>
+                    <span>Segunda</span>
+                    <span>Terca</span>
+                    <span>Quarta</span>
+                    <span>Quinta</span>
+                    <span>Sexta</span>
+                    <span>Sabado</span>
+                </div>
+                <div class="schedule-row">
+                    <span>08:30</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>09:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>10:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>11:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row break">
+                    <span>14:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>15:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>16:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>17:00</span>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>18:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="month">
+            <div class="week-header">
+                <label class="week-check"><input type="checkbox" class="week-select"> Selecionar</label>
+                <div class="week-title" contenteditable="true">ATENDIMENTO MAIO 15/19</div>
+                <button class="week-print" type="button">Imprimir semana</button>
+            </div>
+            <div class="schedule">
+                <div class="schedule-header">
+                    <span>Horario</span>
+                    <span>Segunda</span>
+                    <span>Terca</span>
+                    <span>Quarta</span>
+                    <span>Quinta</span>
+                    <span>Sexta</span>
+                    <span>Sabado</span>
+                </div>
+                <div class="schedule-row">
+                    <span>08:30</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>09:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>10:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>11:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row break">
+                    <span>14:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>15:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>16:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>17:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>18:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="month">
+            <div class="week-header">
+                <label class="week-check"><input type="checkbox" class="week-select"> Selecionar</label>
+                <div class="week-title" contenteditable="true">ATENDIMENTO MAIO 22/26</div>
+                <button class="week-print" type="button">Imprimir semana</button>
+            </div>
+            <div class="schedule">
+                <div class="schedule-header">
+                    <span>Horario</span>
+                    <span>Segunda</span>
+                    <span>Terca</span>
+                    <span>Quarta</span>
+                    <span>Quinta</span>
+                    <span>Sexta</span>
+                    <span>Sabado</span>
+                </div>
+                <div class="schedule-row">
+                    <span>08:30</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>09:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>10:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>11:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row break">
+                    <span>14:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>15:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>16:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>17:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+                <div class="schedule-row">
+                    <span>18:00</span>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                    <div class="cell" contenteditable="true"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="historico">
+        <div class="section-head">
+            <h2>Historico mensal</h2>
+            <p>Selecione o mes para salvar ou carregar a agenda completa.</p>
+        </div>
+        <div class="history-card">
+            <label class="history-field">
+                <span>Mes</span>
+                <input id="history-month" type="month">
+            </label>
+            <div class="history-actions">
+                <button class="history-save" type="button">Salvar historico do mes</button>
+                <button class="history-load" type="button">Ver historico do mes</button>
+            </div>
+            <small class="history-hint">Exemplo: selecione 2026-02 para fevereiro.</small>
+            <div class="history-list" id="history-list"></div>
+            <div class="history-preview" id="history-preview"></div>
+        </div>
+    </section>
+
+    <section class="section" id="pagamentos">
+        <div class="section-head">
+            <h2>Pagamentos e lancamentos</h2>
+            <p>Controle simples das entradas por paciente.</p>
+        </div>
+        <div class="payment-form">
+            <div class="payment-field">
+                <label for="pay-paciente">Paciente</label>
+                <input id="pay-paciente" type="text" placeholder="Nome do paciente">
+            </div>
+            <div class="payment-field">
+                <label for="pay-forma">Forma de pagamento</label>
+                <select id="pay-forma">
+                    <option value="Pix">Pix</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Credito">Credito</option>
+                    <option value="Debito">Debito</option>
+                </select>
+            </div>
+            <div class="payment-field">
+                <label for="pay-valor">Valor</label>
+                <input id="pay-valor" type="number" step="0.01" placeholder="0,00">
+            </div>
+            <div class="payment-field">
+                <label for="pay-data">Data</label>
+                <input id="pay-data" type="date">
+            </div>
+            <div class="payment-field">
+                <label for="pay-por">Pago por</label>
+                <input id="pay-por" type="text" placeholder="Quem pagou">
+            </div>
+            <div class="payment-field">
+                <label for="pay-sessoes">Quantidade de sessoes</label>
+                <select id="pay-sessoes">
+                    <option value="Por sessao">Por sessao</option>
+                    <option value="5 sessoes">5 sessoes</option>
+                    <option value="10 sessoes">10 sessoes</option>
+                    <option value="20 sessoes">20 sessoes</option>
+                </select>
+            </div>
+            <div class="payment-actions">
+                <button id="pay-add" type="button">Adicionar pagamento</button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Forma</th>
+                        <th>Pagamento</th>
+                        <th>Data</th>
+                        <th>Pago por</th>
+                        <th>Observacoes</th>
+                        <th>Acao</th>
+                    </tr>
+                </thead>
+                <tbody id="payments-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="section contact" id="contato">
+        <div class="contact-card">
+            <div>
+                <h2>Agende seu atendimento</h2>
+                <p>Entre em contato para avaliacao e horarios disponiveis.</p>
+                <div class="contact-info">
+                    <p><strong>Telefone:</strong> (00) 00000-0000</p>
+                    <p><strong>Endereco:</strong> Rua Exemplo, 123 - Centro</p>
+                    <p><strong>Horario:</strong> Seg a Sex, 08h as 18h</p>
+                </div>
+            </div>
+            <div class="contact-actions">
+                <a class="btn primary" href="#">Chamar no WhatsApp</a>
+                <a class="btn ghost" href="#">Enviar email</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="avaliacao">
+        <div class="section-head">
+            <h2>Avaliacao</h2>
+            <p>Ficha rapida para registrar avaliacao sem digitar muito.</p>
+        </div>
+        <div class="eval-card">
+            <div class="eval-field">
+                <label for="eval-nome">Nome do paciente</label>
+                <input id="eval-nome" type="text" placeholder="Nome completo">
+            </div>
+            <div class="eval-field">
+                <label for="eval-idade">Idade</label>
+                <input id="eval-idade" type="number" min="0" placeholder="Idade">
+            </div>
+            <div class="eval-field">
+                <label for="eval-queixa">Queixa principal</label>
+                <input id="eval-queixa" type="text" placeholder="Ex: dor lombar">
+            </div>
+            <div class="eval-field">
+                <label for="eval-dor">Dor agora (0-10)</label>
+                <input id="eval-dor" type="range" min="0" max="10" value="0">
+                <div class="range-value"><span id="eval-dor-value">0</span>/10</div>
+            </div>
+            <div class="eval-field">
+                <label for="eval-local">Local da dor</label>
+                <select id="eval-local">
+                    <option value="Cervical">Cervical</option>
+                    <option value="Ombro">Ombro</option>
+                    <option value="Coluna toracica">Coluna toracica</option>
+                    <option value="Lombar">Lombar</option>
+                    <option value="Quadril">Quadril</option>
+                    <option value="Joelho">Joelho</option>
+                    <option value="Tornozelo">Tornozelo</option>
+                    <option value="Outro">Outro</option>
+                </select>
+            </div>
+            <div class="eval-field eval-wide">
+                <label for="eval-hda">HDA</label>
+                <textarea id="eval-hda" rows="2" placeholder="Historico resumido"></textarea>
+            </div>
+            <div class="eval-field eval-wide">
+                <label for="eval-plano">Plano/Conduta</label>
+                <select id="eval-plano">
+                    <option value="Sessao avulsa">Sessao avulsa</option>
+                    <option value="5 sessoes">5 sessoes</option>
+                    <option value="10 sessoes">10 sessoes</option>
+                    <option value="20 sessoes">20 sessoes</option>
+                </select>
+            </div>
+            <div class="eval-actions">
+                <button id="eval-salvar" type="button">Salvar ficha</button>
+            </div>
+        </div>
+        <div class="eval-list">
+            <h3>Pacientes avaliados</h3>
+            <div id="eval-items"></div>
+            <div class="eval-detail" id="eval-detail"></div>
+        </div>
+    </section>
+    <button class="floating-upload" type="button" id="floating-upload">Subir</button>
+        <script>
+        const cells = document.querySelectorAll(".cell");
+        const paletteButtons = document.querySelectorAll(".color-btn");
+        const patientInput = document.getElementById("patient-input");
+        const patientAdd = document.getElementById("patient-add");
+        const patientsActive = document.getElementById("patients-active");
+        const sessionsMonth = document.getElementById("sessions-month");
+        const printButtons = document.querySelectorAll(".week-print");
+        const printSelected = document.querySelector(".print-selected");
+        const weekSelects = document.querySelectorAll(".week-select");
+        const historySave = document.querySelector(".history-save");
+        const historyLoad = document.querySelector(".history-load");
+        const historyMonth = document.getElementById("history-month");
+        const historyList = document.getElementById("history-list");
+        const historyPreview = document.getElementById("history-preview");
+        const viewMonth = document.getElementById("view-month");
+        const viewMonthBtn = document.getElementById("view-month-btn");
+        const weekTitles = document.querySelectorAll(".week-title");
+        const storageKey = "agenda-historico-v1";
+        const storageIndexKey = "agenda-historico-index";
+        const supabaseClient = window.supabase
+            ? window.supabase.createClient(
+                "https://lhnglzxyeazxlxihobzx.supabase.co",
+                "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9"
+            )
+            : null;
+
+        let activeCell = null;
+        let activeChip = null;
+
+        function clearActiveCell() {
+            cells.forEach((cell) => cell.classList.remove("cell-active"));
+        }
+
+        function setActiveCell(cell) {
+            clearActiveCell();
+            activeCell = cell;
+            if (cell) {
+                cell.classList.add("cell-active");
+            }
+        }
+
+        function clearActiveChip() {
+            if (activeChip) {
+                activeChip.classList.remove("chip-active");
+            }
+            activeChip = null;
+        }
+
+        function setActiveChip(chip) {
+            clearActiveChip();
+            activeChip = chip;
+            if (chip) {
+                chip.classList.add("chip-active");
+            }
+        }
+
+        function updateCounts() {
+            const chips = Array.from(document.querySelectorAll(".patient-chip"));
+            sessionsMonth.textContent = chips.length.toString();
+            const unique = new Set(
+                chips
+                    .map((chip) => chip.textContent.trim().toLowerCase())
+                    .filter(Boolean)
+            );
+            patientsActive.textContent = unique.size.toString();
+        }
+
+        function computeCountsFromData(data) {
+            if (!Array.isArray(data)) return { sessions: 0, patients: 0 };
+            const allNames = [];
+            let sessions = 0;
+            data.forEach((week) => {
+                week.cells.forEach((cell) => {
+                    cell.forEach((p) => {
+                        if (p.name) {
+                            sessions += 1;
+                            allNames.push(p.name.trim().toLowerCase());
+                        }
+                    });
+                });
+            });
+            const unique = new Set(allNames.filter(Boolean));
+            return { sessions, patients: unique.size };
+        }
+
+        function createChip(name) {
+            const wrapper = document.createElement("span");
+            wrapper.className = "patient-chip chip-black";
+
+            const chip = document.createElement("span");
+            chip.className = "chip-text";
+            chip.textContent = name.trim();
+
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "chip-remove";
+            remove.textContent = "x";
+            remove.title = "Apagar paciente";
+
+            chip.addEventListener("click", (event) => {
+                event.stopPropagation();
+                setActiveChip(wrapper);
+            });
+
+            remove.addEventListener("click", (event) => {
+                event.stopPropagation();
+                if (activeChip === wrapper) {
+                    clearActiveChip();
+                }
+                wrapper.remove();
+                updateCounts();
+            });
+
+            wrapper.appendChild(chip);
+            wrapper.appendChild(remove);
+
+            return wrapper;
+        }
+
+        function getChipColor(chip) {
+            if (chip.classList.contains("chip-green")) return "green";
+            if (chip.classList.contains("chip-blue")) return "blue";
+            if (chip.classList.contains("chip-orange")) return "orange";
+            return "black";
+        }
+
+        function applyChipColor(chip, color) {
+            chip.classList.remove("chip-black", "chip-green", "chip-blue", "chip-orange");
+            chip.classList.add(`chip-${color}`);
+        }
+
+        function collectScheduleData() {
+            const months = Array.from(document.querySelectorAll(".month"));
+            return months.map((month, monthIndex) => {
+                const title = weekTitles[monthIndex]?.textContent.trim() || "";
+                const cells = Array.from(month.querySelectorAll(".cell"));
+                const cellData = cells.map((cell) => {
+                    const chips = Array.from(cell.querySelectorAll(".patient-chip")).map((chip) => ({
+                        name: chip.querySelector(".chip-text")?.textContent.trim() || "",
+                        color: getChipColor(chip)
+                    }));
+                    return chips;
+                });
+                return { title, cells: cellData };
+            });
+        }
+
+        function renderScheduleData(data) {
+            if (!Array.isArray(data)) return;
+            const months = Array.from(document.querySelectorAll(".month"));
+            months.forEach((month, monthIndex) => {
+                const monthData = data[monthIndex];
+                if (!monthData) return;
+                if (weekTitles[monthIndex] && monthData.title) {
+                    weekTitles[monthIndex].textContent = monthData.title;
+                }
+                const cells = Array.from(month.querySelectorAll(".cell"));
+                cells.forEach((cell, cellIndex) => {
+                    cell.innerHTML = "";
+                    const chipsData = monthData.cells?.[cellIndex] || [];
+                    chipsData.forEach((chipInfo) => {
+                        if (!chipInfo.name) return;
+                        const chip = createChip(chipInfo.name);
+                        applyChipColor(chip, chipInfo.color || "black");
+                        cell.appendChild(chip);
+                    });
+                });
+            });
+            updateCounts();
+        }
+
+        function getHistoryKey(month) {
+            return `${storageKey}:${month}`;
+        }
+
+        function normalizeMonth() {
+            const value = historyMonth.value;
+            if (value) return value;
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            const formatted = `${now.getFullYear()}-${month}`;
+            historyMonth.value = formatted;
+            return formatted;
+        }
+
+        function updateHistoryIndex(month) {
+            const raw = localStorage.getItem(storageIndexKey);
+            const list = raw ? JSON.parse(raw) : [];
+            if (!list.includes(month)) {
+                list.push(month);
+                localStorage.setItem(storageIndexKey, JSON.stringify(list));
+            }
+        }
+
+        function getDayName(index) {
+            const names = ["Segunda", "Terca", "Quarta", "Quinta", "Sexta", "Sabado"];
+            return names[index] || "";
+        }
+
+        function renderHistoryPreview(data) {
+            historyPreview.innerHTML = "";
+            if (!Array.isArray(data) || !data.length) {
+                historyPreview.textContent = "Nenhum historico para mostrar.";
+                return;
+            }
+
+            const times = ["08:30","09:00","10:00","11:00","14:00","15:00","16:00","17:00","18:00"];
+
+            data.forEach((week, weekIndex) => {
+                const wrapper = document.createElement("div");
+                wrapper.className = "history-week";
+
+                const title = document.createElement("div");
+                title.className = "week-title";
+                title.textContent = week.title || `Semana ${weekIndex + 1}`;
+
+                const schedule = document.createElement("div");
+                schedule.className = "schedule";
+
+                const header = document.createElement("div");
+                header.className = "schedule-header";
+                header.innerHTML = `
+                    <span>Horario</span>
+                    <span>Segunda</span>
+                    <span>Terca</span>
+                    <span>Quarta</span>
+                    <span>Quinta</span>
+                    <span>Sexta</span>
+                    <span>Sabado</span>
+                `;
+                schedule.appendChild(header);
+
+                times.forEach((time, rowIndex) => {
+                    const row = document.createElement("div");
+                    row.className = "schedule-row";
+                    if (time === "14:00") row.classList.add("break");
+                    const label = document.createElement("span");
+                    label.textContent = time;
+                    row.appendChild(label);
+
+                    for (let col = 0; col < 6; col += 1) {
+                        const cell = document.createElement("div");
+                        cell.className = "cell";
+                        const cellIndex = rowIndex * 6 + col;
+                        const chipsData = week.cells?.[cellIndex] || [];
+                        chipsData.forEach((chipInfo) => {
+                            if (!chipInfo.name) return;
+                            const chip = createChip(chipInfo.name);
+                            applyChipColor(chip, chipInfo.color || "black");
+                            cell.appendChild(chip);
+                        });
+                        row.appendChild(cell);
+                    }
+                    schedule.appendChild(row);
+                });
+
+                wrapper.appendChild(title);
+                wrapper.appendChild(schedule);
+                historyPreview.appendChild(wrapper);
+            });
+        }
+
+        function setSummaryFromData(data) {
+            const counts = computeCountsFromData(data);
+            sessionsMonth.textContent = counts.sessions.toString();
+            patientsActive.textContent = counts.patients.toString();
+        }
+
+        function getMonthName(monthValue) {
+            const names = [
+                "Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho",
+                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+            ];
+            const parts = monthValue.split("-");
+            const index = Number(parts[1]) - 1;
+            return names[index] || "";
+        }
+
+        function setWeekTitlesForMonth(monthValue) {
+            const monthName = getMonthName(monthValue).toUpperCase();
+            if (!monthName) return;
+            const ranges = ["01/05", "08/12", "15/19", "22/26"];
+            weekTitles.forEach((title, index) => {
+                const range = ranges[index] || "";
+                title.textContent = `ATENDIMENTO ${monthName} ${range}`.trim();
+            });
+        }
+
+        function clearSchedule() {
+            document.querySelectorAll(".cell").forEach((cell) => {
+                cell.innerHTML = "";
+            });
+            updateCounts();
+        }
+
+        async function renderHistoryList() {
+            let list = [];
+            if (supabaseClient) {
+                const { data } = await supabaseClient
+                    .from("agendas")
+                    .select("month")
+                    .order("month", { ascending: false });
+                list = data ? data.map((row) => row.month) : [];
+            } else {
+                const raw = localStorage.getItem(storageIndexKey);
+                list = raw ? JSON.parse(raw) : [];
+            }
+            historyList.innerHTML = "";
+            if (!list.length) {
+                historyList.textContent = "Nenhum mes salvo ainda.";
+                return;
+            }
+            list.sort().forEach((month) => {
+                const item = document.createElement("div");
+                item.className = "history-item";
+                const label = document.createElement("span");
+                label.textContent = month;
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "history-download";
+                btn.textContent = "Ver";
+                btn.addEventListener("click", async () => {
+                    if (supabaseClient) {
+                        const { data } = await supabaseClient
+                            .from("agendas")
+                            .select("data")
+                            .eq("month", month)
+                            .maybeSingle();
+                        if (!data || !data.data) return;
+                        renderHistoryPreview(data.data);
+                        setSummaryFromData(data.data);
+                        return;
+                    }
+                    const rawData = localStorage.getItem(getHistoryKey(month));
+                    if (!rawData) return;
+                    try {
+                        const data = JSON.parse(rawData);
+                        renderHistoryPreview(data);
+                        setSummaryFromData(data);
+                    } catch (err) {
+                        console.error("Falha ao abrir historico", err);
+                    }
+                });
+                item.appendChild(label);
+                item.appendChild(btn);
+                historyList.appendChild(item);
+            });
+        }
+
+        cells.forEach((cell) => {
+            cell.addEventListener("click", () => {
+                setActiveCell(cell);
+            });
+        });
+
+        patientAdd.addEventListener("click", () => {
+            const name = patientInput.value.trim();
+            if (!name || !activeCell) return;
+            const chip = createChip(name);
+            activeCell.appendChild(chip);
+            patientInput.value = "";
+            setActiveChip(chip);
+            updateCounts();
+        });
+
+        patientInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                patientAdd.click();
+            }
+        });
+
+        paletteButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                paletteButtons.forEach((btn) => btn.classList.remove("active"));
+                button.classList.add("active");
+
+                if (!activeChip) return;
+
+                const clear = button.dataset.clear === "true";
+                if (clear) {
+                    activeChip.classList.remove("chip-green", "chip-blue", "chip-orange");
+                    activeChip.classList.add("chip-black");
+                    return;
+                }
+
+                const color = button.dataset.color;
+                activeChip.classList.remove("chip-black", "chip-green", "chip-blue", "chip-orange");
+                activeChip.classList.add(`chip-${color}`);
+            });
+        });
+
+        updateCounts();
+
+        printButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const month = button.closest(".month");
+                if (!month) return;
+                document.body.classList.add("print-mode");
+                month.classList.add("print-target");
+                window.print();
+                setTimeout(() => {
+                    month.classList.remove("print-target");
+                    document.body.classList.remove("print-mode");
+                }, 300);
+            });
+        });
+
+        function printSelectedWeeks() {
+            const targets = Array.from(document.querySelectorAll(".month"));
+            if (!targets.length) return;
+            const printWindow = window.open("", "_blank", "width=900,height=700");
+            if (!printWindow) return;
+
+            const styleTag = document.querySelector("link[rel='stylesheet']");
+            const cssHref = styleTag ? styleTag.getAttribute("href") : "styles.css";
+
+            const content = targets.map((month) => month.outerHTML).join("");
+            const html = `<!doctype html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>Imprimir semanas</title>
+                    <link rel="stylesheet" href="${cssHref}">
+                </head>
+                <body class="print-window">
+                    ${content}
+                    <script>
+                        window.onload = () => {
+                            window.print();
+                        };
+                    <\/script>
+                </body>
+                </html>`;
+
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
+
+        printSelected.addEventListener("click", printSelectedWeeks);
+
+        window.addEventListener("afterprint", () => {
+            document.querySelectorAll(".month.print-target").forEach((month) => {
+                month.classList.remove("print-target");
+            });
+            document.body.classList.remove("print-mode");
+        });
+
+        historySave.addEventListener("click", async () => {
+            const month = normalizeMonth();
+            const payload = collectScheduleData();
+            if (supabaseClient) {
+                await supabaseClient
+                    .from("agendas")
+                    .upsert({ month, data: payload }, { onConflict: "month" });
+            } else {
+                localStorage.setItem(getHistoryKey(month), JSON.stringify(payload));
+                updateHistoryIndex(month);
+            }
+            renderHistoryList();
+        });
+
+        historyLoad.addEventListener("click", async () => {
+            const month = normalizeMonth();
+            if (supabaseClient) {
+                const { data } = await supabaseClient
+                    .from("agendas")
+                    .select("data")
+                    .eq("month", month)
+                    .maybeSingle();
+                if (!data || !data.data) return;
+                renderHistoryPreview(data.data);
+                setSummaryFromData(data.data);
+                return;
+            }
+            const raw = localStorage.getItem(getHistoryKey(month));
+            if (!raw) return;
+            try {
+                const data = JSON.parse(raw);
+                renderHistoryPreview(data);
+                setSummaryFromData(data);
+            } catch (err) {
+                console.error("Falha ao carregar historico", err);
+            }
+        });
+
+        normalizeMonth();
+        renderHistoryList();
+
+        function normalizeViewMonth() {
+            const value = viewMonth.value;
+            if (value) return value;
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            const formatted = `${now.getFullYear()}-${month}`;
+            viewMonth.value = formatted;
+            return formatted;
+        }
+
+        viewMonthBtn.addEventListener("click", async () => {
+            const month = normalizeViewMonth();
+            setWeekTitlesForMonth(month);
+            if (supabaseClient) {
+                const { data } = await supabaseClient
+                    .from("agendas")
+                    .select("data")
+                    .eq("month", month)
+                    .maybeSingle();
+                if (!data || !data.data) {
+                    clearSchedule();
+                    historyPreview.textContent = "Nenhum historico salvo para este mes.";
+                    setSummaryFromData([]);
+                    return;
+                }
+                renderScheduleData(data.data);
+                setSummaryFromData(data.data);
+                return;
+            }
+            const raw = localStorage.getItem(getHistoryKey(month));
+            if (!raw) {
+                clearSchedule();
+                historyPreview.textContent = "Nenhum historico salvo para este mes.";
+                setSummaryFromData([]);
+                return;
+            }
+            try {
+                const data = JSON.parse(raw);
+                renderScheduleData(data);
+                setSummaryFromData(data);
+            } catch (err) {
+                console.error("Falha ao abrir historico", err);
+            }
+        });
+
+        normalizeViewMonth();
+
+        const paymentsBody = document.getElementById("payments-body");
+        const payPaciente = document.getElementById("pay-paciente");
+        const payForma = document.getElementById("pay-forma");
+        const payValor = document.getElementById("pay-valor");
+        const payData = document.getElementById("pay-data");
+        const payPor = document.getElementById("pay-por");
+        const paySessoes = document.getElementById("pay-sessoes");
+        const payAdd = document.getElementById("pay-add");
+        const receiptsTotal = document.getElementById("receipts-total");
+
+        function formatCurrency(value) {
+            if (!value) return "R$ 0,00";
+            return Number(value).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            });
+        }
+
+        function formatDate(value) {
+            if (!value) return "";
+            const parts = value.split("-");
+            if (parts.length !== 3) return value;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        function updateReceiptsTotal() {
+            const rows = Array.from(paymentsBody.querySelectorAll("tr"));
+            const sum = rows.reduce((total, row) => {
+                const raw = row.dataset.value;
+                const value = raw ? Number(raw) : 0;
+                return total + (Number.isFinite(value) ? value : 0);
+            }, 0);
+            receiptsTotal.textContent = formatCurrency(sum);
+        }
+
+        payAdd.addEventListener("click", async () => {
+            const paciente = payPaciente.value.trim();
+            const forma = payForma.value;
+            const valor = payValor.value;
+            const data = payData.value;
+            const pagoPor = payPor.value.trim();
+            const sessoes = paySessoes.value;
+
+            if (!paciente || !valor || !data) return;
+
+            if (supabaseClient) {
+                const { data: inserted } = await supabaseClient
+                    .from("pagamentos")
+                    .insert({
+                        paciente,
+                        forma,
+                        valor: Number(valor),
+                        data,
+                        pago_por: pagoPor || null,
+                        sessoes
+                    })
+                    .select()
+                    .single();
+                if (inserted) {
+                    appendPaymentRow(inserted);
+                }
+            } else {
+                appendPaymentRow({
+                    paciente,
+                    forma,
+                    valor: Number(valor),
+                    data,
+                    pago_por: pagoPor || null,
+                    sessoes
+                });
+            }
+
+            payPaciente.value = "";
+            payValor.value = "";
+            payData.value = "";
+            payPor.value = "";
+            payForma.selectedIndex = 0;
+            paySessoes.selectedIndex = 0;
+        });
+
+        paymentsBody.addEventListener("click", async (event) => {
+            const button = event.target.closest(".payment-remove");
+            if (!button) return;
+            const row = button.closest("tr");
+            if (row && supabaseClient && row.dataset.id) {
+                await supabaseClient.from("pagamentos").delete().eq("id", row.dataset.id);
+            }
+            if (row) row.remove();
+            updateReceiptsTotal();
+        });
+
+        function appendPaymentRow(item) {
+            const row = document.createElement("tr");
+            if (item.id) row.dataset.id = item.id;
+            row.dataset.value = String(Number(item.valor || 0));
+            row.innerHTML = `
+                <td>${item.paciente}</td>
+                <td>${item.forma}</td>
+                <td>${formatCurrency(item.valor)}</td>
+                <td>${formatDate(item.data)}</td>
+                <td>${item.pago_por || "-"}</td>
+                <td>${item.sessoes}</td>
+                <td><button type="button" class="payment-remove">Remover</button></td>
+            `;
+            paymentsBody.appendChild(row);
+            updateReceiptsTotal();
+        }
+
+        async function loadPayments() {
+            if (supabaseClient) {
+                const { data } = await supabaseClient
+                    .from("pagamentos")
+                    .select("*")
+                    .order("data", { ascending: false });
+                paymentsBody.innerHTML = "";
+                (data || []).forEach(appendPaymentRow);
+                return;
+            }
+            updateReceiptsTotal();
+        }
+
+        loadPayments();
+
+        const floatingUpload = document.getElementById("floating-upload");
+        floatingUpload.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        const evalNome = document.getElementById("eval-nome");
+        const evalIdade = document.getElementById("eval-idade");
+        const evalQueixa = document.getElementById("eval-queixa");
+        const evalDor = document.getElementById("eval-dor");
+        const evalDorValue = document.getElementById("eval-dor-value");
+        const evalLocal = document.getElementById("eval-local");
+        const evalHda = document.getElementById("eval-hda");
+        const evalPlano = document.getElementById("eval-plano");
+        const evalSalvar = document.getElementById("eval-salvar");
+        const evalItems = document.getElementById("eval-items");
+        const evalDetail = document.getElementById("eval-detail");
+        const evalKey = "avaliacoes-v1";
+        let evalEditingIndex = null;
+        let evalCache = [];
+
+        async function loadEvaluations() {
+            if (supabaseClient) {
+                const { data } = await supabaseClient
+                    .from("avaliacoes")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+                evalCache = data || [];
+                return;
+            }
+            const raw = localStorage.getItem(evalKey);
+            evalCache = raw ? JSON.parse(raw) : [];
+        }
+
+        function saveEvaluationsLocal(list) {
+            localStorage.setItem(evalKey, JSON.stringify(list));
+        }
+
+        function renderEvalList() {
+            evalItems.innerHTML = "";
+            const list = evalCache;
+            if (!list.length) {
+                evalItems.textContent = "Nenhuma ficha salva ainda.";
+                evalDetail.innerHTML = "";
+                return;
+            }
+            list.forEach((item, index) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "eval-item";
+                button.textContent = item.nome || `Paciente ${index + 1}`;
+                button.addEventListener("click", () => {
+                    evalEditingIndex = null;
+                    renderEvalDetail(item, index);
+                });
+                evalItems.appendChild(button);
+            });
+        }
+
+        function renderEvalDetail(item, index) {
+            evalDetail.innerHTML = `
+                <h4>${item.nome || "Paciente"}</h4>
+                <p><strong>Idade:</strong> ${item.idade || "-"}</p>
+                <p><strong>Queixa:</strong> ${item.queixa || "-"}</p>
+                <p><strong>Dor:</strong> ${item.dor}/10</p>
+                <p><strong>Local:</strong> ${item.local || "-"}</p>
+                <p><strong>HDA:</strong> ${item.hda || "-"}</p>
+                <p><strong>Plano:</strong> ${item.plano || "-"}</p>
+                <div class="eval-detail-actions">
+                    <button type="button" class="eval-edit">Editar</button>
+                    <button type="button" class="eval-delete">Apagar</button>
+                </div>
+            `;
+            const editBtn = evalDetail.querySelector(".eval-edit");
+            const deleteBtn = evalDetail.querySelector(".eval-delete");
+            editBtn.addEventListener("click", () => {
+                evalEditingIndex = index;
+                evalNome.value = item.nome || "";
+                evalIdade.value = item.idade || "";
+                evalQueixa.value = item.queixa || "";
+                evalDor.value = item.dor || "0";
+                evalDorValue.textContent = evalDor.value;
+                evalLocal.value = item.local || "Cervical";
+                evalHda.value = item.hda || "";
+                evalPlano.value = item.plano || "Sessao avulsa";
+                window.scrollTo({ top: evalNome.getBoundingClientRect().top + window.scrollY - 120, behavior: "smooth" });
+            });
+            deleteBtn.addEventListener("click", async () => {
+                if (supabaseClient) {
+                    const id = evalCache[index]?.id;
+                    if (id) {
+                        await supabaseClient.from("avaliacoes").delete().eq("id", id);
+                    }
+                    await loadEvaluations();
+                    evalDetail.innerHTML = "";
+                    renderEvalList();
+                    return;
+                }
+                const list = evalCache.slice();
+                list.splice(index, 1);
+                evalCache = list;
+                saveEvaluationsLocal(list);
+                evalDetail.innerHTML = "";
+                renderEvalList();
+            });
+        }
+
+        evalDor.addEventListener("input", () => {
+            evalDorValue.textContent = evalDor.value;
+        });
+
+        evalSalvar.addEventListener("click", async () => {
+            const nome = evalNome.value.trim();
+            if (!nome) return;
+            const item = {
+                nome,
+                idade: evalIdade.value.trim(),
+                queixa: evalQueixa.value.trim(),
+                dor: evalDor.value,
+                local: evalLocal.value,
+                hda: evalHda.value.trim(),
+                plano: evalPlano.value
+            };
+            if (supabaseClient) {
+                if (evalEditingIndex !== null && evalCache[evalEditingIndex]) {
+                    const id = evalCache[evalEditingIndex].id;
+                    if (id) {
+                        await supabaseClient.from("avaliacoes").update(item).eq("id", id);
+                    }
+                } else {
+                    await supabaseClient.from("avaliacoes").insert(item);
+                }
+                await loadEvaluations();
+                renderEvalList();
+                renderEvalDetail(evalCache[0], 0);
+            } else {
+                const list = evalCache.slice();
+                if (evalEditingIndex !== null && list[evalEditingIndex]) {
+                    list[evalEditingIndex] = item;
+                } else {
+                    list.unshift(item);
+                }
+                evalCache = list;
+                saveEvaluationsLocal(list);
+                renderEvalList();
+                renderEvalDetail(item, evalEditingIndex !== null ? evalEditingIndex : 0);
+            }
+            evalEditingIndex = null;
+            evalNome.value = "";
+            evalIdade.value = "";
+            evalQueixa.value = "";
+            evalDor.value = "0";
+            evalDorValue.textContent = "0";
+            evalLocal.selectedIndex = 0;
+            evalHda.value = "";
+            evalPlano.selectedIndex = 0;
+        });
+
+        loadEvaluations().then(renderEvalList);
+        </script>
+</body>
+</html>
