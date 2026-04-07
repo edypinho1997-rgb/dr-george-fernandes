@@ -593,7 +593,10 @@
     <section class="section" id="pagamentos">
         <div class="section-head">
             <h2>Pagamentos e lancamentos</h2>
-            <p>Controle simples das entradas por paciente.</p>
+            <p>Controle simples das entradas por paciente no mes selecionado da agenda.</p>
+        </div>
+        <div class="payment-toolbar">
+            <button id="print-payments" type="button" class="print-payments">Imprimir pagamentos do mes</button>
         </div>
         <div class="payment-form">
             <div class="payment-field">
@@ -740,6 +743,24 @@
     </section>
     <button class="floating-upload" type="button" id="floating-upload">Subir</button>
         <script>
+        const agendaSection = document.getElementById("agenda");
+        const initialWeeks = agendaSection ? Array.from(agendaSection.querySelectorAll(".month")) : [];
+        const agendaWeekLimit = 6;
+        if (agendaSection && initialWeeks.length) {
+            const templateWeek = initialWeeks[initialWeeks.length - 1];
+            for (let i = initialWeeks.length; i < agendaWeekLimit; i += 1) {
+                const clone = templateWeek.cloneNode(true);
+                clone.querySelectorAll(".cell").forEach((cell) => {
+                    cell.innerHTML = "";
+                });
+                const cloneTitle = clone.querySelector(".week-title");
+                if (cloneTitle) {
+                    cloneTitle.textContent = `ATENDIMENTO EXTRA ${i + 1}`;
+                }
+                agendaSection.appendChild(clone);
+            }
+        }
+
         const cells = document.querySelectorAll(".cell");
         const paletteButtons = document.querySelectorAll(".color-btn");
         const patientControls = document.querySelectorAll(".add-patient");
@@ -955,8 +976,23 @@
             chip.classList.add(`chip-${color}`);
         }
 
+        function getVisibleMonths() {
+            return Array.from(document.querySelectorAll(".month")).filter((month) => !month.hidden);
+        }
+
+        function setVisibleWeekCount(count) {
+            Array.from(document.querySelectorAll(".month")).forEach((month, index) => {
+                month.hidden = index >= count;
+                if (index >= count) {
+                    month.querySelectorAll(".cell").forEach((cell) => {
+                        cell.innerHTML = "";
+                    });
+                }
+            });
+        }
+
         function collectScheduleData() {
-            const months = Array.from(document.querySelectorAll(".month"));
+            const months = getVisibleMonths();
             return months.map((month, monthIndex) => {
                 const title = weekTitles[monthIndex]?.textContent.trim() || "";
                 const cells = Array.from(month.querySelectorAll(".cell"));
@@ -974,17 +1010,13 @@
         function renderScheduleData(data) {
             if (!Array.isArray(data)) return;
             isApplyingScheduleData = true;
-            const months = Array.from(document.querySelectorAll(".month"));
+            const months = getVisibleMonths();
             months.forEach((month, monthIndex) => {
                 const monthData = data[monthIndex];
-                if (!monthData) return;
-                if (weekTitles[monthIndex] && monthData.title) {
-                    weekTitles[monthIndex].textContent = monthData.title;
-                }
                 const cells = Array.from(month.querySelectorAll(".cell"));
                 cells.forEach((cell, cellIndex) => {
                     cell.innerHTML = "";
-                    const chipsData = monthData.cells?.[cellIndex] || [];
+                    const chipsData = monthData?.cells?.[cellIndex] || [];
                     chipsData.forEach((chipInfo) => {
                         if (!chipInfo.name) return;
                         const chip = createChip(chipInfo.name);
@@ -1105,6 +1137,49 @@
             return names[index] || "";
         }
 
+        function getCalendarWeekRanges(monthValue) {
+            const [yearText, monthText] = monthValue.split("-");
+            const year = Number(yearText);
+            const monthIndex = Number(monthText) - 1;
+            if (!year || monthIndex < 0) return [];
+
+            const firstDay = new Date(year, monthIndex, 1);
+            const lastDay = new Date(year, monthIndex + 1, 0);
+            const ranges = [];
+
+            const firstWeekStart = new Date(firstDay);
+            while (firstWeekStart.getDay() !== 1) {
+                firstWeekStart.setDate(firstWeekStart.getDate() - 1);
+            }
+
+            const cursor = new Date(firstWeekStart);
+            while (cursor <= lastDay) {
+                const start = new Date(cursor);
+                const end = new Date(cursor);
+                end.setDate(end.getDate() + 5);
+
+                let daysInTargetMonth = 0;
+                for (let i = 0; i < 6; i += 1) {
+                    const day = new Date(start);
+                    day.setDate(start.getDate() + i);
+                    if (day.getMonth() === monthIndex) {
+                        daysInTargetMonth += 1;
+                    }
+                }
+
+                if (daysInTargetMonth >= 3) {
+                    ranges.push({
+                        start: start.getDate(),
+                        end: end.getDate()
+                    });
+                }
+
+                cursor.setDate(cursor.getDate() + 7);
+            }
+
+            return ranges;
+        }
+
         function updateSummaryMonth(monthValue) {
             const monthName = getMonthName(monthValue) || "este mes";
             summaryMonthLabel.textContent = monthName;
@@ -1116,17 +1191,24 @@
         function setWeekTitlesForMonth(monthValue) {
             const monthName = getMonthName(monthValue).toUpperCase();
             if (!monthName) return;
-            const ranges = ["01/05", "08/12", "15/19", "22/26"];
+            const ranges = getCalendarWeekRanges(monthValue);
+            setVisibleWeekCount(ranges.length);
             weekTitles.forEach((title, index) => {
-                const range = ranges[index] || "";
-                title.textContent = `ATENDIMENTO ${monthName} ${range}`.trim();
+                const range = ranges[index];
+                if (!range) {
+                    title.textContent = "";
+                    return;
+                }
+                title.textContent = `ATENDIMENTO ${monthName} ${String(range.start).padStart(2, "0")}/${String(range.end).padStart(2, "0")}`.trim();
             });
         }
 
         function clearSchedule() {
             isApplyingScheduleData = true;
-            document.querySelectorAll(".cell").forEach((cell) => {
-                cell.innerHTML = "";
+            getVisibleMonths().forEach((month) => {
+                month.querySelectorAll(".cell").forEach((cell) => {
+                    cell.innerHTML = "";
+                });
             });
             isApplyingScheduleData = false;
             updateCounts();
@@ -1335,6 +1417,8 @@
             viewMonth.value = month;
             historyMonth.value = month;
             updateSummaryMonth(month);
+            syncPaymentDateWithSelectedMonth();
+            updatePaymentsVisibility();
             setWeekTitlesForMonth(month);
             if (supabaseClient) {
                 const { data } = await supabaseClient
@@ -1382,6 +1466,7 @@
         const payPor = document.getElementById("pay-por");
         const paySessoes = document.getElementById("pay-sessoes");
         const payAdd = document.getElementById("pay-add");
+        const printPayments = document.getElementById("print-payments");
         receiptsTotal = document.getElementById("receipts-total");
 
         function formatCurrency(value) {
@@ -1413,6 +1498,28 @@
                 return total + (Number.isFinite(value) ? value : 0);
             }, 0);
             receiptsTotal.textContent = formatCurrency(sum);
+        }
+
+        function updatePaymentsVisibility() {
+            if (!paymentsBody) return;
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            Array.from(paymentsBody.querySelectorAll("tr")).forEach((row) => {
+                const rowDate = row.dataset.date || "";
+                const visible = !selectedMonth || !rowDate || rowDate.startsWith(selectedMonth);
+                row.hidden = !visible;
+            });
+            updateReceiptsTotal();
+        }
+
+        function syncPaymentDateWithSelectedMonth() {
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            if (!selectedMonth) return;
+            const paymentDateInput = document.getElementById("pay-data");
+            if (!paymentDateInput) return;
+            const currentValue = paymentDateInput.value;
+            if (!currentValue || !currentValue.startsWith(selectedMonth)) {
+                paymentDateInput.value = `${selectedMonth}-01`;
+            }
         }
 
         payAdd.addEventListener("click", async () => {
@@ -1486,7 +1593,7 @@
                 <td><button type="button" class="payment-remove">Remover</button></td>
             `;
             paymentsBody.appendChild(row);
-            updateReceiptsTotal();
+            updatePaymentsVisibility();
         }
 
         async function loadPayments() {
@@ -1497,12 +1604,67 @@
                     .order("data", { ascending: false });
                 paymentsBody.innerHTML = "";
                 (data || []).forEach(appendPaymentRow);
+                updatePaymentsVisibility();
                 return;
             }
-            updateReceiptsTotal();
+            updatePaymentsVisibility();
         }
 
         loadPayments();
+
+        function printPaymentsMonth() {
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            const monthName = getMonthName(selectedMonth) || selectedMonth;
+            const visibleRows = Array.from(paymentsBody.querySelectorAll("tr")).filter((row) => !row.hidden);
+            if (!visibleRows.length) return;
+
+            const styleTag = document.querySelector("link[rel='stylesheet']");
+            const cssHref = styleTag ? styleTag.getAttribute("href") : "styles.css";
+            const tableRows = visibleRows.map((row) => row.outerHTML).join("");
+            const html = `<!doctype html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>Pagamentos ${monthName}</title>
+                    <link rel="stylesheet" href="${cssHref}">
+                </head>
+                <body class="print-window payments-print-window">
+                    <section class="section">
+                        <div class="section-head">
+                            <h2>Pagamentos de ${monthName}</h2>
+                            <p>Lancamentos do mes selecionado na agenda.</p>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="payments-print-table">
+                                <thead>
+                                    <tr>
+                                        <th>Paciente</th>
+                                        <th>Forma</th>
+                                        <th>Pagamento</th>
+                                        <th>Data</th>
+                                        <th>Pago por</th>
+                                        <th>Observacoes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${tableRows.replace(/<td><button type="button" class="payment-remove">Remover<\/button><\/td>/g, "")}</tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <script>
+                        window.onload = () => window.print();
+                    <\/script>
+                </body>
+                </html>`;
+
+            const printWindow = window.open("", "_blank", "width=1000,height=700");
+            if (!printWindow) return;
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
+
+        printPayments.addEventListener("click", printPaymentsMonth);
 
         const floatingUpload = document.getElementById("floating-upload");
         floatingUpload.addEventListener("click", () => {

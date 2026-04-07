@@ -537,7 +537,7 @@ a {
     background: #f2f2f2;
     border-radius: 6px;
     padding: 2px 4px;
-    border: 2px solid #111111;
+    border: 1px dashed #111111;
     font-size: 0.72rem;
     color: #222;
     line-height: 1;
@@ -844,6 +844,22 @@ a {
     display: grid;
     gap: 14px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.payment-toolbar {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.print-payments {
+    border: none;
+    background: #222;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
 }
 
 .payment-field {
@@ -1316,5 +1332,62 @@ th {
 
     body.print-window .month {
         page-break-inside: avoid;
+    }
+
+    body.print-window .patient-chip,
+    body.print-mode .patient-chip {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: #fff !important;
+        text-shadow: none;
+        box-shadow: none;
+        border-width: 1px;
+        border-style: solid;
+    }
+
+    body.print-window .patient-chip.chip-black,
+    body.print-mode .patient-chip.chip-black {
+        background: #000 !important;
+        border-color: #000 !important;
+    }
+
+    body.print-window .patient-chip.chip-green,
+    body.print-mode .patient-chip.chip-green {
+        background: #006d1d !important;
+        border-color: #004f15 !important;
+    }
+
+    body.print-window .patient-chip.chip-blue,
+    body.print-mode .patient-chip.chip-blue {
+        background: #004ab8 !important;
+        border-color: #00368a !important;
+    }
+
+    body.print-window .patient-chip.chip-orange,
+    body.print-mode .patient-chip.chip-orange {
+        background: #b85a00 !important;
+        border-color: #8a4300 !important;
+    }
+
+    body.print-window .chip-remove,
+    body.print-mode .chip-remove {
+        background: rgba(255, 255, 255, 0.18) !important;
+        border-color: rgba(255, 255, 255, 0.55) !important;
+        color: #fff !important;
+    }
+
+    body.payments-print-window .payment-remove,
+    body.payments-print-window .print-payments {
+        display: none !important;
+    }
+
+    body.payments-print-window .table-wrap {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    body.payments-print-window th,
+    body.payments-print-window td {
+        color: #111;
     }
 }
