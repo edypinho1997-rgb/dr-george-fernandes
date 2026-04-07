@@ -133,6 +133,17 @@ a {
     margin: 22px 0;
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
+}
+
+.accent-btn {
+    background: #87d3e6;
+    color: #fff;
+    border-color: transparent;
+}
+
+.accent-btn:hover {
+    background: #74c4d9;
 }
 
 .hero-badges {
@@ -170,6 +181,56 @@ a {
 
 .hero-stats strong {
     font-size: 1.4rem;
+}
+
+.hero-summary-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: start;
+}
+
+.hero-week-list {
+    display: grid;
+    gap: 6px;
+}
+
+.hero-week-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.hero-week-row strong {
+    font-size: 1.1rem;
+}
+
+.hero-week-row small,
+.hero-total-block small,
+.hero-receipts small {
+    color: var(--muted);
+}
+
+.hero-total-block {
+    display: grid;
+    gap: 4px;
+    text-align: right;
+    justify-items: end;
+}
+
+.hero-total-block strong {
+    font-size: 1.9rem;
+}
+
+.hero-receipts {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hero-receipts strong {
+    font-size: 1.3rem;
 }
 
 .section {
@@ -230,12 +291,12 @@ a {
 }
 
 .schedule {
-    margin-top: 24px;
+    margin-top: 10px;
     display: grid;
-    gap: 12px;
+    gap: 0;
     background: var(--card);
-    padding: 18px;
-    border-radius: var(--radius);
+    padding: 4px 6px;
+    border-radius: 12px;
     box-shadow: var(--shadow);
     overflow-x: auto;
 }
@@ -243,8 +304,8 @@ a {
 .schedule-tools {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-top: 18px;
+    gap: 10px;
+    margin-top: 16px;
     flex-wrap: wrap;
 }
 
@@ -253,7 +314,7 @@ a {
     gap: 8px;
     align-items: center;
     background: #fff;
-    padding: 6px 8px;
+    padding: 5px 7px;
     border-radius: 12px;
     border: 1px solid #eadfda;
     box-shadow: var(--shadow);
@@ -263,14 +324,14 @@ a {
     border: none;
     outline: none;
     font-size: 0.85rem;
-    min-width: 180px;
+    min-width: 170px;
 }
 
 .add-patient button {
     border: none;
     background: #222;
     color: #fff;
-    padding: 6px 12px;
+    padding: 6px 11px;
     border-radius: 10px;
     font-size: 0.8rem;
     cursor: pointer;
@@ -281,7 +342,7 @@ a {
     gap: 8px;
     align-items: center;
     background: #fff;
-    padding: 6px 8px;
+    padding: 5px 7px;
     border-radius: 12px;
     border: 1px solid #eadfda;
     box-shadow: var(--shadow);
@@ -313,6 +374,12 @@ a {
     font-size: 0.8rem;
     cursor: pointer;
     border: 1px solid #eadfda;
+}
+
+.history-save.schedule-save {
+    background: #1c4e9a;
+    color: #fff;
+    border-color: transparent;
 }
 
 .history-save,
@@ -446,33 +513,34 @@ a {
 .schedule-header,
 .schedule-row {
     display: grid;
-    grid-template-columns: 72px repeat(6, minmax(90px, 1fr));
-    gap: 6px;
+    grid-template-columns: 64px repeat(6, minmax(88px, 1fr));
+    gap: 1px;
     align-items: center;
 }
 
 .schedule-row {
-    background: #f5fbf8;
-    padding: 10px 0;
+    background: transparent;
+    padding: 0;
 }
 
 .schedule-row.break {
-    background: #eef7ff;
+    background: transparent;
 }
 
 .schedule-header {
     font-weight: 700;
+    margin-bottom: 0;
 }
 
 .cell {
-    min-height: 30px;
+    min-height: 12px;
     background: #ffffff;
-    border-radius: 10px;
-    padding: 6px;
+    border-radius: 6px;
+    padding: 2px 4px;
     border: 1px dashed #e6e1dd;
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     color: #222;
-    line-height: 1.4;
+    line-height: 1;
 }
 
 .cell-active {
@@ -482,16 +550,19 @@ a {
 
 .patient-chip {
     display: inline-block;
-    padding: 4px 8px;
-    border-radius: 8px;
-    margin: 2px 4px 2px 0;
-    font-size: 0.8rem;
-    background: #f3f1ef;
-    color: #222;
+    padding: 4px 9px;
+    border-radius: 999px;
+    margin: 1px 2px 1px 0;
+    font-size: 0.98rem;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+    color: #111827;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
 }
 
 .patient-chip.chip-active {
@@ -499,46 +570,59 @@ a {
 }
 
 .patient-chip.chip-black {
-    background: #f3f1ef;
-    color: #222;
+    background: #000000;
+    border: 1px solid #000000;
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
 .patient-chip.chip-green {
-    background: #e6f6f0;
-    color: #1b6b4b;
+    background: #007018;
+    border: 1px solid #004d0f;
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(0, 77, 15, 0.18);
 }
 
 .patient-chip.chip-blue {
-    background: #e8f0ff;
-    color: #1c4e9a;
+    background: #0047b8;
+    border: 1px solid #003286;
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(0, 50, 134, 0.18);
 }
 
 .patient-chip.chip-orange {
-    background: #fff1e2;
-    color: #9a4d1c;
+    background: #c45700;
+    border: 1px solid #8c3e00;
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 0 1px rgba(140, 62, 0, 0.18);
 }
 
 .chip-text {
     display: inline-block;
+    padding: 0;
+    border-radius: 0;
+    font-weight: 900;
 }
 
 .chip-remove {
     border: none;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.16);
     color: inherit;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 999px;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 900;
     line-height: 1;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.42);
 }
 
 .chip-remove:hover {
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.28);
 }
 
 .cell[contenteditable="true"]:focus {
@@ -631,23 +715,61 @@ a {
 }
 
 .month {
-    margin-top: 18px;
+    margin-top: 14px;
 }
 
 .week-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 .week-check {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--muted);
+}
+
+.week-inline-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #c7def8;
+    padding: 6px 8px;
+    border-radius: 14px;
+}
+
+.add-patient-inline,
+.color-palette-inline {
+    box-shadow: none;
+}
+
+.add-patient-inline {
+    border-color: rgba(255, 255, 255, 0.75);
+}
+
+.add-patient-inline input {
+    min-width: 150px;
+    font-size: 0.8rem;
+}
+
+.add-patient-inline button {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+}
+
+.color-palette-inline {
+    gap: 6px;
+}
+
+.color-palette-inline .color-btn {
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    border-radius: 999px;
 }
 
 .week-title {
@@ -655,8 +777,8 @@ a {
     color: #0f1b2d;
     font-weight: 700;
     text-align: center;
-    padding: 12px;
-    border-radius: 16px;
+    padding: 8px 12px;
+    border-radius: 14px;
     flex: 1;
     min-width: 220px;
 }
@@ -665,9 +787,9 @@ a {
     border: none;
     background: #222;
     color: #fff;
-    padding: 10px 14px;
+    padding: 7px 11px;
     border-radius: 12px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     cursor: pointer;
 }
 
@@ -866,6 +988,25 @@ th {
     grid-column: span 3;
 }
 
+.eval-evolution-list {
+    display: grid;
+    gap: 10px;
+}
+
+.eval-evolution-entry {
+    display: grid;
+    gap: 8px;
+}
+
+.eval-evolution-text {
+    border: 1px solid #d5e1f3;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    min-height: 84px;
+    resize: vertical;
+}
+
 .range-value {
     font-size: 0.85rem;
     color: var(--muted);
@@ -873,15 +1014,36 @@ th {
 
 .eval-actions {
     grid-column: span 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .eval-actions button {
     border: none;
-    background: #1b5fbe;
     color: #fff;
     padding: 10px 14px;
     border-radius: 12px;
     font-size: 0.9rem;
+    cursor: pointer;
+}
+
+#eval-salvar {
+    background: #1b5fbe;
+}
+
+.eval-add-evolution {
+    background: #25a244;
+}
+
+.eval-remove-evolution {
+    justify-self: start;
+    border: none;
+    background: #eef4ff;
+    color: #1b5fbe;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
     cursor: pointer;
 }
 
@@ -922,6 +1084,19 @@ th {
     border: 1px solid #d7e6f7;
     border-radius: 12px;
     padding: 12px;
+}
+
+.eval-detail-block {
+    margin-top: 8px;
+}
+
+.eval-detail-list {
+    margin: 8px 0 0;
+    padding-left: 20px;
+}
+
+.eval-detail-list li + li {
+    margin-top: 6px;
 }
 
 .eval-detail-actions {
@@ -973,6 +1148,135 @@ th {
     .hero-actions {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    body {
+        font-size: 15px;
+    }
+
+    .hero {
+        padding: 20px 5vw 40px;
+    }
+
+    .hero-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-card {
+        order: 2;
+        padding: 20px;
+    }
+
+    .hero-text {
+        order: 1;
+    }
+
+    .hero-actions .btn {
+        width: 100%;
+    }
+
+    .hero-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-total-block {
+        text-align: left;
+        justify-items: start;
+    }
+
+    .hero-badges span {
+        font-size: 0.8rem;
+    }
+
+    .section {
+        padding: 48px 5vw;
+    }
+
+    .service-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .schedule-tools {
+        gap: 8px;
+    }
+
+    .add-patient,
+    .month-picker {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .add-patient input,
+    .month-picker input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .print-selected {
+        width: 100%;
+    }
+
+    .color-palette {
+        width: 100%;
+    }
+
+    .legend {
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+
+    .week-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .week-title {
+        min-width: 0;
+    }
+
+    .week-print {
+        width: 100%;
+    }
+
+    .schedule {
+        padding: 12px;
+        overflow-x: auto;
+    }
+
+    .schedule-header,
+    .schedule-row {
+        grid-template-columns: 56px repeat(6, minmax(90px, 1fr));
+    }
+
+    .schedule-row span {
+        font-size: 0.85rem;
+    }
+
+    .cell {
+        min-height: 34px;
+    }
+
+    .payment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-card {
+        grid-template-columns: 1fr;
+    }
+
+    .eval-card {
+        grid-template-columns: 1fr;
+    }
+
+    .eval-wide,
+    .eval-actions {
+        grid-column: span 1;
+    }
+
+    .floating-upload {
+        right: 16px;
+        bottom: 16px;
+        padding: 12px 16px;
     }
 }
 

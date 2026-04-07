@@ -41,6 +41,7 @@
                 <div class="hero-actions">
                     <a class="btn primary" href="#agenda">Ver agenda</a>
                     <a class="btn ghost" href="#pagamentos">Ver pagamentos</a>
+                    <a class="btn accent-btn" href="#avaliacao">avaliar</a>
                 </div>
                 <div class="hero-badges">
                     <span>Atendimento por horario marcado</span>
@@ -51,21 +52,35 @@
             <div class="hero-card">
                 <div class="hero-card-top">
                     <h3>Resumo rapido</h3>
-                    <p>Confira os atendimentos e recebimentos do mes em um unico lugar.</p>
+                    <p>Confira os atendimentos e recebimentos de <span id="summary-month-label">Abril</span> em um unico lugar.</p>
                 </div>
-                <div class="hero-stats">
-                    <div>
-                        <strong id="patients-active">0</strong>
-                        <small>Pacientes ativos</small>
+                <div class="hero-summary-grid">
+                    <div class="hero-week-list">
+                        <div class="hero-week-row">
+                            <strong id="week-1-count">0</strong>
+                            <small>semana 1</small>
+                        </div>
+                        <div class="hero-week-row">
+                            <strong id="week-2-count">0</strong>
+                            <small>semana 2</small>
+                        </div>
+                        <div class="hero-week-row">
+                            <strong id="week-3-count">0</strong>
+                            <small>semana 3</small>
+                        </div>
+                        <div class="hero-week-row">
+                            <strong id="week-4-count">0</strong>
+                            <small>semana 4</small>
+                        </div>
                     </div>
-                    <div>
+                    <div class="hero-total-block">
                         <strong id="sessions-month">0</strong>
-                        <small>Sessoes no mes</small>
+                        <small>Sessoes em <span id="summary-month-inline">Abril</span></small>
                     </div>
-                    <div>
-                        <strong id="receipts-total">R$ 0,00</strong>
-                        <small>Recebimentos</small>
-                    </div>
+                </div>
+                <div class="hero-receipts">
+                    <strong id="receipts-total">R$ 0,00</strong>
+                    <small>Recebimentos de <span id="summary-month-payments">Abril</span></small>
                 </div>
                 <a class="btn secondary" href="#contato">Falar no WhatsApp</a>
             </div>
@@ -91,9 +106,10 @@
             </div>
         <div class="schedule-tools">
             <div class="add-patient">
-                <input id="patient-input" type="text" placeholder="Adicionar paciente">
-                <button id="patient-add" type="button">Adicionar</button>
+                <input id="patient-input" class="patient-input" type="text" placeholder="Adicionar paciente">
+                <button id="patient-add" class="patient-add" type="button">Adicionar</button>
             </div>
+            <button class="history-save schedule-save" type="button">Salvar mes</button>
             <button class="print-selected" type="button">Imprimir mes</button>
             <div class="month-picker">
                 <input id="view-month" type="month">
@@ -218,6 +234,19 @@
         <div class="month">
             <div class="week-header">
                 <label class="week-check"><input type="checkbox" class="week-select"> Selecionar</label>
+                <div class="week-inline-tools">
+                    <div class="add-patient add-patient-inline">
+                        <input class="patient-input" type="text" placeholder="Adicionar paciente">
+                        <button class="patient-add" type="button">Adicionar</button>
+                    </div>
+                    <div class="color-palette color-palette-inline" aria-label="Paleta de cores">
+                        <button class="color-btn black" type="button" data-color="black">Preto</button>
+                        <button class="color-btn green" type="button" data-color="green">Verde</button>
+                        <button class="color-btn blue" type="button" data-color="blue">Azul</button>
+                        <button class="color-btn orange" type="button" data-color="orange">Laranja</button>
+                        <button class="color-btn clear" type="button" data-clear="true">Limpar cor</button>
+                    </div>
+                </div>
                 <div class="week-title" contenteditable="true">ATENDIMENTO MAIO 08/12</div>
                 <button class="week-print" type="button">Imprimir semana</button>
             </div>
@@ -318,6 +347,19 @@
         <div class="month">
             <div class="week-header">
                 <label class="week-check"><input type="checkbox" class="week-select"> Selecionar</label>
+                <div class="week-inline-tools">
+                    <div class="add-patient add-patient-inline">
+                        <input class="patient-input" type="text" placeholder="Adicionar paciente">
+                        <button class="patient-add" type="button">Adicionar</button>
+                    </div>
+                    <div class="color-palette color-palette-inline" aria-label="Paleta de cores">
+                        <button class="color-btn black" type="button" data-color="black">Preto</button>
+                        <button class="color-btn green" type="button" data-color="green">Verde</button>
+                        <button class="color-btn blue" type="button" data-color="blue">Azul</button>
+                        <button class="color-btn orange" type="button" data-color="orange">Laranja</button>
+                        <button class="color-btn clear" type="button" data-clear="true">Limpar cor</button>
+                    </div>
+                </div>
                 <div class="week-title" contenteditable="true">ATENDIMENTO MAIO 15/19</div>
                 <button class="week-print" type="button">Imprimir semana</button>
             </div>
@@ -418,6 +460,19 @@
         <div class="month">
             <div class="week-header">
                 <label class="week-check"><input type="checkbox" class="week-select"> Selecionar</label>
+                <div class="week-inline-tools">
+                    <div class="add-patient add-patient-inline">
+                        <input class="patient-input" type="text" placeholder="Adicionar paciente">
+                        <button class="patient-add" type="button">Adicionar</button>
+                    </div>
+                    <div class="color-palette color-palette-inline" aria-label="Paleta de cores">
+                        <button class="color-btn black" type="button" data-color="black">Preto</button>
+                        <button class="color-btn green" type="button" data-color="green">Verde</button>
+                        <button class="color-btn blue" type="button" data-color="blue">Azul</button>
+                        <button class="color-btn orange" type="button" data-color="orange">Laranja</button>
+                        <button class="color-btn clear" type="button" data-clear="true">Limpar cor</button>
+                    </div>
+                </div>
                 <div class="week-title" contenteditable="true">ATENDIMENTO MAIO 22/26</div>
                 <button class="week-print" type="button">Imprimir semana</button>
             </div>
@@ -631,6 +686,10 @@
                 <input id="eval-idade" type="number" min="0" placeholder="Idade">
             </div>
             <div class="eval-field">
+                <label for="eval-telefone">Telefone</label>
+                <input id="eval-telefone" type="tel" placeholder="(00) 00000-0000">
+            </div>
+            <div class="eval-field">
                 <label for="eval-queixa">Queixa principal</label>
                 <input id="eval-queixa" type="text" placeholder="Ex: dor lombar">
             </div>
@@ -657,7 +716,7 @@
                 <textarea id="eval-hda" rows="2" placeholder="Historico resumido"></textarea>
             </div>
             <div class="eval-field eval-wide">
-                <label for="eval-plano">Plano/Conduta</label>
+                <label for="eval-plano">Plano de sessao</label>
                 <select id="eval-plano">
                     <option value="Sessao avulsa">Sessao avulsa</option>
                     <option value="5 sessoes">5 sessoes</option>
@@ -665,8 +724,13 @@
                     <option value="20 sessoes">20 sessoes</option>
                 </select>
             </div>
+            <div class="eval-field eval-wide">
+                <label>Evolucao</label>
+                <div class="eval-evolution-list" id="eval-evolution-list"></div>
+            </div>
             <div class="eval-actions">
                 <button id="eval-salvar" type="button">Salvar ficha</button>
+                <button id="eval-add-evolution" type="button" class="eval-add-evolution">Adicionar evolucao</button>
             </div>
         </div>
         <div class="eval-list">
@@ -679,14 +743,21 @@
         <script>
         const cells = document.querySelectorAll(".cell");
         const paletteButtons = document.querySelectorAll(".color-btn");
-        const patientInput = document.getElementById("patient-input");
-        const patientAdd = document.getElementById("patient-add");
-        const patientsActive = document.getElementById("patients-active");
+        const patientControls = document.querySelectorAll(".add-patient");
         const sessionsMonth = document.getElementById("sessions-month");
+        const summaryMonthLabel = document.getElementById("summary-month-label");
+        const summaryMonthInline = document.getElementById("summary-month-inline");
+        const summaryMonthPayments = document.getElementById("summary-month-payments");
+        const weekCountElements = [
+            document.getElementById("week-1-count"),
+            document.getElementById("week-2-count"),
+            document.getElementById("week-3-count"),
+            document.getElementById("week-4-count")
+        ];
         const printButtons = document.querySelectorAll(".week-print");
         const printSelected = document.querySelector(".print-selected");
         const weekSelects = document.querySelectorAll(".week-select");
-        const historySave = document.querySelector(".history-save");
+        const historySaveButtons = document.querySelectorAll(".history-save");
         const historyLoad = document.querySelector(".history-load");
         const historyMonth = document.getElementById("history-month");
         const historyList = document.getElementById("history-list");
@@ -694,6 +765,8 @@
         const viewMonth = document.getElementById("view-month");
         const viewMonthBtn = document.getElementById("view-month-btn");
         const weekTitles = document.querySelectorAll(".week-title");
+        let paymentsBody = null;
+        let receiptsTotal = null;
         const storageKey = "agenda-historico-v1";
         const storageIndexKey = "agenda-historico-index";
         const supabaseClient = window.supabase
@@ -734,32 +807,43 @@
         }
 
         function updateCounts() {
-            const chips = Array.from(document.querySelectorAll(".patient-chip"));
-            sessionsMonth.textContent = chips.length.toString();
-            const unique = new Set(
-                chips
-                    .map((chip) => chip.textContent.trim().toLowerCase())
-                    .filter(Boolean)
+            const monthCards = Array.from(document.querySelectorAll(".month"));
+            const weeklyCounts = monthCards.map((month) =>
+                month.querySelectorAll(".patient-chip").length
             );
-            patientsActive.textContent = unique.size.toString();
+            setWeeklyCounts(weeklyCounts);
+            const totalSessions = weeklyCounts.reduce((sum, count) => sum + count, 0);
+            sessionsMonth.textContent = totalSessions.toString();
+            updateReceiptsTotal();
         }
 
         function computeCountsFromData(data) {
-            if (!Array.isArray(data)) return { sessions: 0, patients: 0 };
-            const allNames = [];
+            if (!Array.isArray(data)) return { sessions: 0, weekly: [0, 0, 0, 0] };
             let sessions = 0;
-            data.forEach((week) => {
+            const weekly = data.map((week) => {
+                let weekTotal = 0;
                 week.cells.forEach((cell) => {
                     cell.forEach((p) => {
                         if (p.name) {
                             sessions += 1;
-                            allNames.push(p.name.trim().toLowerCase());
+                            weekTotal += 1;
                         }
                     });
                 });
+                return weekTotal;
             });
-            const unique = new Set(allNames.filter(Boolean));
-            return { sessions, patients: unique.size };
+            while (weekly.length < 4) {
+                weekly.push(0);
+            }
+            return { sessions, weekly: weekly.slice(0, 4) };
+        }
+
+        function setWeeklyCounts(weeklyCounts) {
+            weekCountElements.forEach((element, index) => {
+                if (!element) return;
+                const value = weeklyCounts[index] || 0;
+                element.textContent = value.toString();
+            });
         }
 
         function createChip(name) {
@@ -794,6 +878,36 @@
             wrapper.appendChild(remove);
 
             return wrapper;
+        }
+
+        function addPatientFromInput(input) {
+            const name = input.value.trim();
+            if (!name || !activeCell) return;
+            const chip = createChip(name);
+            activeCell.appendChild(chip);
+            input.value = "";
+            setActiveChip(chip);
+            updateCounts();
+        }
+
+        function bindPatientControl(control) {
+            const input = control.querySelector(".patient-input");
+            const button = control.querySelector(".patient-add");
+            if (!input || !button || button.dataset.bound === "true") return;
+
+            button.dataset.bound = "true";
+            input.dataset.bound = "true";
+
+            button.addEventListener("click", () => {
+                addPatientFromInput(input);
+            });
+
+            input.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    addPatientFromInput(input);
+                }
+            });
         }
 
         function getChipColor(chip) {
@@ -942,7 +1056,8 @@
         function setSummaryFromData(data) {
             const counts = computeCountsFromData(data);
             sessionsMonth.textContent = counts.sessions.toString();
-            patientsActive.textContent = counts.patients.toString();
+            setWeeklyCounts(counts.weekly);
+            updateReceiptsTotal();
         }
 
         function getMonthName(monthValue) {
@@ -953,6 +1068,14 @@
             const parts = monthValue.split("-");
             const index = Number(parts[1]) - 1;
             return names[index] || "";
+        }
+
+        function updateSummaryMonth(monthValue) {
+            const monthName = getMonthName(monthValue) || "este mes";
+            summaryMonthLabel.textContent = monthName;
+            summaryMonthInline.textContent = monthName;
+            summaryMonthPayments.textContent = monthName;
+            updateReceiptsTotal();
         }
 
         function setWeekTitlesForMonth(monthValue) {
@@ -1032,22 +1155,7 @@
             });
         });
 
-        patientAdd.addEventListener("click", () => {
-            const name = patientInput.value.trim();
-            if (!name || !activeCell) return;
-            const chip = createChip(name);
-            activeCell.appendChild(chip);
-            patientInput.value = "";
-            setActiveChip(chip);
-            updateCounts();
-        });
-
-        patientInput.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                patientAdd.click();
-            }
-        });
+        patientControls.forEach(bindPatientControl);
 
         paletteButtons.forEach((button) => {
             button.addEventListener("click", () => {
@@ -1127,7 +1235,7 @@
             document.body.classList.remove("print-mode");
         });
 
-        historySave.addEventListener("click", async () => {
+        async function handleHistorySave() {
             const month = normalizeMonth();
             const payload = collectScheduleData();
             if (supabaseClient) {
@@ -1139,6 +1247,10 @@
                 updateHistoryIndex(month);
             }
             renderHistoryList();
+        }
+
+        historySaveButtons.forEach((button) => {
+            button.addEventListener("click", handleHistorySave);
         });
 
         historyLoad.addEventListener("click", async () => {
@@ -1175,11 +1287,13 @@
             const month = String(now.getMonth() + 1).padStart(2, "0");
             const formatted = `${now.getFullYear()}-${month}`;
             viewMonth.value = formatted;
+            updateSummaryMonth(formatted);
             return formatted;
         }
 
         viewMonthBtn.addEventListener("click", async () => {
             const month = normalizeViewMonth();
+            updateSummaryMonth(month);
             setWeekTitlesForMonth(month);
             if (supabaseClient) {
                 const { data } = await supabaseClient
@@ -1215,7 +1329,7 @@
 
         normalizeViewMonth();
 
-        const paymentsBody = document.getElementById("payments-body");
+        paymentsBody = document.getElementById("payments-body");
         const payPaciente = document.getElementById("pay-paciente");
         const payForma = document.getElementById("pay-forma");
         const payValor = document.getElementById("pay-valor");
@@ -1223,7 +1337,7 @@
         const payPor = document.getElementById("pay-por");
         const paySessoes = document.getElementById("pay-sessoes");
         const payAdd = document.getElementById("pay-add");
-        const receiptsTotal = document.getElementById("receipts-total");
+        receiptsTotal = document.getElementById("receipts-total");
 
         function formatCurrency(value) {
             if (!value) return "R$ 0,00";
@@ -1241,9 +1355,15 @@
         }
 
         function updateReceiptsTotal() {
+            if (!paymentsBody || !receiptsTotal) return;
             const rows = Array.from(paymentsBody.querySelectorAll("tr"));
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
             const sum = rows.reduce((total, row) => {
                 const raw = row.dataset.value;
+                const rowDate = row.dataset.date || "";
+                if (selectedMonth && rowDate && !rowDate.startsWith(selectedMonth)) {
+                    return total;
+                }
                 const value = raw ? Number(raw) : 0;
                 return total + (Number.isFinite(value) ? value : 0);
             }, 0);
@@ -1310,6 +1430,7 @@
             const row = document.createElement("tr");
             if (item.id) row.dataset.id = item.id;
             row.dataset.value = String(Number(item.valor || 0));
+            row.dataset.date = item.data || "";
             row.innerHTML = `
                 <td>${item.paciente}</td>
                 <td>${item.forma}</td>
@@ -1345,6 +1466,7 @@
 
         const evalNome = document.getElementById("eval-nome");
         const evalIdade = document.getElementById("eval-idade");
+        const evalTelefone = document.getElementById("eval-telefone");
         const evalQueixa = document.getElementById("eval-queixa");
         const evalDor = document.getElementById("eval-dor");
         const evalDorValue = document.getElementById("eval-dor-value");
@@ -1352,20 +1474,97 @@
         const evalHda = document.getElementById("eval-hda");
         const evalPlano = document.getElementById("eval-plano");
         const evalSalvar = document.getElementById("eval-salvar");
+        const evalAddEvolution = document.getElementById("eval-add-evolution");
+        const evalEvolutionList = document.getElementById("eval-evolution-list");
         const evalItems = document.getElementById("eval-items");
         const evalDetail = document.getElementById("eval-detail");
         const evalKey = "avaliacoes-v1";
         let evalEditingIndex = null;
         let evalCache = [];
+        let evalUseLocalFallback = false;
+
+        function normalizeEvolutionEntries(item) {
+            if (Array.isArray(item?.evolucoes)) {
+                return item.evolucoes.map((entry) => `${entry || ""}`.trim()).filter(Boolean);
+            }
+            if (typeof item?.evolucao === "string" && item.evolucao.trim()) {
+                return [item.evolucao.trim()];
+            }
+            return [];
+        }
+
+        function createEvolutionField(value = "") {
+            const wrapper = document.createElement("div");
+            wrapper.className = "eval-evolution-entry";
+
+            const textarea = document.createElement("textarea");
+            textarea.rows = 2;
+            textarea.className = "eval-evolution-text";
+            textarea.placeholder = "Descreva a evolucao desta sessao";
+            textarea.value = value;
+
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "eval-remove-evolution";
+            removeButton.textContent = "Remover";
+            removeButton.addEventListener("click", () => {
+                wrapper.remove();
+                if (!evalEvolutionList.children.length) {
+                    createEvolutionField();
+                }
+            });
+
+            wrapper.appendChild(textarea);
+            wrapper.appendChild(removeButton);
+            evalEvolutionList.appendChild(wrapper);
+        }
+
+        function fillEvolutionFields(entries = []) {
+            evalEvolutionList.innerHTML = "";
+            if (!entries.length) {
+                createEvolutionField();
+                return;
+            }
+            entries.forEach((entry) => createEvolutionField(entry));
+        }
+
+        function collectEvolutionEntries() {
+            return Array.from(evalEvolutionList.querySelectorAll(".eval-evolution-text"))
+                .map((field) => field.value.trim())
+                .filter(Boolean);
+        }
+
+        function renderEvolutionDetail(entries) {
+            if (!entries.length) {
+                return `<p><strong>Evolucao:</strong> -</p>`;
+            }
+            const items = entries
+                .map((entry, idx) => `<li><strong>${idx + 1}.</strong> ${entry}</li>`)
+                .join("");
+            return `
+                <div class="eval-detail-block">
+                    <strong>Evolucao:</strong>
+                    <ul class="eval-detail-list">${items}</ul>
+                </div>
+            `;
+        }
 
         async function loadEvaluations() {
-            if (supabaseClient) {
-                const { data } = await supabaseClient
-                    .from("avaliacoes")
-                    .select("*")
-                    .order("created_at", { ascending: false });
-                evalCache = data || [];
-                return;
+            if (supabaseClient && !evalUseLocalFallback) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from("avaliacoes")
+                        .select("*")
+                        .order("created_at", { ascending: false });
+                    if (error) {
+                        throw error;
+                    }
+                    evalCache = data || [];
+                    return;
+                } catch (error) {
+                    console.warn("Falha ao carregar avaliacoes do Supabase. Usando armazenamento local.", error);
+                    evalUseLocalFallback = true;
+                }
             }
             const raw = localStorage.getItem(evalKey);
             evalCache = raw ? JSON.parse(raw) : [];
@@ -1397,14 +1596,17 @@
         }
 
         function renderEvalDetail(item, index) {
+            const evolutionEntries = normalizeEvolutionEntries(item);
             evalDetail.innerHTML = `
                 <h4>${item.nome || "Paciente"}</h4>
                 <p><strong>Idade:</strong> ${item.idade || "-"}</p>
+                <p><strong>Telefone:</strong> ${item.telefone || "-"}</p>
                 <p><strong>Queixa:</strong> ${item.queixa || "-"}</p>
                 <p><strong>Dor:</strong> ${item.dor}/10</p>
                 <p><strong>Local:</strong> ${item.local || "-"}</p>
                 <p><strong>HDA:</strong> ${item.hda || "-"}</p>
-                <p><strong>Plano:</strong> ${item.plano || "-"}</p>
+                <p><strong>Plano de sessao:</strong> ${item.plano || "-"}</p>
+                ${renderEvolutionDetail(evolutionEntries)}
                 <div class="eval-detail-actions">
                     <button type="button" class="eval-edit">Editar</button>
                     <button type="button" class="eval-delete">Apagar</button>
@@ -1416,24 +1618,34 @@
                 evalEditingIndex = index;
                 evalNome.value = item.nome || "";
                 evalIdade.value = item.idade || "";
+                evalTelefone.value = item.telefone || "";
                 evalQueixa.value = item.queixa || "";
                 evalDor.value = item.dor || "0";
                 evalDorValue.textContent = evalDor.value;
                 evalLocal.value = item.local || "Cervical";
                 evalHda.value = item.hda || "";
                 evalPlano.value = item.plano || "Sessao avulsa";
+                fillEvolutionFields(normalizeEvolutionEntries(item));
                 window.scrollTo({ top: evalNome.getBoundingClientRect().top + window.scrollY - 120, behavior: "smooth" });
             });
             deleteBtn.addEventListener("click", async () => {
-                if (supabaseClient) {
-                    const id = evalCache[index]?.id;
-                    if (id) {
-                        await supabaseClient.from("avaliacoes").delete().eq("id", id);
+                if (supabaseClient && !evalUseLocalFallback) {
+                    try {
+                        const id = evalCache[index]?.id;
+                        if (id) {
+                            const { error } = await supabaseClient.from("avaliacoes").delete().eq("id", id);
+                            if (error) {
+                                throw error;
+                            }
+                        }
+                        await loadEvaluations();
+                        evalDetail.innerHTML = "";
+                        renderEvalList();
+                        return;
+                    } catch (error) {
+                        console.warn("Falha ao apagar avaliacao no Supabase. Removendo localmente.", error);
+                        evalUseLocalFallback = true;
                     }
-                    await loadEvaluations();
-                    evalDetail.innerHTML = "";
-                    renderEvalList();
-                    return;
                 }
                 const list = evalCache.slice();
                 list.splice(index, 1);
@@ -1448,30 +1660,57 @@
             evalDorValue.textContent = evalDor.value;
         });
 
+        evalAddEvolution.addEventListener("click", () => {
+            createEvolutionField();
+        });
+
         evalSalvar.addEventListener("click", async () => {
             const nome = evalNome.value.trim();
             if (!nome) return;
             const item = {
                 nome,
                 idade: evalIdade.value.trim(),
+                telefone: evalTelefone.value.trim(),
                 queixa: evalQueixa.value.trim(),
                 dor: evalDor.value,
                 local: evalLocal.value,
                 hda: evalHda.value.trim(),
+                evolucoes: collectEvolutionEntries(),
                 plano: evalPlano.value
             };
-            if (supabaseClient) {
-                if (evalEditingIndex !== null && evalCache[evalEditingIndex]) {
-                    const id = evalCache[evalEditingIndex].id;
-                    if (id) {
-                        await supabaseClient.from("avaliacoes").update(item).eq("id", id);
+            if (supabaseClient && !evalUseLocalFallback) {
+                try {
+                    if (evalEditingIndex !== null && evalCache[evalEditingIndex]) {
+                        const id = evalCache[evalEditingIndex].id;
+                        if (id) {
+                            const { error } = await supabaseClient.from("avaliacoes").update(item).eq("id", id);
+                            if (error) {
+                                throw error;
+                            }
+                        }
+                    } else {
+                        const { error } = await supabaseClient.from("avaliacoes").insert(item);
+                        if (error) {
+                            throw error;
+                        }
                     }
-                } else {
-                    await supabaseClient.from("avaliacoes").insert(item);
+                    await loadEvaluations();
+                    renderEvalList();
+                    renderEvalDetail(evalCache[0], 0);
+                } catch (error) {
+                    console.warn("Falha ao salvar avaliacao no Supabase. Salvando localmente para teste.", error);
+                    evalUseLocalFallback = true;
+                    const list = evalCache.slice();
+                    if (evalEditingIndex !== null && list[evalEditingIndex]) {
+                        list[evalEditingIndex] = item;
+                    } else {
+                        list.unshift(item);
+                    }
+                    evalCache = list;
+                    saveEvaluationsLocal(list);
+                    renderEvalList();
+                    renderEvalDetail(item, evalEditingIndex !== null ? evalEditingIndex : 0);
                 }
-                await loadEvaluations();
-                renderEvalList();
-                renderEvalDetail(evalCache[0], 0);
             } else {
                 const list = evalCache.slice();
                 if (evalEditingIndex !== null && list[evalEditingIndex]) {
@@ -1487,14 +1726,17 @@
             evalEditingIndex = null;
             evalNome.value = "";
             evalIdade.value = "";
+            evalTelefone.value = "";
             evalQueixa.value = "";
             evalDor.value = "0";
             evalDorValue.textContent = "0";
             evalLocal.selectedIndex = 0;
             evalHda.value = "";
             evalPlano.selectedIndex = 0;
+            fillEvolutionFields();
         });
 
+        fillEvolutionFields();
         loadEvaluations().then(renderEvalList);
         </script>
 </body>
