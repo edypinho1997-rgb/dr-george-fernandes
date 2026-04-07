@@ -109,7 +109,6 @@
                 <input id="patient-input" class="patient-input" type="text" placeholder="Adicionar paciente">
                 <button id="patient-add" class="patient-add" type="button">Adicionar</button>
             </div>
-            <button class="history-save schedule-save" type="button">Salvar mes</button>
             <button class="print-selected" type="button">Imprimir mes</button>
             <div class="month-picker">
                 <input id="view-month" type="month">
@@ -778,6 +777,8 @@
 
         let activeCell = null;
         let activeChip = null;
+        let agendaAutosaveTimer = null;
+        let isApplyingScheduleData = false;
 
         function clearActiveCell() {
             cells.forEach((cell) => cell.classList.remove("cell-active"));
@@ -846,6 +847,36 @@
             });
         }
 
+        async function saveAgendaForCurrentMonth() {
+            const month = normalizeViewMonth();
+            historyMonth.value = month;
+            const payload = collectScheduleData();
+            if (supabaseClient) {
+                await supabaseClient
+                    .from("agendas")
+                    .upsert({ month, data: payload }, { onConflict: "month" });
+            } else {
+                localStorage.setItem(getHistoryKey(month), JSON.stringify(payload));
+                updateHistoryIndex(month);
+            }
+            renderHistoryList();
+        }
+
+        function scheduleAgendaAutosave() {
+            if (isApplyingScheduleData) return;
+            if (agendaAutosaveTimer) {
+                clearTimeout(agendaAutosaveTimer);
+            }
+            agendaAutosaveTimer = window.setTimeout(async () => {
+                agendaAutosaveTimer = null;
+                try {
+                    await saveAgendaForCurrentMonth();
+                } catch (error) {
+                    console.error("Falha ao salvar agenda automaticamente", error);
+                }
+            }, 1200);
+        }
+
         function createChip(name) {
             const wrapper = document.createElement("span");
             wrapper.className = "patient-chip chip-black";
@@ -872,6 +903,7 @@
                 }
                 wrapper.remove();
                 updateCounts();
+                scheduleAgendaAutosave();
             });
 
             wrapper.appendChild(chip);
@@ -888,6 +920,7 @@
             input.value = "";
             setActiveChip(chip);
             updateCounts();
+            scheduleAgendaAutosave();
         }
 
         function bindPatientControl(control) {
@@ -940,6 +973,7 @@
 
         function renderScheduleData(data) {
             if (!Array.isArray(data)) return;
+            isApplyingScheduleData = true;
             const months = Array.from(document.querySelectorAll(".month"));
             months.forEach((month, monthIndex) => {
                 const monthData = data[monthIndex];
@@ -959,6 +993,7 @@
                     });
                 });
             });
+            isApplyingScheduleData = false;
             updateCounts();
         }
 
@@ -1089,9 +1124,11 @@
         }
 
         function clearSchedule() {
+            isApplyingScheduleData = true;
             document.querySelectorAll(".cell").forEach((cell) => {
                 cell.innerHTML = "";
             });
+            isApplyingScheduleData = false;
             updateCounts();
         }
 
@@ -1168,12 +1205,20 @@
                 if (clear) {
                     activeChip.classList.remove("chip-green", "chip-blue", "chip-orange");
                     activeChip.classList.add("chip-black");
+                    scheduleAgendaAutosave();
                     return;
                 }
 
                 const color = button.dataset.color;
                 activeChip.classList.remove("chip-black", "chip-green", "chip-blue", "chip-orange");
                 activeChip.classList.add(`chip-${color}`);
+                scheduleAgendaAutosave();
+            });
+        });
+
+        weekTitles.forEach((title) => {
+            title.addEventListener("input", () => {
+                scheduleAgendaAutosave();
             });
         });
 
@@ -1236,17 +1281,7 @@
         });
 
         async function handleHistorySave() {
-            const month = normalizeMonth();
-            const payload = collectScheduleData();
-            if (supabaseClient) {
-                await supabaseClient
-                    .from("agendas")
-                    .upsert({ month, data: payload }, { onConflict: "month" });
-            } else {
-                localStorage.setItem(getHistoryKey(month), JSON.stringify(payload));
-                updateHistoryIndex(month);
-            }
-            renderHistoryList();
+            await saveAgendaForCurrentMonth();
         }
 
         historySaveButtons.forEach((button) => {
@@ -1282,17 +1317,23 @@
 
         function normalizeViewMonth() {
             const value = viewMonth.value;
-            if (value) return value;
+            if (value) {
+                historyMonth.value = value;
+                return value;
+            }
             const now = new Date();
             const month = String(now.getMonth() + 1).padStart(2, "0");
             const formatted = `${now.getFullYear()}-${month}`;
             viewMonth.value = formatted;
+            historyMonth.value = formatted;
             updateSummaryMonth(formatted);
             return formatted;
         }
 
-        viewMonthBtn.addEventListener("click", async () => {
-            const month = normalizeViewMonth();
+        async function loadSelectedMonth(monthValue) {
+            const month = monthValue || normalizeViewMonth();
+            viewMonth.value = month;
+            historyMonth.value = month;
             updateSummaryMonth(month);
             setWeekTitlesForMonth(month);
             if (supabaseClient) {
@@ -1325,9 +1366,13 @@
             } catch (err) {
                 console.error("Falha ao abrir historico", err);
             }
+        }
+
+        viewMonthBtn.addEventListener("click", async () => {
+            await loadSelectedMonth(viewMonth.value || normalizeViewMonth());
         });
 
-        normalizeViewMonth();
+        loadSelectedMonth(normalizeViewMonth());
 
         paymentsBody = document.getElementById("payments-body");
         const payPaciente = document.getElementById("pay-paciente");

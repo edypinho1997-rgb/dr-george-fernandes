@@ -534,13 +534,17 @@ a {
 
 .cell {
     min-height: 12px;
-    background: #ffffff;
+    background: #f2f2f2;
     border-radius: 6px;
     padding: 2px 4px;
-    border: 1px dashed #e6e1dd;
+    border: 2px solid #111111;
     font-size: 0.72rem;
     color: #222;
     line-height: 1;
+}
+
+.cell:hover {
+    background: #e5e5e5;
 }
 
 .cell-active {
