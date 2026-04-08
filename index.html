@@ -2028,7 +2028,7 @@
         }
 
         if (supabaseClient) {
-            collaborativeRefreshTimer = window.setInterval(refreshSharedData, 3000);
+            collaborativeRefreshTimer = window.setInterval(refreshSharedData, 1000);
             document.addEventListener("visibilitychange", () => {
                 if (!document.hidden) {
                     refreshSharedData();
