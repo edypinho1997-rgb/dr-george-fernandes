@@ -800,6 +800,17 @@
         let activeChip = null;
         let agendaAutosaveTimer = null;
         let isApplyingScheduleData = false;
+        let collaborativeRefreshTimer = null;
+        let lastPaymentsSignature = "";
+        let lastEvaluationsSignature = "";
+
+        function serializeData(value) {
+            try {
+                return JSON.stringify(value ?? null);
+            } catch (error) {
+                return "";
+            }
+        }
 
         function clearActiveCell() {
             cells.forEach((cell) => cell.classList.remove("cell-active"));
@@ -1604,6 +1615,7 @@
                     .order("data", { ascending: false });
                 paymentsBody.innerHTML = "";
                 (data || []).forEach(appendPaymentRow);
+                lastPaymentsSignature = serializeData(data || []);
                 updatePaymentsVisibility();
                 return;
             }
@@ -1767,6 +1779,7 @@
                         throw error;
                     }
                     evalCache = data || [];
+                    lastEvaluationsSignature = serializeData(evalCache);
                     return;
                 } catch (error) {
                     console.warn("Falha ao carregar avaliacoes do Supabase. Usando armazenamento local.", error);
@@ -1945,6 +1958,84 @@
 
         fillEvolutionFields();
         loadEvaluations().then(renderEvalList);
+
+        async function refreshAgendaFromRemote() {
+            if (!supabaseClient || document.hidden || agendaAutosaveTimer) return;
+            const month = viewMonth.value || normalizeViewMonth();
+            const { data } = await supabaseClient
+                .from("agendas")
+                .select("data")
+                .eq("month", month)
+                .maybeSingle();
+
+            const remoteData = data?.data || [];
+            const localData = collectScheduleData();
+            if (serializeData(remoteData) === serializeData(localData)) return;
+
+            setWeekTitlesForMonth(month);
+            if (!remoteData.length) {
+                clearSchedule();
+                historyPreview.textContent = "Nenhum historico salvo para este mes.";
+                setSummaryFromData([]);
+                return;
+            }
+
+            renderScheduleData(remoteData);
+            setSummaryFromData(remoteData);
+        }
+
+        async function refreshPaymentsFromRemote() {
+            if (!supabaseClient || document.hidden || !paymentsBody) return;
+            const { data } = await supabaseClient
+                .from("pagamentos")
+                .select("*")
+                .order("data", { ascending: false });
+            const signature = serializeData(data || []);
+            if (signature === lastPaymentsSignature) return;
+            lastPaymentsSignature = signature;
+            paymentsBody.innerHTML = "";
+            (data || []).forEach(appendPaymentRow);
+            updatePaymentsVisibility();
+        }
+
+        async function refreshEvaluationsFromRemote() {
+            if (!supabaseClient || document.hidden || evalUseLocalFallback) return;
+            const { data } = await supabaseClient
+                .from("avaliacoes")
+                .select("*")
+                .order("created_at", { ascending: false });
+            const signature = serializeData(data || []);
+            if (signature === lastEvaluationsSignature) return;
+            lastEvaluationsSignature = signature;
+            evalCache = data || [];
+            renderEvalList();
+            if (evalCache.length) {
+                renderEvalDetail(evalCache[0], 0);
+            } else {
+                evalDetail.innerHTML = "";
+            }
+        }
+
+        async function refreshSharedData() {
+            if (!supabaseClient || document.hidden) return;
+            try {
+                await refreshAgendaFromRemote();
+                await refreshPaymentsFromRemote();
+                await refreshEvaluationsFromRemote();
+            } catch (error) {
+                console.error("Falha ao atualizar dados automaticamente", error);
+            }
+        }
+
+        if (supabaseClient) {
+            collaborativeRefreshTimer = window.setInterval(refreshSharedData, 3000);
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) {
+                    refreshSharedData();
+                }
+            });
+            window.addEventListener("focus", refreshSharedData);
+        }
         </script>
 </body>
 </html>
