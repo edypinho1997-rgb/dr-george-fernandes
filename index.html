@@ -803,6 +803,8 @@
         let collaborativeRefreshTimer = null;
         let lastPaymentsSignature = "";
         let lastEvaluationsSignature = "";
+        let lastLocalAgendaChangeAt = 0;
+        let lastUserInteractionAt = Date.now();
 
         function serializeData(value) {
             try {
@@ -810,6 +812,10 @@
             } catch (error) {
                 return "";
             }
+        }
+
+        function markUserInteraction() {
+            lastUserInteractionAt = Date.now();
         }
 
         function clearActiveCell() {
@@ -896,6 +902,7 @@
 
         function scheduleAgendaAutosave() {
             if (isApplyingScheduleData) return;
+            lastLocalAgendaChangeAt = Date.now();
             if (agendaAutosaveTimer) {
                 clearTimeout(agendaAutosaveTimer);
             }
@@ -906,7 +913,7 @@
                 } catch (error) {
                     console.error("Falha ao salvar agenda automaticamente", error);
                 }
-            }, 1200);
+            }, 500);
         }
 
         function createChip(name) {
@@ -1961,6 +1968,10 @@
 
         async function refreshAgendaFromRemote() {
             if (!supabaseClient || document.hidden || agendaAutosaveTimer) return;
+            const now = Date.now();
+            const recentlyChangedAgenda = now - lastLocalAgendaChangeAt < 5000;
+            const userIsActiveHere = document.hasFocus() && now - lastUserInteractionAt < 5000;
+            if (recentlyChangedAgenda || userIsActiveHere) return;
             const month = viewMonth.value || normalizeViewMonth();
             const { data } = await supabaseClient
                 .from("agendas")
@@ -2028,13 +2039,19 @@
         }
 
         if (supabaseClient) {
+            document.addEventListener("pointerdown", markUserInteraction, true);
+            document.addEventListener("keydown", markUserInteraction, true);
             collaborativeRefreshTimer = window.setInterval(refreshSharedData, 1000);
             document.addEventListener("visibilitychange", () => {
                 if (!document.hidden) {
+                    markUserInteraction();
                     refreshSharedData();
                 }
             });
-            window.addEventListener("focus", refreshSharedData);
+            window.addEventListener("focus", () => {
+                markUserInteraction();
+                refreshSharedData();
+            });
         }
         </script>
 </body>
