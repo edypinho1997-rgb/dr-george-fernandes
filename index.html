@@ -82,6 +82,10 @@
                     <strong id="receipts-total">R$ 0,00</strong>
                     <small>Recebimentos de <span id="summary-month-payments">Abril</span></small>
                 </div>
+                <div class="hero-birthday-summary" id="summary-birthdays">
+                    <strong id="summary-birthdays-title">Proximos aniversariantes</strong>
+                    <div id="summary-birthdays-list">Nenhum aniversariante cadastrado.</div>
+                </div>
                 <a class="btn secondary" href="#contato">Falar no WhatsApp</a>
             </div>
         </div>
@@ -772,6 +776,8 @@
         const summaryMonthLabel = document.getElementById("summary-month-label");
         const summaryMonthInline = document.getElementById("summary-month-inline");
         const summaryMonthPayments = document.getElementById("summary-month-payments");
+        const summaryBirthdaysTitle = document.getElementById("summary-birthdays-title");
+        const summaryBirthdaysList = document.getElementById("summary-birthdays-list");
         const weekCountElements = [
             document.getElementById("week-1-count"),
             document.getElementById("week-2-count"),
@@ -1506,6 +1512,100 @@
             return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
 
+        function parseBirthDate(value) {
+            if (!value || typeof value !== "string") return null;
+            const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!match) return null;
+            const [, year, month, day] = match;
+            const parsedMonth = Number(month);
+            const parsedDay = Number(day);
+            if (!parsedMonth || !parsedDay) return null;
+            return {
+                year: Number(year),
+                month: parsedMonth,
+                day: parsedDay
+            };
+        }
+
+        function formatBirthDateShort(value) {
+            const parsed = parseBirthDate(value);
+            if (!parsed) return "";
+            return `${String(parsed.day).padStart(2, "0")}/${String(parsed.month).padStart(2, "0")}`;
+        }
+
+        function getNextBirthdayDate(value) {
+            const parsed = parseBirthDate(value);
+            if (!parsed) return null;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let nextBirthday = new Date(today.getFullYear(), parsed.month - 1, parsed.day);
+            if (
+                nextBirthday.getMonth() !== parsed.month - 1 ||
+                nextBirthday.getDate() !== parsed.day
+            ) {
+                return null;
+            }
+            if (nextBirthday < today) {
+                nextBirthday = new Date(today.getFullYear() + 1, parsed.month - 1, parsed.day);
+            }
+            return nextBirthday;
+        }
+
+        function getPreferredBirthdayName(item, firstNameCounts) {
+            const fullName = `${item?.nome || ""}`.trim();
+            if (!fullName) return "Paciente";
+            const firstName = fullName.split(/\s+/)[0];
+            const normalizedFirstName = firstName.toLowerCase();
+            return (firstNameCounts.get(normalizedFirstName) || 0) > 1 ? fullName : firstName;
+        }
+
+        function updateBirthdaySummary() {
+            if (!summaryBirthdaysTitle || !summaryBirthdaysList) return;
+
+            const validItems = evalCache.filter((item) => parseBirthDate(item?.dataNascimento));
+            if (!validItems.length) {
+                summaryBirthdaysTitle.textContent = "Proximos aniversariantes";
+                summaryBirthdaysList.textContent = "Nenhum aniversariante cadastrado.";
+                return;
+            }
+
+            const firstNameCounts = validItems.reduce((map, item) => {
+                const firstName = `${item?.nome || ""}`.trim().split(/\s+/)[0];
+                if (!firstName) return map;
+                const normalized = firstName.toLowerCase();
+                map.set(normalized, (map.get(normalized) || 0) + 1);
+                return map;
+            }, new Map());
+
+            const upcomingBirthdays = validItems
+                .map((item) => ({
+                    item,
+                    nextDate: getNextBirthdayDate(item.dataNascimento)
+                }))
+                .filter((entry) => entry.nextDate)
+                .sort((a, b) => {
+                    const diff = a.nextDate - b.nextDate;
+                    if (diff !== 0) return diff;
+                    return `${a.item.nome || ""}`.localeCompare(`${b.item.nome || ""}`, "pt-BR");
+                })
+                .slice(0, 3);
+
+            if (!upcomingBirthdays.length) {
+                summaryBirthdaysTitle.textContent = "Proximos aniversariantes";
+                summaryBirthdaysList.textContent = "Nenhum aniversariante cadastrado.";
+                return;
+            }
+
+            summaryBirthdaysTitle.textContent = "Proximos aniversariantes";
+            summaryBirthdaysList.innerHTML = upcomingBirthdays
+                .map(({ item }) => {
+                    const name = getPreferredBirthdayName(item, firstNameCounts);
+                    const date = formatBirthDateShort(item.dataNascimento);
+                    return `<p><strong>${name}</strong> - ${date}</p>`;
+                })
+                .join("");
+        }
+
         function updateReceiptsTotal() {
             if (!paymentsBody || !receiptsTotal) return;
             const rows = Array.from(paymentsBody.querySelectorAll("tr"));
@@ -1809,6 +1909,7 @@
         function renderEvalList() {
             evalItems.innerHTML = "";
             const list = evalCache;
+            updateBirthdaySummary();
             if (!list.length) {
                 evalItems.textContent = "Nenhuma ficha salva ainda.";
                 evalDetail.innerHTML = "";
