@@ -688,6 +688,10 @@
                 <input id="eval-idade" type="number" min="0" placeholder="Idade">
             </div>
             <div class="eval-field">
+                <label for="eval-data-nascimento">Data de nascimento</label>
+                <input id="eval-data-nascimento" type="date">
+            </div>
+            <div class="eval-field">
                 <label for="eval-telefone">Telefone</label>
                 <input id="eval-telefone" type="tel" placeholder="(00) 00000-0000">
             </div>
@@ -1699,6 +1703,7 @@
         const evalLocal = document.getElementById("eval-local");
         const evalHda = document.getElementById("eval-hda");
         const evalPlano = document.getElementById("eval-plano");
+        const evalDataNascimento = document.getElementById("eval-data-nascimento");
         const evalSalvar = document.getElementById("eval-salvar");
         const evalAddEvolution = document.getElementById("eval-add-evolution");
         const evalEvolutionList = document.getElementById("eval-evolution-list");
@@ -1827,6 +1832,7 @@
             evalDetail.innerHTML = `
                 <h4>${item.nome || "Paciente"}</h4>
                 <p><strong>Idade:</strong> ${item.idade || "-"}</p>
+                <p><strong>Data de nascimento:</strong> ${item.dataNascimento || "-"}</p>
                 <p><strong>Telefone:</strong> ${item.telefone || "-"}</p>
                 <p><strong>Queixa:</strong> ${item.queixa || "-"}</p>
                 <p><strong>Dor:</strong> ${item.dor}/10</p>
@@ -1845,6 +1851,7 @@
                 evalEditingIndex = index;
                 evalNome.value = item.nome || "";
                 evalIdade.value = item.idade || "";
+                evalDataNascimento.value = item.dataNascimento || "";
                 evalTelefone.value = item.telefone || "";
                 evalQueixa.value = item.queixa || "";
                 evalDor.value = item.dor || "0";
@@ -1897,6 +1904,7 @@
             const item = {
                 nome,
                 idade: evalIdade.value.trim(),
+                dataNascimento: evalDataNascimento.value,
                 telefone: evalTelefone.value.trim(),
                 queixa: evalQueixa.value.trim(),
                 dor: evalDor.value,
@@ -1953,6 +1961,7 @@
             evalEditingIndex = null;
             evalNome.value = "";
             evalIdade.value = "";
+            evalDataNascimento.value = "";
             evalTelefone.value = "";
             evalQueixa.value = "";
             evalDor.value = "0";
@@ -2056,3 +2065,4 @@
         </script>
 </body>
 </html>
+
