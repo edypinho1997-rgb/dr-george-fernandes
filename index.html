@@ -79,7 +79,10 @@
                     </div>
                 </div>
                 <div class="hero-receipts">
-                    <strong id="receipts-total">R$ 0,00</strong>
+                    <div class="hero-receipts-topline">
+                        <strong id="receipts-total">R$ 0,00</strong>
+                        <button type="button" class="money-toggle" id="money-toggle" aria-label="Ocultar valor" aria-pressed="false" title="Ocultar valor"></button>
+                    </div>
                     <small>Recebimentos de <span id="summary-month-payments">Abril</span></small>
                 </div>
                 <div class="hero-birthday-summary" id="summary-birthdays">
@@ -778,6 +781,7 @@
         const summaryMonthPayments = document.getElementById("summary-month-payments");
         const summaryBirthdaysTitle = document.getElementById("summary-birthdays-title");
         const summaryBirthdaysList = document.getElementById("summary-birthdays-list");
+        const moneyToggle = document.getElementById("money-toggle");
         const weekCountElements = [
             document.getElementById("week-1-count"),
             document.getElementById("week-2-count"),
@@ -1606,6 +1610,45 @@
                 .join("");
         }
 
+        let receiptsVisible = true;
+        let currentReceiptsTotal = 0;
+        const moneyToggleIcons = {
+            visible: `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path>
+                    <circle cx="12" cy="12" r="3.2"></circle>
+                </svg>
+            `,
+            hidden: `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 3l18 18"></path>
+                    <path d="M10.6 6.3A11.3 11.3 0 0 1 12 6c6.5 0 10 6 10 6a17.7 17.7 0 0 1-4.1 4.6"></path>
+                    <path d="M6.7 6.8A17.3 17.3 0 0 0 2 12s3.5 6 10 6c1.6 0 3-.3 4.2-.9"></path>
+                </svg>
+            `
+        };
+
+        function formatHiddenCurrency(value) {
+            const formatted = formatCurrency(value);
+            return formatted.replace(/\d/g, "*");
+        }
+
+        function renderReceiptsTotal() {
+            if (!receiptsTotal) return;
+            receiptsTotal.textContent = receiptsVisible
+                ? formatCurrency(currentReceiptsTotal)
+                : formatHiddenCurrency(currentReceiptsTotal);
+        }
+
+        function syncMoneyToggleState() {
+            if (!moneyToggle) return;
+            const label = receiptsVisible ? "Ocultar valor" : "Mostrar valor";
+            moneyToggle.innerHTML = receiptsVisible ? moneyToggleIcons.visible : moneyToggleIcons.hidden;
+            moneyToggle.setAttribute("aria-label", label);
+            moneyToggle.setAttribute("title", label);
+            moneyToggle.setAttribute("aria-pressed", receiptsVisible ? "false" : "true");
+        }
+
         function updateReceiptsTotal() {
             if (!paymentsBody || !receiptsTotal) return;
             const rows = Array.from(paymentsBody.querySelectorAll("tr"));
@@ -1619,7 +1662,8 @@
                 const value = raw ? Number(raw) : 0;
                 return total + (Number.isFinite(value) ? value : 0);
             }, 0);
-            receiptsTotal.textContent = formatCurrency(sum);
+            currentReceiptsTotal = sum;
+            renderReceiptsTotal();
         }
 
         function updatePaymentsVisibility() {
@@ -1731,6 +1775,15 @@
                 return;
             }
             updatePaymentsVisibility();
+        }
+
+        if (moneyToggle) {
+            syncMoneyToggleState();
+            moneyToggle.addEventListener("click", () => {
+                receiptsVisible = !receiptsVisible;
+                syncMoneyToggleState();
+                renderReceiptsTotal();
+            });
         }
 
         loadPayments();

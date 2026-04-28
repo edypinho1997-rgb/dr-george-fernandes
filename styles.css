@@ -223,14 +223,46 @@ a {
 }
 
 .hero-receipts {
+    display: grid;
+    gap: 4px;
+}
+
+.hero-receipts-topline {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
 
 .hero-receipts strong {
     font-size: 1.3rem;
+}
+
+.money-toggle {
+    border: none;
+    background: transparent;
+    color: var(--brand-dark);
+    cursor: pointer;
+    padding: 0;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.money-toggle:hover {
+    opacity: 0.75;
+}
+
+.money-toggle svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .hero-birthday-summary {
