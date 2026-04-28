@@ -1612,6 +1612,7 @@
 
         let receiptsVisible = true;
         let currentReceiptsTotal = 0;
+        const moneyTogglePassword = "999";
         const moneyToggleIcons = {
             visible: `
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1780,6 +1781,13 @@
         if (moneyToggle) {
             syncMoneyToggleState();
             moneyToggle.addEventListener("click", () => {
+                if (!receiptsVisible) {
+                    const enteredPassword = window.prompt("Digite a senha de 3 digitos para mostrar o valor:");
+                    if (enteredPassword !== moneyTogglePassword) {
+                        window.alert("Senha incorreta.");
+                        return;
+                    }
+                }
                 receiptsVisible = !receiptsVisible;
                 syncMoneyToggleState();
                 renderReceiptsTotal();
