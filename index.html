@@ -11,6 +11,24 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body>
+    <div class="login-gate" id="login-gate">
+        <form class="login-box" id="login-form">
+            <div class="login-brand">
+                <img src="imagens/marca-dagua.png" alt="Dr. George Fernandes">
+            </div>
+            <h1>Acesso restrito</h1>
+            <div class="login-field">
+                <label for="login-user">Login</label>
+                <input id="login-user" type="text" autocomplete="username" placeholder="Digite o login">
+            </div>
+            <div class="login-field">
+                <label for="login-password">Senha</label>
+                <input id="login-password" type="password" autocomplete="current-password" placeholder="Digite a senha">
+            </div>
+            <p class="login-error" id="login-error" hidden>Login ou senha incorretos.</p>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
     <header class="hero">
         <nav class="topbar">
             <div class="brand">
@@ -24,10 +42,14 @@
                 <a href="#servicos">Servicos</a>
                 <a href="#agenda">Agenda</a>
                 <a href="#pagamentos">Pagamentos</a>
+                <a href="#exames">Exames</a>
                 <a href="#historico">Historico</a>
                 <a href="#contato">Contato</a>
             </div>
-            <a class="btn primary" href="#contato">Agendar</a>
+            <div class="topbar-actions">
+                <a class="btn primary" href="#contato">Agendar</a>
+                <button class="logout-btn" id="logout-btn" type="button">Sair</button>
+            </div>
         </nav>
 
         <div class="hero-grid">
@@ -103,6 +125,7 @@
             <a class="service-action" href="#agenda">Agenda semanal</a>
             <a class="service-action" href="#avaliacao">Avaliacao</a>
             <a class="service-action" href="#pagamentos">Pagamento</a>
+            <a class="service-action" href="#exames">Solicitação de exames</a>
         </div>
     </section>
 
@@ -653,12 +676,79 @@
                         <th>Pagamento</th>
                         <th>Data</th>
                         <th>Pago por</th>
-                        <th>Observacoes</th>
+                        <th>Observações</th>
                         <th>Acao</th>
                     </tr>
                 </thead>
                 <tbody id="payments-body"></tbody>
             </table>
+        </div>
+    </section>
+
+    <section class="section" id="exames">
+        <div class="section-head">
+            <h2>Solicitação de exames</h2>
+            <p>Preencha os dados e gere uma solicitação pronta para imprimir em papel timbrado.</p>
+        </div>
+        <div class="exam-request-card">
+            <div class="exam-field">
+                <label for="exam-paciente">Paciente</label>
+                <input id="exam-paciente" type="text" placeholder="Nome completo">
+            </div>
+            <div class="exam-field">
+                <label for="exam-cpf">CPF</label>
+                <input id="exam-cpf" type="text" placeholder="000.000.000-00">
+            </div>
+            <div class="exam-field">
+                <label for="exam-nascimento">Data de nascimento</label>
+                <input id="exam-nascimento" type="date">
+            </div>
+            <div class="exam-field">
+                <label for="exam-data">Data</label>
+                <input id="exam-data" type="date">
+            </div>
+            <div class="exam-field">
+                <label for="exam-diagnostico">Diagnóstico/indicação</label>
+                <input id="exam-diagnostico" type="text" placeholder="Ex: dor lombar, pós-operatório">
+            </div>
+            <div class="exam-field">
+                <label for="exam-profissional">Profissional</label>
+                <input id="exam-profissional" type="text" value="Dr. George Fernandes">
+            </div>
+            <div class="exam-field">
+                <label for="exam-crefito">CREFITO</label>
+                <input id="exam-crefito" type="text" value="331783-F">
+            </div>
+            <div class="exam-field">
+                <label for="exam-tipo">Tipo</label>
+                <select id="exam-tipo">
+                    <option value="Solicitação de exames">Solicitação de exames</option>
+                    <option value="Relatório fisioterapêutico">Relatório fisioterapêutico</option>
+                </select>
+            </div>
+            <div class="exam-field exam-wide">
+                <label>Exames rapidos</label>
+                <div class="exam-options">
+                    <label><input type="checkbox" value="Raio-X"> Raio-X</label>
+                    <label><input type="checkbox" value="Ultrassonografia"> Ultrassonografia</label>
+                    <label><input type="checkbox" value="Ressonância magnética"> Ressonância magnética</label>
+                    <label><input type="checkbox" value="Avaliação postural"> Avaliação postural</label>
+                    <label><input type="checkbox" value="Baropodometria"> Baropodometria</label>
+                    <label><input type="checkbox" value="Biofotogrametria"> Biofotogrametria</label>
+                </div>
+            </div>
+            <div class="exam-field exam-wide">
+                <label for="exam-lista">Exames solicitados</label>
+                <textarea id="exam-lista" rows="4" placeholder="Digite um exame por linha ou marque os exames rapidos acima"></textarea>
+            </div>
+            <div class="exam-field exam-wide">
+                <label for="exam-observacoes">Observações</label>
+                <textarea id="exam-observacoes" rows="3" placeholder="Ex: avaliar região lombar, comparar com exame anterior"></textarea>
+            </div>
+            <div class="exam-actions">
+                <button id="exam-generate" type="button">Gerar e imprimir</button>
+                <button id="exam-clear" type="button">Limpar</button>
+            </div>
         </div>
     </section>
 
@@ -754,6 +844,51 @@
     </section>
     <button class="floating-upload" type="button" id="floating-upload">Subir</button>
         <script>
+        const loginGate = document.getElementById("login-gate");
+        const loginForm = document.getElementById("login-form");
+        const loginUser = document.getElementById("login-user");
+        const loginPassword = document.getElementById("login-password");
+        const loginError = document.getElementById("login-error");
+        const logoutBtn = document.getElementById("logout-btn");
+        const loginSessionKey = "clinica-login-liberado";
+        const allowedLogin = "reg";
+        const allowedPassword = "123";
+
+        function unlockSite() {
+            loginGate.classList.add("hidden");
+            localStorage.setItem(loginSessionKey, "true");
+        }
+
+        if (localStorage.getItem(loginSessionKey) === "true") {
+            loginGate.classList.add("hidden");
+        } else {
+            loginUser.focus();
+        }
+
+        loginForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const user = loginUser.value.trim();
+            const password = loginPassword.value;
+            if (user === allowedLogin && password === allowedPassword) {
+                loginError.hidden = true;
+                unlockSite();
+                return;
+            }
+            loginError.hidden = false;
+            loginPassword.value = "";
+            loginPassword.focus();
+        });
+
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem(loginSessionKey);
+            loginGate.classList.remove("hidden");
+            loginUser.value = "";
+            loginPassword.value = "";
+            loginError.hidden = true;
+            loginUser.focus();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
         const agendaSection = document.getElementById("agenda");
         const initialWeeks = agendaSection ? Array.from(agendaSection.querySelectorAll(".month")) : [];
         const agendaWeekLimit = 6;
@@ -1853,7 +1988,7 @@
                                         <th>Pagamento</th>
                                         <th>Data</th>
                                         <th>Pago por</th>
-                                        <th>Observacoes</th>
+                                        <th>Observações</th>
                                     </tr>
                                 </thead>
                                 <tbody>${tableRows.replace(/<td><button type="button" class="payment-remove">Remover<\/button><\/td>/g, "")}</tbody>
@@ -1874,6 +2009,337 @@
         }
 
         printPayments.addEventListener("click", printPaymentsMonth);
+
+        const examPaciente = document.getElementById("exam-paciente");
+        const examCpf = document.getElementById("exam-cpf");
+        const examNascimento = document.getElementById("exam-nascimento");
+        const examData = document.getElementById("exam-data");
+        const examDiagnostico = document.getElementById("exam-diagnostico");
+        const examProfissional = document.getElementById("exam-profissional");
+        const examCrefito = document.getElementById("exam-crefito");
+        const examTipo = document.getElementById("exam-tipo");
+        const examLista = document.getElementById("exam-lista");
+        const examObservacoes = document.getElementById("exam-observacoes");
+        const examGenerate = document.getElementById("exam-generate");
+        const examClear = document.getElementById("exam-clear");
+        const examOptionChecks = document.querySelectorAll(".exam-options input[type='checkbox']");
+
+        function escapeHtml(value) {
+            return `${value || ""}`
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function formatDateBr(value) {
+            if (!value) return "";
+            const [year, month, day] = value.split("-");
+            if (!year || !month || !day) return value;
+            return `${day}/${month}/${year}`;
+        }
+
+        function getSelectedExamLines() {
+            const typedLines = examLista.value
+                .split("\n")
+                .map((line) => line.trim())
+                .filter(Boolean);
+            const checkedLines = Array.from(examOptionChecks)
+                .filter((check) => check.checked)
+                .map((check) => check.value);
+            return Array.from(new Set([...checkedLines, ...typedLines]));
+        }
+
+        function syncExamQuickOptions() {
+            const typedLines = examLista.value
+                .split("\n")
+                .map((line) => line.trim())
+                .filter(Boolean);
+            const checkedLines = Array.from(examOptionChecks)
+                .filter((check) => check.checked)
+                .map((check) => check.value);
+            examLista.value = Array.from(new Set([...checkedLines, ...typedLines])).join("\n");
+        }
+
+        function setDefaultExamDate() {
+            if (examData && !examData.value) {
+                examData.value = new Date().toISOString().slice(0, 10);
+            }
+        }
+
+        function printExamRequest() {
+            const patient = examPaciente.value.trim();
+            const exams = getSelectedExamLines();
+            if (!patient) {
+                window.alert("Digite o nome do paciente.");
+                examPaciente.focus();
+                return;
+            }
+            if (!exams.length) {
+                window.alert("Informe pelo menos um exame.");
+                examLista.focus();
+                return;
+            }
+
+            const examItems = exams.map((exam) => `<li>${escapeHtml(exam)}</li>`).join("");
+            const diagnosis = examDiagnostico.value.trim();
+            const notes = examObservacoes.value.trim();
+            const requestDate = formatDateBr(examData.value);
+            const professional = examProfissional.value.trim() || "Dr. George Fernandes";
+            const crefito = examCrefito.value.trim();
+            const signatureCrefito = crefito ? `Fisioterapeuta - CREFITO - ${crefito}` : "Fisioterapeuta";
+            const documentTitle = examTipo.value || "Solicitação de exames";
+            const headerImageUrl = new URL("imagens/cabeçalho.png", window.location.href).href;
+            const watermarkImageUrl = new URL("imagens/marca-dagua.png", window.location.href).href;
+            const printWindow = window.open("", "_blank", "width=900,height=700");
+            if (!printWindow) return;
+
+            const html = `<!doctype html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>${escapeHtml(documentTitle)} - ${escapeHtml(patient)}</title>
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 0;
+                        }
+
+                        * {
+                            box-sizing: border-box;
+                        }
+
+                        body {
+                            margin: 0;
+                            background: #fff;
+                            color: #111;
+                            font-family: Arial, sans-serif;
+                            font-size: 11pt;
+                        }
+
+                        .letter-page {
+                            position: relative;
+                            width: 210mm;
+                            min-height: 297mm;
+                            margin: 0 auto;
+                            background: #fff;
+                            padding: 18mm 15mm 32mm;
+                            overflow: hidden;
+                        }
+
+                        .letter-header {
+                            display: flex;
+                            justify-content: center;
+                            margin-bottom: 22px;
+                        }
+
+                        .header-logo {
+                            display: block;
+                            width: 150px;
+                            height: auto;
+                        }
+
+                        .watermark {
+                            position: absolute;
+                            left: 50%;
+                            top: 48%;
+                            transform: translate(-50%, -50%);
+                            pointer-events: none;
+                            opacity: 0.48;
+                            z-index: 0;
+                        }
+
+                        .watermark img {
+                            width: 470px;
+                            height: auto;
+                        }
+
+                        .letter-content {
+                            position: relative;
+                            z-index: 1;
+                        }
+
+                        h1 {
+                            margin: 0 0 16px;
+                            text-align: center;
+                            font-size: 14px;
+                            text-transform: uppercase;
+                        }
+
+                        .patient-data {
+                            margin-bottom: 20px;
+                            line-height: 1.35;
+                            font-size: 13px;
+                            overflow-wrap: anywhere;
+                        }
+
+                        .section-title {
+                            margin: 18px 0 10px;
+                            font-weight: 700;
+                        }
+
+                        ul {
+                            margin: 8px 0 18px 24px;
+                            padding: 0;
+                            line-height: 1.5;
+                            overflow-wrap: anywhere;
+                        }
+
+                        p {
+                            margin: 0 0 12px;
+                            line-height: 1.45;
+                            text-align: justify;
+                            overflow-wrap: anywhere;
+                        }
+
+                        .document-closing {
+                            margin-top: 190px;
+                            padding-top: 0;
+                        }
+
+                        .signature {
+                            width: 270px;
+                            margin: 0 0 0 15px;
+                            text-align: center;
+                            page-break-inside: avoid;
+                        }
+
+                        .signature-line {
+                            width: 100%;
+                            margin: 0 auto 8px;
+                            border-top: 1px solid #111;
+                        }
+
+                        .signature strong {
+                            display: block;
+                            overflow-wrap: anywhere;
+                        }
+
+                        .signature span {
+                            display: block;
+                            margin-top: 4px;
+                            font-weight: 700;
+                            overflow-wrap: anywhere;
+                        }
+
+                        .letter-footer {
+                            position: absolute;
+                            left: 15mm;
+                            right: 15mm;
+                            bottom: 10mm;
+                            text-align: center;
+                            font-size: 10px;
+                            line-height: 1.35;
+                            z-index: 1;
+                            page-break-inside: avoid;
+                        }
+
+                        @media print {
+                            body {
+                                background: #fff;
+                            }
+
+                            .letter-page {
+                                width: auto;
+                                min-height: 297mm;
+                                margin: 0;
+                                padding: 18mm 15mm 32mm;
+                                overflow: visible;
+                            }
+
+                            .letter-footer {
+                                position: fixed;
+                                left: 15mm;
+                                right: 15mm;
+                                bottom: 12mm;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <main class="letter-page">
+                        <div class="watermark"><img src="${escapeHtml(watermarkImageUrl)}" alt=""></div>
+                        <header class="letter-header">
+                            <img class="header-logo" src="${escapeHtml(headerImageUrl)}" alt="Dr. George Fernandes">
+                        </header>
+                        <section class="letter-content">
+                            <h1>${escapeHtml(documentTitle)}</h1>
+                            <div class="patient-data">
+                                <div><strong>Paciente:</strong> ${escapeHtml(patient)}</div>
+                                ${examCpf.value.trim() ? `<div><strong>CPF:</strong> ${escapeHtml(examCpf.value.trim())}</div>` : ""}
+                                ${examNascimento.value ? `<div><strong>Data de nascimento:</strong> ${escapeHtml(formatDateBr(examNascimento.value))}</div>` : ""}
+                                ${requestDate ? `<div><strong>Data:</strong> ${escapeHtml(requestDate)}</div>` : ""}
+                            </div>
+                            ${diagnosis ? `<div class="section-title">Indicação clínica:</div><p>${escapeHtml(diagnosis)}</p>` : ""}
+                            <div class="section-title">Exames solicitados:</div>
+                            <ul>${examItems}</ul>
+                            ${notes ? `<div class="section-title">Observações:</div><p>${escapeHtml(notes)}</p>` : ""}
+                            <p>Solicito a realização dos exames acima para avaliação e acompanhamento fisioterapêutico do paciente.</p>
+                            <div class="document-closing">
+                                <div class="signature">
+                                    <div class="signature-line"></div>
+                                    <strong>${escapeHtml(professional)}</strong>
+                                    <span>${escapeHtml(signatureCrefito)}</span>
+                                </div>
+                            </div>
+                        </section>
+                        <footer class="letter-footer">
+                            G F da C Silva Fisioterapia LTDA<br>
+                            CNPJ: 53.828.385/0001-46<br>
+                            Rua das Jacas, 291 - Vila Emanuela<br>
+                            65939-000 - Itinga do Maranhão
+                        </footer>
+                    </main>
+                    <script>
+                        window.onload = () => {
+                            const images = Array.from(document.images);
+                            Promise.all(images.map((image) => {
+                                if (image.complete) return Promise.resolve();
+                                return new Promise((resolve) => {
+                                    image.addEventListener("load", resolve, { once: true });
+                                    image.addEventListener("error", resolve, { once: true });
+                                });
+                            })).then(() => {
+                                setTimeout(() => window.print(), 250);
+                            });
+                        };
+                    <\/script>
+                </body>
+                </html>`;
+
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
+
+        if (examGenerate) {
+            setDefaultExamDate();
+            examGenerate.addEventListener("click", printExamRequest);
+            examOptionChecks.forEach((check) => {
+                check.addEventListener("change", syncExamQuickOptions);
+            });
+        }
+
+        if (examClear) {
+            examClear.addEventListener("click", () => {
+                examPaciente.value = "";
+                examCpf.value = "";
+                examNascimento.value = "";
+                examDiagnostico.value = "";
+                examProfissional.value = "Dr. George Fernandes";
+                examCrefito.value = "331783-F";
+                examTipo.selectedIndex = 0;
+                examLista.value = "";
+                examObservacoes.value = "";
+                examOptionChecks.forEach((check) => {
+                    check.checked = false;
+                });
+                setDefaultExamDate();
+                examPaciente.focus();
+            });
+        }
 
         const floatingUpload = document.getElementById("floating-upload");
         floatingUpload.addEventListener("click", () => {
