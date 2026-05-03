@@ -200,7 +200,7 @@ a {
 .hero-text h1 {
     font-family: "Playfair Display", serif;
     font-size: clamp(2.4rem, 4vw, 3.6rem);
-    margin: 10px 0 16px;
+    margin: 10px 0 8px;
 }
 
 .eyebrow {
@@ -246,6 +246,10 @@ a {
     padding: 8px 14px;
     font-size: 0.85rem;
     box-shadow: var(--shadow);
+}
+
+.history-support {
+    display: none;
 }
 
 .hero-card {
@@ -391,6 +395,19 @@ a {
     max-width: 60ch;
 }
 
+.hero-services {
+    margin-top: 0;
+    padding: 0;
+}
+
+.hero-services .section-head h2 {
+    font-size: 1.8rem;
+}
+
+.hero-services .service-actions {
+    max-width: 760px;
+}
+
 .cards {
     margin-top: 26px;
     display: grid;
@@ -401,14 +418,16 @@ a {
 .service-actions {
     margin-top: 22px;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 820px;
 }
 
 .service-action {
     background: var(--card);
-    border-radius: 22px;
-    padding: 24px;
+    border-radius: 16px;
+    min-height: 76px;
+    padding: 18px 24px;
     text-align: center;
     font-weight: 700;
     font-size: 1.05rem;
@@ -417,6 +436,8 @@ a {
     box-shadow: var(--shadow);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    display: grid;
+    place-items: center;
 }
 
 .service-action:hover {
@@ -1032,6 +1053,72 @@ a {
     cursor: pointer;
 }
 
+.fee-simulator {
+    margin-top: 18px;
+    background: #ffffff;
+    padding: 18px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 16px;
+}
+
+.fee-simulator-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.fee-simulator-head h3,
+.fee-simulator-head p {
+    margin: 0;
+}
+
+.fee-simulator-head p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.fee-simulator-head span {
+    background: #e8f0ff;
+    color: var(--brand-dark);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.fee-simulator-grid,
+.fee-results {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.fee-results {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.fee-results div {
+    border: 1px solid #d5e1f3;
+    border-radius: 14px;
+    padding: 12px;
+    background: #f7faff;
+    display: grid;
+    gap: 4px;
+}
+
+.fee-results small {
+    color: var(--muted);
+}
+
+.fee-results strong {
+    font-size: 1.1rem;
+}
+
 .payment-remove {
     border: none;
     background: #f0f3f9;
@@ -1171,6 +1258,11 @@ th {
     }
 
     .payment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .fee-simulator-grid,
+    .fee-results {
         grid-template-columns: 1fr;
     }
 

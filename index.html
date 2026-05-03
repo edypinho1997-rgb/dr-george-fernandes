@@ -43,11 +43,8 @@
                 <a href="#agenda">Agenda</a>
                 <a href="#pagamentos">Pagamentos</a>
                 <a href="#exames">Exames</a>
-                <a href="#historico">Historico</a>
-                <a href="#contato">Contato</a>
             </div>
             <div class="topbar-actions">
-                <a class="btn primary" href="#contato">Agendar</a>
                 <button class="logout-btn" id="logout-btn" type="button">Sair</button>
             </div>
         </nav>
@@ -56,19 +53,17 @@
             <div class="hero-text">
                 <p class="eyebrow">Atendimento humanizado</p>
                 <h1>Fisioterapia com carinho, tecnica e resultados.</h1>
-                <p class="lead">
-                    Acompanhamento personalizado para dores, reabilitacao e qualidade de vida.
-                    Atendimentos individuais com plano de cuidado claro e acompanhamento real.
-                </p>
-                <div class="hero-actions">
-                    <a class="btn primary" href="#agenda">Ver agenda</a>
-                    <a class="btn ghost" href="#pagamentos">Ver pagamentos</a>
-                    <a class="btn accent-btn" href="#avaliacao">avaliar</a>
-                </div>
-                <div class="hero-badges">
-                    <span>Atendimento por horario marcado</span>
-                    <span>Planos mensais e por sessao</span>
-                    <span>Pix, credito e dinheiro</span>
+                <div class="hero-services" id="servicos">
+                    <div class="section-head">
+                        <h2>Servicos</h2>
+                        <p>Atendimentos personalizados para cada fase da sua rotina.</p>
+                    </div>
+                    <div class="service-actions">
+                        <a class="service-action" href="#agenda">Agenda semanal</a>
+                        <a class="service-action" href="#avaliacao">Avaliacao</a>
+                        <a class="service-action" href="#exames">Solicitação de exames</a>
+                        <a class="service-action" href="#pagamentos">Pagamento</a>
+                    </div>
                 </div>
             </div>
             <div class="hero-card">
@@ -108,26 +103,12 @@
                     <small>Recebimentos de <span id="summary-month-payments">Abril</span></small>
                 </div>
                 <div class="hero-birthday-summary" id="summary-birthdays">
-                    <strong id="summary-birthdays-title">Proximos aniversariantes</strong>
+                    <strong id="summary-birthdays-title">Aniversariantes do mes</strong>
                     <div id="summary-birthdays-list">Nenhum aniversariante cadastrado.</div>
                 </div>
-                <a class="btn secondary" href="#contato">Falar no WhatsApp</a>
             </div>
         </div>
     </header>
-
-    <section class="section" id="servicos">
-        <div class="section-head">
-            <h2>Servicos</h2>
-            <p>Atendimentos personalizados para cada fase da sua rotina.</p>
-        </div>
-        <div class="service-actions">
-            <a class="service-action" href="#agenda">Agenda semanal</a>
-            <a class="service-action" href="#avaliacao">Avaliacao</a>
-            <a class="service-action" href="#pagamentos">Pagamento</a>
-            <a class="service-action" href="#exames">Solicitação de exames</a>
-        </div>
-    </section>
 
         <section class="section accent" id="agenda">
             <div class="section-head">
@@ -600,25 +581,12 @@
         </div>
     </section>
 
-    <section class="section" id="historico">
-        <div class="section-head">
-            <h2>Historico mensal</h2>
-            <p>Selecione o mes para salvar ou carregar a agenda completa.</p>
-        </div>
-        <div class="history-card">
-            <label class="history-field">
-                <span>Mes</span>
-                <input id="history-month" type="month">
-            </label>
-            <div class="history-actions">
-                <button class="history-save" type="button">Salvar historico do mes</button>
-                <button class="history-load" type="button">Ver historico do mes</button>
-            </div>
-            <small class="history-hint">Exemplo: selecione 2026-02 para fevereiro.</small>
-            <div class="history-list" id="history-list"></div>
-            <div class="history-preview" id="history-preview"></div>
-        </div>
-    </section>
+    <div class="history-support" aria-hidden="true">
+        <input id="history-month" type="month" tabindex="-1">
+        <button class="history-load" type="button" tabindex="-1">Ver historico do mes</button>
+        <div id="history-list"></div>
+        <div id="history-preview"></div>
+    </div>
 
     <section class="section" id="pagamentos">
         <div class="section-head">
@@ -665,6 +633,62 @@
             </div>
             <div class="payment-actions">
                 <button id="pay-add" type="button">Adicionar pagamento</button>
+            </div>
+        </div>
+        <div class="fee-simulator">
+            <div class="fee-simulator-head">
+                <div>
+                    <h3>Simulacao Ton</h3>
+                    <p>Exemplo para testar taxas da maquininha antes de cadastrar no pagamento.</p>
+                </div>
+                <span>Exemplo</span>
+            </div>
+            <div class="fee-simulator-grid">
+                <label class="payment-field" for="fee-amount">
+                    Valor base
+                    <input id="fee-amount" type="number" step="0.01" value="100" placeholder="0,00">
+                </label>
+                <label class="payment-field" for="fee-rate">
+                    Taxa da maquininha (%)
+                    <input id="fee-rate" type="number" step="0.01" value="4" placeholder="0">
+                </label>
+                <label class="payment-field" for="fee-installments">
+                    Parcelas
+                    <select id="fee-installments">
+                        <option value="1">Credito a vista</option>
+                        <option value="2">2x</option>
+                        <option value="3">3x</option>
+                        <option value="4">4x</option>
+                        <option value="5">5x</option>
+                        <option value="6">6x</option>
+                        <option value="10">10x</option>
+                    </select>
+                </label>
+                <label class="payment-field" for="fee-mode">
+                    Como calcular
+                    <select id="fee-mode">
+                        <option value="passar">Paciente paga a taxa</option>
+                        <option value="absorver">Clinica assume a taxa</option>
+                    </select>
+                </label>
+            </div>
+            <div class="fee-results">
+                <div>
+                    <small>Paciente paga</small>
+                    <strong id="fee-customer-total">R$ 104,17</strong>
+                </div>
+                <div>
+                    <small>Valor da taxa</small>
+                    <strong id="fee-amount-total">R$ 4,17</strong>
+                </div>
+                <div>
+                    <small>Liquido para a clinica</small>
+                    <strong id="fee-net-total">R$ 100,00</strong>
+                </div>
+                <div>
+                    <small>Valor por parcela</small>
+                    <strong id="fee-installment-total">R$ 104,17</strong>
+                </div>
             </div>
         </div>
         <div class="table-wrap">
@@ -748,24 +772,6 @@
             <div class="exam-actions">
                 <button id="exam-generate" type="button">Gerar e imprimir</button>
                 <button id="exam-clear" type="button">Limpar</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="section contact" id="contato">
-        <div class="contact-card">
-            <div>
-                <h2>Agende seu atendimento</h2>
-                <p>Entre em contato para avaliacao e horarios disponiveis.</p>
-                <div class="contact-info">
-                    <p><strong>Telefone:</strong> (00) 00000-0000</p>
-                    <p><strong>Endereco:</strong> Rua Exemplo, 123 - Centro</p>
-                    <p><strong>Horario:</strong> Seg a Sex, 08h as 18h</p>
-                </div>
-            </div>
-            <div class="contact-actions">
-                <a class="btn primary" href="#">Chamar no WhatsApp</a>
-                <a class="btn ghost" href="#">Enviar email</a>
             </div>
         </div>
     </section>
@@ -1669,6 +1675,47 @@
             });
         }
 
+        const feeAmount = document.getElementById("fee-amount");
+        const feeRate = document.getElementById("fee-rate");
+        const feeInstallments = document.getElementById("fee-installments");
+        const feeMode = document.getElementById("fee-mode");
+        const feeCustomerTotal = document.getElementById("fee-customer-total");
+        const feeAmountTotal = document.getElementById("fee-amount-total");
+        const feeNetTotal = document.getElementById("fee-net-total");
+        const feeInstallmentTotal = document.getElementById("fee-installment-total");
+
+        function updateFeeSimulator() {
+            if (!feeAmount || !feeRate || !feeMode) return;
+            const amount = Number(feeAmount.value) || 0;
+            const rate = Math.max(0, Number(feeRate.value) || 0) / 100;
+            const installments = Math.max(1, Number(feeInstallments.value) || 1);
+            const mode = feeMode.value;
+            let customerPays = amount;
+            let netValue = amount;
+
+            if (mode === "passar") {
+                customerPays = rate >= 1 ? amount : amount / (1 - rate);
+                netValue = amount;
+            } else {
+                customerPays = amount;
+                netValue = amount * (1 - rate);
+            }
+
+            const feeValue = Math.max(0, customerPays - netValue);
+            feeCustomerTotal.textContent = formatCurrency(customerPays);
+            feeAmountTotal.textContent = formatCurrency(feeValue);
+            feeNetTotal.textContent = formatCurrency(netValue);
+            feeInstallmentTotal.textContent = formatCurrency(customerPays / installments);
+        }
+
+        [feeAmount, feeRate, feeInstallments, feeMode].forEach((field) => {
+            if (!field) return;
+            field.addEventListener("input", updateFeeSimulator);
+            field.addEventListener("change", updateFeeSimulator);
+        });
+
+        updateFeeSimulator();
+
         function formatDate(value) {
             if (!value) return "";
             const parts = value.split("-");
@@ -1715,6 +1762,12 @@
             return nextBirthday;
         }
 
+        function getBirthdayWindowEnd(today) {
+            const end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+            end.setHours(23, 59, 59, 999);
+            return end;
+        }
+
         function getPreferredBirthdayName(item, firstNameCounts) {
             const fullName = `${item?.nome || ""}`.trim();
             if (!fullName) return "Paciente";
@@ -1728,7 +1781,7 @@
 
             const validItems = evalCache.filter((item) => parseBirthDate(item?.dataNascimento));
             if (!validItems.length) {
-                summaryBirthdaysTitle.textContent = "Proximos aniversariantes";
+                summaryBirthdaysTitle.textContent = "Aniversariantes do mes";
                 summaryBirthdaysList.textContent = "Nenhum aniversariante cadastrado.";
                 return;
             }
@@ -1741,26 +1794,28 @@
                 return map;
             }, new Map());
 
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const birthdayWindowEnd = getBirthdayWindowEnd(today);
             const upcomingBirthdays = validItems
                 .map((item) => ({
                     item,
                     nextDate: getNextBirthdayDate(item.dataNascimento)
                 }))
-                .filter((entry) => entry.nextDate)
+                .filter((entry) => entry.nextDate && entry.nextDate >= today && entry.nextDate <= birthdayWindowEnd)
                 .sort((a, b) => {
                     const diff = a.nextDate - b.nextDate;
                     if (diff !== 0) return diff;
                     return `${a.item.nome || ""}`.localeCompare(`${b.item.nome || ""}`, "pt-BR");
-                })
-                .slice(0, 3);
+                });
 
             if (!upcomingBirthdays.length) {
-                summaryBirthdaysTitle.textContent = "Proximos aniversariantes";
-                summaryBirthdaysList.textContent = "Nenhum aniversariante cadastrado.";
+                summaryBirthdaysTitle.textContent = "Aniversariantes do mes";
+                summaryBirthdaysList.textContent = "Nenhum aniversariante neste periodo.";
                 return;
             }
 
-            summaryBirthdaysTitle.textContent = "Proximos aniversariantes";
+            summaryBirthdaysTitle.textContent = "Aniversariantes do mes";
             summaryBirthdaysList.innerHTML = upcomingBirthdays
                 .map(({ item }) => {
                     const name = getPreferredBirthdayName(item, firstNameCounts);
