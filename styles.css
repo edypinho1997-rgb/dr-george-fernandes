@@ -23,6 +23,10 @@ body {
     background: radial-gradient(circle at top, #f2f6ff 0%, #dbe7ff 65%);
 }
 
+body.certificate-page .section {
+    min-height: 100vh;
+}
+
 .login-gate {
     position: fixed;
     inset: 0;
@@ -1194,11 +1198,13 @@ a {
     cursor: pointer;
 }
 
-#exam-generate {
+#exam-generate,
+#cert-generate {
     background: #1b5fbe;
 }
 
-#exam-clear {
+#exam-clear,
+#cert-clear {
     background: #222;
 }
 
