@@ -61,6 +61,10 @@
                 <input id="cert-cid" type="text" placeholder="Opcional">
             </div>
             <div class="exam-field">
+                <label for="cert-problema">Problema/diagnostico</label>
+                <input id="cert-problema" type="text" placeholder="Ex: fratura de radio">
+            </div>
+            <div class="exam-field">
                 <label for="cert-profissional">Profissional</label>
                 <input id="cert-profissional" type="text" value="Dr. George Fernandes">
             </div>
@@ -89,6 +93,7 @@
         const certDias = document.getElementById("cert-dias");
         const certMotivo = document.getElementById("cert-motivo");
         const certCid = document.getElementById("cert-cid");
+        const certProblema = document.getElementById("cert-problema");
         const certProfissional = document.getElementById("cert-profissional");
         const certCrefito = document.getElementById("cert-crefito");
         const certObservacoes = document.getElementById("cert-observacoes");
@@ -141,20 +146,22 @@
             const defaultReason = getDefaultCertificateReason(days);
             const reason = (certMotivo.value.trim() || defaultReason).replace("{dias}", `${days}`).replace("{dia}", days === 1 ? "dia" : "dias");
             const cid = certCid.value.trim();
+            const problem = certProblema.value.trim();
             const notes = certObservacoes.value.trim();
             const scheduleText = schedule ? `, no horario de ${escapeHtml(schedule)}` : "";
+            const problemText = problem ? ` Diagnostico/problema informado: ${escapeHtml(problem)}.` : "";
             const cidText = cid ? ` CID/observacao clinica: ${escapeHtml(cid)}.` : "";
             const notesText = notes ? `<p>${escapeHtml(notes)}</p>` : "";
 
             if (type === "afastamento") {
                 return `
-                    <p>Atesto, para os devidos fins, que o(a) paciente <strong>${escapeHtml(patient)}</strong> esteve em atendimento fisioterapeutico nesta clinica em ${escapeHtml(serviceDate)}${scheduleText}, ${escapeHtml(reason)}${cidText}</p>
+                    <p>Atesto, para os devidos fins, que o(a) paciente <strong>${escapeHtml(patient)}</strong> esteve em atendimento fisioterapeutico nesta clinica em ${escapeHtml(serviceDate)}${scheduleText}, ${escapeHtml(reason)}${problemText}${cidText}</p>
                     ${notesText}
                 `;
             }
 
             return `
-                <p>Declaro, para os devidos fins, que o(a) paciente <strong>${escapeHtml(patient)}</strong> compareceu a atendimento fisioterapeutico nesta clinica em ${escapeHtml(serviceDate)}${scheduleText}.${cidText}</p>
+                <p>Declaro, para os devidos fins, que o(a) paciente <strong>${escapeHtml(patient)}</strong> compareceu a atendimento fisioterapeutico nesta clinica em ${escapeHtml(serviceDate)}${scheduleText}.${problemText}${cidText}</p>
                 ${notesText}
             `;
         }
@@ -272,6 +279,7 @@
             certDias.value = "1";
             certMotivo.value = getDefaultCertificateReason(1);
             certCid.value = "";
+            certProblema.value = "";
             certProfissional.value = "Dr. George Fernandes";
             certCrefito.value = "331783-F";
             certObservacoes.value = "";
