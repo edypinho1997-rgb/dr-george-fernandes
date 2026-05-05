@@ -881,10 +881,12 @@
         const storageKey = "agenda-historico-v1";
         const storageIndexKey = "agenda-historico-index";
         const selectedViewMonthKey = "agenda-mes-selecionado";
+        const supabaseUrl = "https://lhnglzxyeazxlxihobzx.supabase.co";
+        const supabaseAnonKey = "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9";
         const supabaseClient = window.supabase
             ? window.supabase.createClient(
-                "https://lhnglzxyeazxlxihobzx.supabase.co",
-                "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9"
+                supabaseUrl,
+                supabaseAnonKey
             )
             : null;
 
@@ -2778,16 +2780,78 @@ Considerações finais:
 ${finalNotes}`;
         }
 
-        async function copyPromptToChatGpt() {
-            const prompt = buildChatGptPrompt();
-            const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
-            try {
-                await navigator.clipboard.writeText(prompt);
-                window.alert("Prompt copiado. Vou tentar abrir o ChatGPT já com o texto preenchido. Se não aparecer, cole manualmente.");
-            } catch (error) {
-                window.prompt("Copie este texto e cole no ChatGPT:", prompt);
+        async function applyMagicText() {
+            const hda = evalHda.value.trim();
+            const consideracoes = evalConsideracoes.value.trim();
+            const evolucoes = collectEvolutionEntries();
+            const avaliacao = {
+                nome: evalNome.value.trim(),
+                idade: evalIdade.value.trim(),
+                dataNascimento: evalDataNascimento.value.trim(),
+                queixa: evalQueixa.value.trim(),
+                dor: evalDor.value,
+                areaAcometida: evalLocal.value,
+                sessoesRealizadas: evalPlano.value.trim(),
+            };
+            if (!hda && !consideracoes && !evolucoes.length) {
+                window.alert("Preencha HDA ou Considerações finais antes de usar o Texto mágico.");
+                return;
             }
-            window.open(chatGptUrl, "_blank", "noopener");
+
+            evalChatgptCopy.disabled = true;
+            const originalLabel = evalChatgptCopy.textContent;
+            evalChatgptCopy.textContent = "Reformulando...";
+
+            try {
+                if (!supabaseClient) {
+                    throw new Error("Supabase não carregado.");
+                }
+                const response = await fetch(`${supabaseUrl}/functions/v1/texto-magico`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": supabaseAnonKey,
+                        "Authorization": `Bearer ${supabaseAnonKey}`,
+                    },
+                    body: JSON.stringify({
+                        hda,
+                        consideracoes,
+                        evolucoes,
+                        avaliacao,
+                    }),
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data?.details || data?.error || `HTTP ${response.status}`);
+                }
+                if (data?.hda) {
+                    evalHda.value = data.hda;
+                }
+                if (data?.consideracoes) {
+                    evalConsideracoes.value = data.consideracoes;
+                }
+                window.alert("Texto reformulado. Confira antes de salvar.");
+            } catch (error) {
+                console.warn("Falha no Texto mágico pela IA.", error);
+                let message = error?.message || "Erro desconhecido.";
+                if (error?.context) {
+                    try {
+                        const details = await error.context.clone().json();
+                        message = details?.details || details?.error || message;
+                    } catch (jsonError) {
+                        try {
+                            const details = await error.context.clone().text();
+                            message = details || message;
+                        } catch (textError) {
+                            console.warn("Nao consegui ler o detalhe do erro da Edge Function.", textError);
+                        }
+                    }
+                }
+                window.alert(`Nao consegui reformular pelo Gemini agora.\n\nDetalhe: ${message}`);
+            } finally {
+                evalChatgptCopy.disabled = false;
+                evalChatgptCopy.textContent = originalLabel;
+            }
         }
 
         function getEvaluationFinalNotes(item) {
@@ -3119,7 +3183,7 @@ ${finalNotes}`;
         });
 
         evalOrganizeText.addEventListener("click", organizeEvaluationTexts);
-        evalChatgptCopy.addEventListener("click", copyPromptToChatGpt);
+        evalChatgptCopy.addEventListener("click", applyMagicText);
 
         evalSalvar.addEventListener("click", async () => {
             const nome = evalNome.value.trim();
