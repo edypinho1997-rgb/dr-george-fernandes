@@ -61,7 +61,7 @@
                     </div>
                     <div class="service-actions">
                         <a class="service-action" href="#agenda">Agenda semanal</a>
-                        <a class="service-action" href="#avaliacao">Avaliacao</a>
+                        <a class="service-action" href="#avaliacao">Avaliação</a>
                         <a class="service-action" href="exames.html" target="_blank" rel="noopener">Solicitação de exames</a>
                         <a class="service-action" href="atestado.html" target="_blank" rel="noopener">Atestado</a>
                         <a class="service-action" href="#pagamentos">Pagamento</a>
@@ -713,8 +713,8 @@
 
     <section class="section" id="avaliacao">
         <div class="section-head">
-            <h2>Avaliacao</h2>
-            <p>Ficha rapida para registrar avaliacao sem digitar muito.</p>
+            <h2>Avaliação</h2>
+            <p>Ficha rápida para registrar avaliação sem digitar muito.</p>
         </div>
         <div class="eval-card">
             <div class="eval-field">
@@ -743,11 +743,11 @@
                 <div class="range-value"><span id="eval-dor-value">0</span>/10</div>
             </div>
             <div class="eval-field">
-                <label for="eval-local">Local da dor</label>
+                <label for="eval-local">Área acometida</label>
                 <select id="eval-local">
                     <option value="Cervical">Cervical</option>
                     <option value="Ombro">Ombro</option>
-                    <option value="Coluna toracica">Coluna toracica</option>
+                    <option value="Coluna torácica">Coluna torácica</option>
                     <option value="Lombar">Lombar</option>
                     <option value="Quadril">Quadril</option>
                     <option value="Joelho">Joelho</option>
@@ -757,24 +757,25 @@
             </div>
             <div class="eval-field eval-wide">
                 <label for="eval-hda">HDA</label>
-                <textarea id="eval-hda" rows="2" placeholder="Historico resumido"></textarea>
+                <textarea id="eval-hda" rows="2" placeholder="Histórico resumido"></textarea>
             </div>
             <div class="eval-field eval-wide">
-                <label for="eval-plano">Plano de sessao</label>
-                <select id="eval-plano">
-                    <option value="Sessao avulsa">Sessao avulsa</option>
-                    <option value="5 sessoes">5 sessoes</option>
-                    <option value="10 sessoes">10 sessoes</option>
-                    <option value="20 sessoes">20 sessoes</option>
-                </select>
+                <label for="eval-plano">Quantidade de sessões realizadas</label>
+                <input id="eval-plano" type="number" min="0" step="1" placeholder="Ex: 5">
             </div>
             <div class="eval-field eval-wide">
-                <label>Evolucao</label>
+                <label>Evolução</label>
                 <div class="eval-evolution-list" id="eval-evolution-list"></div>
+            </div>
+            <div class="eval-field eval-wide">
+                <label for="eval-consideracoes">Considerações finais</label>
+                <textarea id="eval-consideracoes" rows="3" placeholder="Ex: paciente evoluiu bem, mantém dor leve, necessário continuar por mais 5 sessões"></textarea>
             </div>
             <div class="eval-actions">
                 <button id="eval-salvar" type="button">Salvar ficha</button>
-                <button id="eval-add-evolution" type="button" class="eval-add-evolution">Adicionar evolucao</button>
+                <button id="eval-add-evolution" type="button" class="eval-add-evolution">Adicionar evolução</button>
+                <button id="eval-organize-text" type="button" class="eval-organize-text">Organizar textos</button>
+                <button id="eval-chatgpt-copy" type="button" class="eval-chatgpt-copy">Texto mágico</button>
             </div>
         </div>
         <div class="eval-list">
@@ -2658,9 +2659,12 @@
         const evalLocal = document.getElementById("eval-local");
         const evalHda = document.getElementById("eval-hda");
         const evalPlano = document.getElementById("eval-plano");
+        const evalConsideracoes = document.getElementById("eval-consideracoes");
         const evalDataNascimento = document.getElementById("eval-data-nascimento");
         const evalSalvar = document.getElementById("eval-salvar");
         const evalAddEvolution = document.getElementById("eval-add-evolution");
+        const evalOrganizeText = document.getElementById("eval-organize-text");
+        const evalChatgptCopy = document.getElementById("eval-chatgpt-copy");
         const evalEvolutionList = document.getElementById("eval-evolution-list");
         const evalItems = document.getElementById("eval-items");
         const evalDetail = document.getElementById("eval-detail");
@@ -2668,10 +2672,13 @@
         let evalEditingIndex = null;
         let evalCache = [];
         let evalUseLocalFallback = false;
+        const finalNotesPrefix = "__CONSIDERACOES_FINAIS__:";
 
         function normalizeEvolutionEntries(item) {
             if (Array.isArray(item?.evolucoes)) {
-                return item.evolucoes.map((entry) => `${entry || ""}`.trim()).filter(Boolean);
+                return item.evolucoes
+                    .map((entry) => `${entry || ""}`.trim())
+                    .filter((entry) => entry && !entry.startsWith(finalNotesPrefix));
             }
             if (typeof item?.evolucao === "string" && item.evolucao.trim()) {
                 return [item.evolucao.trim()];
@@ -2686,7 +2693,7 @@
             const textarea = document.createElement("textarea");
             textarea.rows = 2;
             textarea.className = "eval-evolution-text";
-            textarea.placeholder = "Descreva a evolucao desta sessao";
+            textarea.placeholder = "Descreva a evolução desta sessão";
             textarea.value = value;
 
             const removeButton = document.createElement("button");
@@ -2720,19 +2727,258 @@
                 .filter(Boolean);
         }
 
+        function organizeClinicalText(value) {
+            return `${value || ""}`
+                .split(/\n+/)
+                .map((line) => line
+                    .replace(/\s+/g, " ")
+                    .replace(/\s+([,.!?;:])/g, "$1")
+                    .trim()
+                )
+                .filter(Boolean)
+                .map((line) => {
+                    const normalized = line
+                        .replace(/\bi\b/g, "e")
+                        .replace(/\bq\b/g, "que")
+                        .replace(/\bpcte\b/gi, "paciente")
+                        .replace(/\bpaciente relata que paciente\b/gi, "paciente relata que")
+                        .replace(/\bnescess[aá]rio\b/gi, "necessário");
+                    const capitalized = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+                    return /[.!?]$/.test(capitalized) ? capitalized : `${capitalized}.`;
+                })
+                .join("\n");
+        }
+
+        function organizeEvaluationTexts() {
+            [evalHda, evalConsideracoes].forEach((field) => {
+                field.value = organizeClinicalText(field.value);
+            });
+            evalEvolutionList.querySelectorAll(".eval-evolution-text").forEach((field) => {
+                field.value = organizeClinicalText(field.value);
+            });
+        }
+
+        function buildChatGptPrompt() {
+            const hda = evalHda.value.trim() || "-";
+            const finalNotes = evalConsideracoes.value.trim() || "-";
+            return `Reformule apenas os textos abaixo em linguagem profissional para relatório fisioterapêutico.
+Não invente informações.
+Não adicione diagnóstico que não foi informado.
+Mantenha o sentido clínico.
+Corrija português, pontuação e organize as frases.
+Se algum bloco ficar com menos de 3 linhas, desenvolva levemente a redação apenas quando houver informação suficiente.
+Não invente quantidade de sessões, frequência, prazos, diagnóstico, condutas ou evolução que não foram informados.
+Se houver pouca informação, mantenha o texto curto e claro em vez de completar com suposições.
+Separe a resposta em dois blocos com os títulos "HDA" e "Considerações finais".
+
+HDA:
+${hda}
+
+Considerações finais:
+${finalNotes}`;
+        }
+
+        async function copyPromptToChatGpt() {
+            const prompt = buildChatGptPrompt();
+            try {
+                await navigator.clipboard.writeText(prompt);
+                window.alert("Prompt copiado. Agora cole no ChatGPT e depois traga a resposta para HDA e Considerações finais.");
+            } catch (error) {
+                window.prompt("Copie este texto e cole no ChatGPT:", prompt);
+            }
+            window.open("https://chatgpt.com/", "_blank", "noopener");
+        }
+
+        function getEvaluationFinalNotes(item) {
+            if (typeof item?.consideracoes === "string" && item.consideracoes.trim()) {
+                return item.consideracoes.trim();
+            }
+            if (!Array.isArray(item?.evolucoes)) return "";
+            const entry = item.evolucoes.find((value) => `${value || ""}`.startsWith(finalNotesPrefix));
+            return entry ? `${entry}`.replace(finalNotesPrefix, "").trim() : "";
+        }
+
+        function collectEvaluationNotesPayload() {
+            const entries = collectEvolutionEntries();
+            const finalNotes = evalConsideracoes.value.trim();
+            if (finalNotes) {
+                entries.push(`${finalNotesPrefix}${finalNotes}`);
+            }
+            return entries;
+        }
+
         function renderEvolutionDetail(entries) {
             if (!entries.length) {
-                return `<p><strong>Evolucao:</strong> -</p>`;
+                return `<p><strong>Evolução:</strong> -</p>`;
             }
             const items = entries
-                .map((entry, idx) => `<li><strong>${idx + 1}.</strong> ${entry}</li>`)
+                .map((entry, idx) => `<li><strong>${idx + 1}.</strong> ${escapeHtml(entry)}</li>`)
                 .join("");
             return `
                 <div class="eval-detail-block">
-                    <strong>Evolucao:</strong>
+                    <strong>Evolução:</strong>
                     <ul class="eval-detail-list">${items}</ul>
                 </div>
             `;
+        }
+
+        function getEvaluationField(item, field, fallback = "-") {
+            const value = item?.[field];
+            if (value === null || value === undefined || value === "") return fallback;
+            return value;
+        }
+
+        function getEvaluationBirthDate(item) {
+            const value = item?.dataNascimento || item?.data_nascimento || "";
+            return value ? formatDateBr(value) : "-";
+        }
+
+        const evaluationProfessionals = [
+            {
+                name: "Dr. George Fernandes",
+                crefito: "331783-F"
+            },
+            {
+                name: "Dr. Edyeverton Pinheiro",
+                crefito: "346784-F"
+            }
+        ];
+
+        function getEvaluationProfessional(index) {
+            return evaluationProfessionals[Number(index)] || evaluationProfessionals[0];
+        }
+
+        function printEvaluationReport(item, professionalIndex = 0) {
+            if (!item) return;
+            const professional = getEvaluationProfessional(professionalIndex);
+            const evolutionEntries = normalizeEvolutionEntries(item);
+            const finalNotes = getEvaluationFinalNotes(item);
+            const painValue = Number(getEvaluationField(item, "dor", "0")) || 0;
+            const affectedArea = getEvaluationField(item, "local", "");
+            const painInfoHtml = painValue > 0
+                ? `<div class="info"><strong>Dor agora</strong>${escapeHtml(painValue)}/10</div>`
+                : "";
+            const affectedAreaInfoHtml = affectedArea && affectedArea !== "Outro"
+                ? `<div class="info"><strong>Área acometida</strong>${escapeHtml(affectedArea)}</div>`
+                : "";
+            const evolutionHtml = evolutionEntries
+                .map((entry, index) => `<li><strong>${index + 1}.</strong> ${escapeHtml(entry)}</li>`)
+                .join("");
+            const evolutionSectionHtml = evolutionEntries.length
+                ? `
+                    <h2>Evolução</h2>
+                    <div class="block"><ul>${evolutionHtml}</ul></div>
+                `
+                : "";
+            const finalNotesSectionHtml = finalNotes
+                ? `
+                    <h2>Considerações finais</h2>
+                    <div class="block">${escapeHtml(finalNotes)}</div>
+                `
+                : "";
+            const watermarkImageUrl = new URL("imagens/marca-dagua.png", window.location.href).href;
+            const patientName = getEvaluationField(item, "nome", "Paciente");
+            const html = `<!doctype html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>Relatório - ${escapeHtml(patientName)}</title>
+                    <style>
+                        * { box-sizing: border-box; }
+                        body { margin: 0; background: #eef3f9; color: #1d2b3a; font-family: Arial, sans-serif; }
+                        .report-page { position: relative; width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm 16mm 24mm; overflow: hidden; }
+                        .watermark { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0.06; pointer-events: none; }
+                        .watermark img { width: 145mm; max-width: 80%; }
+                        .report-content { position: relative; z-index: 1; }
+                        .report-header { display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 2px solid #1b5fbe; padding-bottom: 14px; margin-bottom: 20px; }
+                        .report-brand { display: flex; align-items: center; gap: 12px; }
+                        .report-brand img { width: 72px; height: 72px; object-fit: contain; }
+                        h1 { margin: 0; font-size: 22px; color: #143b73; }
+                        h2 { margin: 24px 0 10px; font-size: 15px; color: #143b73; text-transform: uppercase; }
+                        p { margin: 0; line-height: 1.5; }
+                        .muted { color: #607086; font-size: 12px; }
+                        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 18px; margin: 18px 0; }
+                        .info { border-bottom: 1px solid #dbe6f4; padding-bottom: 8px; font-size: 13px; }
+                        .info strong { display: block; color: #56677d; font-size: 11px; text-transform: uppercase; margin-bottom: 3px; }
+                        .block { border: 1px solid #dbe6f4; border-radius: 10px; padding: 12px; margin-top: 10px; white-space: pre-line; }
+                        ul { margin: 8px 0 0; padding-left: 20px; }
+                        li + li { margin-top: 6px; }
+                        .signature { margin-top: 44px; text-align: center; }
+                        .signature-line { width: 78mm; border-top: 1px solid #1d2b3a; margin: 0 auto 8px; }
+                        .footer { position: absolute; left: 16mm; right: 16mm; bottom: 12mm; border-top: 1px solid #dbe6f4; padding-top: 8px; text-align: center; font-size: 11px; color: #607086; }
+                        @media print {
+                            body { background: #fff; }
+                            .report-page { width: 210mm; min-height: 297mm; box-shadow: none; margin: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <main class="report-page">
+                        <div class="watermark"><img src="${watermarkImageUrl}" alt=""></div>
+                        <section class="report-content">
+                            <header class="report-header">
+                                <div class="report-brand">
+                                    <img src="${watermarkImageUrl}" alt="Dr. George Fernandes">
+                                    <div>
+                                        <h1>Relatório de avaliação fisioterapêutica</h1>
+                                    </div>
+                                </div>
+                            </header>
+
+                            <h2>Dados do paciente</h2>
+                            <div class="info-grid">
+                                <div class="info"><strong>Nome</strong>${escapeHtml(patientName)}</div>
+                                <div class="info"><strong>Idade</strong>${escapeHtml(getEvaluationField(item, "idade"))}</div>
+                                <div class="info"><strong>Data de nascimento</strong>${escapeHtml(getEvaluationBirthDate(item))}</div>
+                            </div>
+
+                            <h2>Avaliação</h2>
+                            <div class="info-grid">
+                                <div class="info"><strong>Queixa principal</strong>${escapeHtml(getEvaluationField(item, "queixa"))}</div>
+                                ${painInfoHtml}
+                                ${affectedAreaInfoHtml}
+                                <div class="info"><strong>Quantidade de sessões realizadas</strong>${escapeHtml(getEvaluationField(item, "plano"))}</div>
+                            </div>
+
+                            <h2>Histórico da doença atual</h2>
+                            <div class="block">${escapeHtml(getEvaluationField(item, "hda"))}</div>
+
+                            ${evolutionSectionHtml}
+
+                            ${finalNotesSectionHtml}
+
+                            <div class="signature">
+                                <div class="signature-line"></div>
+                                <strong>${escapeHtml(professional.name)}</strong>
+                                <p class="muted">Fisioterapeuta - CREFITO ${escapeHtml(professional.crefito)}</p>
+                            </div>
+                        </section>
+                        <footer class="footer">
+                            G F da C Silva Fisioterapia LTDA - CNPJ: 53.828.385/0001-46<br>
+                            Rua das Jacas, 291 - Vila Emanuela - Itinga do Maranhão
+                        </footer>
+                    </main>
+                    <script>
+                        window.onload = () => {
+                            const images = Array.from(document.images);
+                            Promise.all(images.map((image) => {
+                                if (image.complete) return Promise.resolve();
+                                return new Promise((resolve) => {
+                                    image.addEventListener("load", resolve, { once: true });
+                                    image.addEventListener("error", resolve, { once: true });
+                                });
+                            })).then(() => setTimeout(() => window.print(), 250));
+                        };
+                    <\/script>
+                </body>
+                </html>`;
+
+            const printWindow = window.open("", "_blank", "width=900,height=700");
+            if (!printWindow) return;
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
         }
 
         async function loadEvaluations() {
@@ -2785,24 +3031,40 @@
 
         function renderEvalDetail(item, index) {
             const evolutionEntries = normalizeEvolutionEntries(item);
+            const finalNotes = getEvaluationFinalNotes(item);
             evalDetail.innerHTML = `
-                <h4>${item.nome || "Paciente"}</h4>
-                <p><strong>Idade:</strong> ${item.idade || "-"}</p>
-                <p><strong>Data de nascimento:</strong> ${item.dataNascimento || "-"}</p>
-                <p><strong>Telefone:</strong> ${item.telefone || "-"}</p>
-                <p><strong>Queixa:</strong> ${item.queixa || "-"}</p>
-                <p><strong>Dor:</strong> ${item.dor}/10</p>
-                <p><strong>Local:</strong> ${item.local || "-"}</p>
-                <p><strong>HDA:</strong> ${item.hda || "-"}</p>
-                <p><strong>Plano de sessao:</strong> ${item.plano || "-"}</p>
+                <h4>${escapeHtml(getEvaluationField(item, "nome", "Paciente"))}</h4>
+                <p><strong>Idade:</strong> ${escapeHtml(getEvaluationField(item, "idade"))}</p>
+                <p><strong>Data de nascimento:</strong> ${escapeHtml(getEvaluationBirthDate(item))}</p>
+                <p><strong>Telefone:</strong> ${escapeHtml(getEvaluationField(item, "telefone"))}</p>
+                <p><strong>Queixa:</strong> ${escapeHtml(getEvaluationField(item, "queixa"))}</p>
+                <p><strong>Dor:</strong> ${escapeHtml(getEvaluationField(item, "dor", "0"))}/10</p>
+                <p><strong>Área acometida:</strong> ${escapeHtml(getEvaluationField(item, "local"))}</p>
+                <p><strong>HDA:</strong> ${escapeHtml(getEvaluationField(item, "hda"))}</p>
+                <p><strong>Quantidade de sessões realizadas:</strong> ${escapeHtml(getEvaluationField(item, "plano"))}</p>
                 ${renderEvolutionDetail(evolutionEntries)}
+                ${finalNotes ? `<p><strong>Considerações finais:</strong> ${escapeHtml(finalNotes)}</p>` : ""}
+                <label class="eval-professional-field">
+                    Fisioterapeuta responsável
+                    <select class="eval-professional">
+                        ${evaluationProfessionals.map((professional, professionalIndex) => `
+                            <option value="${professionalIndex}">${escapeHtml(professional.name)} - CREFITO ${escapeHtml(professional.crefito)}</option>
+                        `).join("")}
+                    </select>
+                </label>
                 <div class="eval-detail-actions">
+                    <button type="button" class="eval-print">Relatório / imprimir</button>
                     <button type="button" class="eval-edit">Editar</button>
                     <button type="button" class="eval-delete">Apagar</button>
                 </div>
             `;
+            const printBtn = evalDetail.querySelector(".eval-print");
+            const professionalSelect = evalDetail.querySelector(".eval-professional");
             const editBtn = evalDetail.querySelector(".eval-edit");
             const deleteBtn = evalDetail.querySelector(".eval-delete");
+            printBtn.addEventListener("click", () => {
+                printEvaluationReport(item, professionalSelect.value);
+            });
             editBtn.addEventListener("click", () => {
                 evalEditingIndex = index;
                 evalNome.value = item.nome || "";
@@ -2814,7 +3076,8 @@
                 evalDorValue.textContent = evalDor.value;
                 evalLocal.value = item.local || "Cervical";
                 evalHda.value = item.hda || "";
-                evalPlano.value = item.plano || "Sessao avulsa";
+                evalPlano.value = item.plano || "";
+                evalConsideracoes.value = getEvaluationFinalNotes(item);
                 fillEvolutionFields(normalizeEvolutionEntries(item));
                 window.scrollTo({ top: evalNome.getBoundingClientRect().top + window.scrollY - 120, behavior: "smooth" });
             });
@@ -2833,7 +3096,7 @@
                         renderEvalList();
                         return;
                     } catch (error) {
-                        console.warn("Falha ao apagar avaliacao no Supabase. Removendo localmente.", error);
+                        console.warn("Falha ao apagar avaliação no Supabase. Removendo localmente.", error);
                         evalUseLocalFallback = true;
                     }
                 }
@@ -2854,6 +3117,9 @@
             createEvolutionField();
         });
 
+        evalOrganizeText.addEventListener("click", organizeEvaluationTexts);
+        evalChatgptCopy.addEventListener("click", copyPromptToChatGpt);
+
         evalSalvar.addEventListener("click", async () => {
             const nome = evalNome.value.trim();
             if (!nome) return;
@@ -2866,7 +3132,7 @@
                 dor: evalDor.value,
                 local: evalLocal.value,
                 hda: evalHda.value.trim(),
-                evolucoes: collectEvolutionEntries(),
+                evolucoes: collectEvaluationNotesPayload(),
                 plano: evalPlano.value
             };
             if (supabaseClient && !evalUseLocalFallback) {
@@ -2889,7 +3155,7 @@
                     renderEvalList();
                     renderEvalDetail(evalCache[0], 0);
                 } catch (error) {
-                    console.warn("Falha ao salvar avaliacao no Supabase. Salvando localmente para teste.", error);
+                    console.warn("Falha ao salvar avaliação no Supabase. Salvando localmente para teste.", error);
                     evalUseLocalFallback = true;
                     const list = evalCache.slice();
                     if (evalEditingIndex !== null && list[evalEditingIndex]) {
@@ -2924,7 +3190,8 @@
             evalDorValue.textContent = "0";
             evalLocal.selectedIndex = 0;
             evalHda.value = "";
-            evalPlano.selectedIndex = 0;
+            evalPlano.value = "";
+            evalConsideracoes.value = "";
             fillEvolutionFields();
         });
 

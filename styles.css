@@ -1380,6 +1380,14 @@ th {
     background: #25a244;
 }
 
+.eval-organize-text {
+    background: #6b4bb8;
+}
+
+.eval-chatgpt-copy {
+    background: #111827;
+}
+
 .eval-remove-evolution {
     justify-self: start;
     border: none;
@@ -1443,12 +1451,36 @@ th {
     margin-top: 6px;
 }
 
+.eval-professional-field {
+    display: grid;
+    gap: 6px;
+    margin-top: 12px;
+    color: #56677d;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.eval-professional {
+    max-width: 420px;
+    border: 1px solid #d5e1f3;
+    border-radius: 10px;
+    padding: 8px 10px;
+    color: #1b2430;
+    font-size: 0.9rem;
+    font-weight: 400;
+    text-transform: none;
+    background: #fff;
+}
+
 .eval-detail-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-top: 12px;
 }
 
+.eval-print,
 .eval-edit,
 .eval-delete {
     border: none;
@@ -1456,6 +1488,11 @@ th {
     border-radius: 10px;
     font-size: 0.85rem;
     cursor: pointer;
+}
+
+.eval-print {
+    background: #25a244;
+    color: #fff;
 }
 
 .eval-edit {
