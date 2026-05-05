@@ -777,6 +777,14 @@
                 <button id="eval-organize-text" type="button" class="eval-organize-text">Organizar textos</button>
                 <button id="eval-chatgpt-copy" type="button" class="eval-chatgpt-copy">Texto mágico</button>
             </div>
+            <div class="eval-field eval-wide eval-question-field">
+                <label for="eval-question">Perguntas</label>
+                <textarea id="eval-question" rows="3" placeholder="Digite uma dúvida sobre o caso, CIF, relatório ou conduta dentro da fisioterapia"></textarea>
+                <div class="eval-question-actions">
+                    <button id="eval-question-send" type="button">Perguntar</button>
+                </div>
+                <div class="eval-question-answer" id="eval-question-answer" hidden></div>
+            </div>
         </div>
         <div class="eval-list">
             <h3>Pacientes avaliados</h3>
@@ -2667,6 +2675,9 @@
         const evalAddEvolution = document.getElementById("eval-add-evolution");
         const evalOrganizeText = document.getElementById("eval-organize-text");
         const evalChatgptCopy = document.getElementById("eval-chatgpt-copy");
+        const evalQuestion = document.getElementById("eval-question");
+        const evalQuestionSend = document.getElementById("eval-question-send");
+        const evalQuestionAnswer = document.getElementById("eval-question-answer");
         const evalEvolutionList = document.getElementById("eval-evolution-list");
         const evalItems = document.getElementById("eval-items");
         const evalDetail = document.getElementById("eval-detail");
@@ -2729,6 +2740,22 @@
                 .filter(Boolean);
         }
 
+        function collectEvaluationContextPayload() {
+            return {
+                nome: evalNome.value.trim(),
+                idade: evalIdade.value.trim(),
+                dataNascimento: evalDataNascimento.value.trim(),
+                telefone: evalTelefone.value.trim(),
+                queixa: evalQueixa.value.trim(),
+                dor: evalDor.value,
+                areaAcometida: evalLocal.value,
+                hda: evalHda.value.trim(),
+                sessoesRealizadas: evalPlano.value.trim(),
+                evolucoes: collectEvolutionEntries(),
+                consideracoes: evalConsideracoes.value.trim(),
+            };
+        }
+
         function organizeClinicalText(value) {
             return `${value || ""}`
                 .split(/\n+/)
@@ -2784,15 +2811,7 @@ ${finalNotes}`;
             const hda = evalHda.value.trim();
             const consideracoes = evalConsideracoes.value.trim();
             const evolucoes = collectEvolutionEntries();
-            const avaliacao = {
-                nome: evalNome.value.trim(),
-                idade: evalIdade.value.trim(),
-                dataNascimento: evalDataNascimento.value.trim(),
-                queixa: evalQueixa.value.trim(),
-                dor: evalDor.value,
-                areaAcometida: evalLocal.value,
-                sessoesRealizadas: evalPlano.value.trim(),
-            };
+            const avaliacao = collectEvaluationContextPayload();
             if (!hda && !consideracoes && !evolucoes.length) {
                 window.alert("Preencha HDA ou Considerações finais antes de usar o Texto mágico.");
                 return;
@@ -2851,6 +2870,47 @@ ${finalNotes}`;
             } finally {
                 evalChatgptCopy.disabled = false;
                 evalChatgptCopy.textContent = originalLabel;
+            }
+        }
+
+        async function askClinicalQuestion() {
+            const pergunta = evalQuestion.value.trim();
+            if (!pergunta) {
+                window.alert("Digite uma pergunta antes de enviar.");
+                evalQuestion.focus();
+                return;
+            }
+
+            evalQuestionSend.disabled = true;
+            const originalLabel = evalQuestionSend.textContent;
+            evalQuestionSend.textContent = "Respondendo...";
+            evalQuestionAnswer.hidden = false;
+            evalQuestionAnswer.textContent = "Analisando...";
+
+            try {
+                const response = await fetch(`${supabaseUrl}/functions/v1/perguntas`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": supabaseAnonKey,
+                        "Authorization": `Bearer ${supabaseAnonKey}`,
+                    },
+                    body: JSON.stringify({
+                        pergunta,
+                        avaliacao: collectEvaluationContextPayload(),
+                    }),
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data?.details || data?.error || `HTTP ${response.status}`);
+                }
+                evalQuestionAnswer.textContent = data?.resposta || "Nao recebi uma resposta.";
+            } catch (error) {
+                console.warn("Falha ao responder pergunta pela IA.", error);
+                evalQuestionAnswer.textContent = `Nao consegui responder agora.\n\nDetalhe: ${error?.message || "Erro desconhecido."}`;
+            } finally {
+                evalQuestionSend.disabled = false;
+                evalQuestionSend.textContent = originalLabel;
             }
         }
 
@@ -3184,6 +3244,7 @@ ${finalNotes}`;
 
         evalOrganizeText.addEventListener("click", organizeEvaluationTexts);
         evalChatgptCopy.addEventListener("click", applyMagicText);
+        evalQuestionSend.addEventListener("click", askClinicalQuestion);
 
         evalSalvar.addEventListener("click", async () => {
             const nome = evalNome.value.trim();

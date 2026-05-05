@@ -1388,6 +1388,42 @@ th {
     background: #111827;
 }
 
+.eval-question-field {
+    border-top: 1px solid #e5edf8;
+    padding-top: 14px;
+}
+
+.eval-question-actions {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.eval-question-actions button {
+    border: none;
+    background: #0f766e;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.eval-question-actions button:disabled,
+.eval-actions button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.eval-question-answer {
+    white-space: pre-wrap;
+    background: #f7fbff;
+    border: 1px solid #d5e1f3;
+    border-radius: 10px;
+    color: #172033;
+    line-height: 1.55;
+    padding: 12px;
+}
+
 .eval-remove-evolution {
     justify-self: start;
     border: none;
