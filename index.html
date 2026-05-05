@@ -2780,13 +2780,14 @@ ${finalNotes}`;
 
         async function copyPromptToChatGpt() {
             const prompt = buildChatGptPrompt();
+            const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
             try {
                 await navigator.clipboard.writeText(prompt);
-                window.alert("Prompt copiado. Agora cole no ChatGPT e depois traga a resposta para HDA e Considerações finais.");
+                window.alert("Prompt copiado. Vou tentar abrir o ChatGPT já com o texto preenchido. Se não aparecer, cole manualmente.");
             } catch (error) {
                 window.prompt("Copie este texto e cole no ChatGPT:", prompt);
             }
-            window.open("https://chatgpt.com/", "_blank", "noopener");
+            window.open(chatGptUrl, "_blank", "noopener");
         }
 
         function getEvaluationFinalNotes(item) {
