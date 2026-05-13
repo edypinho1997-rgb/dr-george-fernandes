@@ -847,6 +847,7 @@
         let supplyMissingState = [];
         let supplyCatalogState = [];
         let supplyUseLocalFallback = false;
+        let supplyLocalMigrationAttempted = false;
 
         function unlockSite() {
             loginGate.classList.add("hidden");
@@ -1070,7 +1071,8 @@
         }
 
         async function migrateLocalSupplyItemsToSupabase() {
-            if (!supabaseClient || supplyUseLocalFallback) return;
+            if (!supabaseClient || supplyUseLocalFallback || supplyLocalMigrationAttempted) return;
+            supplyLocalMigrationAttempted = true;
             const localMissing = readJsonList(supplyMissingKey);
             const localCatalog = readJsonList(supplyCatalogKey);
             const merged = [...localCatalog, ...localMissing].reduce((list, name) => {
@@ -1100,12 +1102,21 @@
         async function loadSupplyItems() {
             if (supabaseClient && !supplyUseLocalFallback) {
                 setSupplyMessage("Carregando produtos...");
-                await migrateLocalSupplyItemsToSupabase();
 
-                const { data, error } = await supabaseClient
+                let { data, error } = await supabaseClient
                     .from(supplyTable)
                     .select("nome, faltando")
                     .order("nome", { ascending: true });
+
+                if (!error && (!data || !data.length)) {
+                    await migrateLocalSupplyItemsToSupabase();
+                    const result = await supabaseClient
+                        .from(supplyTable)
+                        .select("nome, faltando")
+                        .order("nome", { ascending: true });
+                    data = result.data;
+                    error = result.error;
+                }
 
                 if (!error) {
                     supplyCatalogState = (data || []).map((item) => item.nome).filter(Boolean);
