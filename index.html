@@ -841,6 +841,10 @@
         const supplyCount = document.getElementById("supply-count");
         const supplyMissingKey = "clinica-produtos-faltando";
         const supplyCatalogKey = "clinica-produtos-salvos";
+        const supplyTable = "produtos_faltando";
+        let supplyMissingState = [];
+        let supplyCatalogState = [];
+        let supplyUseLocalFallback = false;
 
         function unlockSite() {
             loginGate.classList.add("hidden");
@@ -874,6 +878,18 @@
             return list.some((item) => item.toLowerCase() === name.toLowerCase());
         }
 
+        function getSupplyNormalizedName(name) {
+            return normalizeSupplyName(name).toLowerCase();
+        }
+
+        function setSupplyMessage(message) {
+            supplyList.innerHTML = "";
+            const empty = document.createElement("p");
+            empty.className = "supply-empty";
+            empty.textContent = message;
+            supplyList.appendChild(empty);
+        }
+
         function openSupplyDrawer() {
             supplyDrawer.classList.add("open");
             supplyDrawer.setAttribute("aria-hidden", "false");
@@ -887,12 +903,30 @@
             supplyToggle.setAttribute("aria-expanded", "false");
         }
 
-        function addSupplyItem(rawName) {
+        async function addSupplyItem(rawName) {
             const name = normalizeSupplyName(rawName);
             if (!name) return;
 
-            const missing = readJsonList(supplyMissingKey);
-            const catalog = readJsonList(supplyCatalogKey);
+            if (supabaseClient && !supplyUseLocalFallback) {
+                const { error } = await supabaseClient
+                    .from(supplyTable)
+                    .upsert({
+                        nome: name,
+                        nome_normalizado: getSupplyNormalizedName(name),
+                        faltando: true
+                    }, { onConflict: "nome_normalizado" });
+
+                if (!error) {
+                    await loadSupplyItems();
+                    return;
+                }
+
+                console.warn("Falha ao salvar produto no Supabase. Usando armazenamento local.", error);
+                supplyUseLocalFallback = true;
+            }
+
+            const missing = supplyMissingState.length ? [...supplyMissingState] : readJsonList(supplyMissingKey);
+            const catalog = supplyCatalogState.length ? [...supplyCatalogState] : readJsonList(supplyCatalogKey);
 
             if (!supplyHasItem(missing, name)) {
                 missing.push(name);
@@ -905,24 +939,61 @@
                 saveJsonList(supplyCatalogKey, catalog);
             }
 
+            supplyMissingState = missing;
+            supplyCatalogState = catalog;
             renderSupplyDrawer();
         }
 
-        function removeSupplyMissing(name) {
-            const missing = readJsonList(supplyMissingKey).filter((item) => item.toLowerCase() !== name.toLowerCase());
+        async function removeSupplyMissing(name) {
+            if (supabaseClient && !supplyUseLocalFallback) {
+                const { error } = await supabaseClient
+                    .from(supplyTable)
+                    .update({ faltando: false })
+                    .eq("nome_normalizado", getSupplyNormalizedName(name));
+
+                if (!error) {
+                    await loadSupplyItems();
+                    return;
+                }
+
+                console.warn("Falha ao atualizar produto no Supabase. Usando armazenamento local.", error);
+                supplyUseLocalFallback = true;
+            }
+
+            const missing = supplyMissingState.filter((item) => item.toLowerCase() !== name.toLowerCase());
             saveJsonList(supplyMissingKey, missing);
+            supplyMissingState = missing;
             renderSupplyDrawer();
         }
 
-        function removeSupplySaved(name) {
-            const catalog = readJsonList(supplyCatalogKey).filter((item) => item.toLowerCase() !== name.toLowerCase());
+        async function removeSupplySaved(name) {
+            if (supabaseClient && !supplyUseLocalFallback) {
+                const { error } = await supabaseClient
+                    .from(supplyTable)
+                    .delete()
+                    .eq("nome_normalizado", getSupplyNormalizedName(name));
+
+                if (!error) {
+                    await loadSupplyItems();
+                    return;
+                }
+
+                console.warn("Falha ao apagar produto no Supabase. Usando armazenamento local.", error);
+                supplyUseLocalFallback = true;
+            }
+
+            const catalog = supplyCatalogState.filter((item) => item.toLowerCase() !== name.toLowerCase());
+            const missing = supplyMissingState.filter((item) => item.toLowerCase() !== name.toLowerCase());
             saveJsonList(supplyCatalogKey, catalog);
+            saveJsonList(supplyMissingKey, missing);
+            supplyCatalogState = catalog;
+            supplyMissingState = missing;
             renderSupplyDrawer();
         }
 
         function renderSupplyDrawer() {
-            const missing = readJsonList(supplyMissingKey);
-            const catalog = readJsonList(supplyCatalogKey);
+            const missing = supplyMissingState;
+            const catalog = supplyCatalogState;
 
             supplyCount.textContent = missing.length;
             supplyList.innerHTML = "";
@@ -941,7 +1012,9 @@
                     const label = document.createElement("label");
                     const checkbox = document.createElement("input");
                     checkbox.type = "checkbox";
-                    checkbox.addEventListener("change", () => removeSupplyMissing(name));
+                    checkbox.addEventListener("change", () => {
+                        removeSupplyMissing(name);
+                    });
 
                     const text = document.createElement("span");
                     text.textContent = name;
@@ -949,7 +1022,9 @@
                     const removeButton = document.createElement("button");
                     removeButton.type = "button";
                     removeButton.textContent = "Remover";
-                    removeButton.addEventListener("click", () => removeSupplyMissing(name));
+                    removeButton.addEventListener("click", () => {
+                        removeSupplyMissing(name);
+                    });
 
                     label.appendChild(checkbox);
                     label.appendChild(text);
@@ -973,19 +1048,79 @@
                     addButton.type = "button";
                     addButton.textContent = name;
                     addButton.disabled = supplyHasItem(missing, name);
-                    addButton.addEventListener("click", () => addSupplyItem(name));
+                    addButton.addEventListener("click", () => {
+                        addSupplyItem(name);
+                    });
 
                     const removeButton = document.createElement("button");
                     removeButton.type = "button";
                     removeButton.textContent = "x";
                     removeButton.setAttribute("aria-label", `Apagar ${name} dos itens salvos`);
-                    removeButton.addEventListener("click", () => removeSupplySaved(name));
+                    removeButton.addEventListener("click", () => {
+                        removeSupplySaved(name);
+                    });
 
                     chip.appendChild(addButton);
                     chip.appendChild(removeButton);
                     supplySuggestions.appendChild(chip);
                 });
             }
+        }
+
+        async function migrateLocalSupplyItemsToSupabase() {
+            if (!supabaseClient || supplyUseLocalFallback) return;
+            const localMissing = readJsonList(supplyMissingKey);
+            const localCatalog = readJsonList(supplyCatalogKey);
+            const merged = [...localCatalog, ...localMissing].reduce((list, name) => {
+                const normalized = getSupplyNormalizedName(name);
+                if (!normalized || list.some((item) => item.nome_normalizado === normalized)) {
+                    return list;
+                }
+                list.push({
+                    nome: normalizeSupplyName(name),
+                    nome_normalizado: normalized,
+                    faltando: supplyHasItem(localMissing, name)
+                });
+                return list;
+            }, []);
+
+            if (!merged.length) return;
+
+            const { error } = await supabaseClient
+                .from(supplyTable)
+                .upsert(merged, { onConflict: "nome_normalizado" });
+
+            if (error) {
+                console.warn("Falha ao migrar produtos locais para o Supabase.", error);
+            }
+        }
+
+        async function loadSupplyItems() {
+            if (supabaseClient && !supplyUseLocalFallback) {
+                setSupplyMessage("Carregando produtos...");
+                await migrateLocalSupplyItemsToSupabase();
+
+                const { data, error } = await supabaseClient
+                    .from(supplyTable)
+                    .select("nome, faltando")
+                    .order("nome", { ascending: true });
+
+                if (!error) {
+                    supplyCatalogState = (data || []).map((item) => item.nome).filter(Boolean);
+                    supplyMissingState = (data || []).filter((item) => item.faltando).map((item) => item.nome).filter(Boolean);
+                    saveJsonList(supplyCatalogKey, supplyCatalogState);
+                    saveJsonList(supplyMissingKey, supplyMissingState);
+                    renderSupplyDrawer();
+                    return;
+                }
+
+                console.warn("Falha ao carregar produtos do Supabase. Usando armazenamento local.", error);
+                supplyUseLocalFallback = true;
+            }
+
+            supplyMissingState = readJsonList(supplyMissingKey);
+            supplyCatalogState = readJsonList(supplyCatalogKey);
+            renderSupplyDrawer();
         }
 
         supplyToggle.addEventListener("click", () => {
@@ -1010,8 +1145,6 @@
                 closeSupplyDrawer();
             }
         });
-
-        renderSupplyDrawer();
 
         loginForm.addEventListener("submit", (event) => {
             event.preventDefault();
@@ -1095,6 +1228,7 @@
                 supabaseAnonKey
             )
             : null;
+        loadSupplyItems();
 
         let activeCell = null;
         let activeChip = null;
