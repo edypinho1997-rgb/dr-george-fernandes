@@ -42,6 +42,7 @@
                 <a href="#servicos">Servicos</a>
                 <a href="#agenda">Agenda</a>
                 <a href="#pagamentos">Pagamentos</a>
+                <a href="atlas.html" target="_blank" rel="noopener">Atlas</a>
                 <a href="exames.html" target="_blank" rel="noopener">Exames</a>
                 <a href="atestado.html" target="_blank" rel="noopener">Atestado</a>
             </div>
@@ -62,6 +63,7 @@
                     <div class="service-actions">
                         <a class="service-action" href="#agenda">Agenda semanal</a>
                         <a class="service-action" href="#avaliacao">Avaliação</a>
+                        <a class="service-action" href="atlas.html" target="_blank" rel="noopener">Atlas visual</a>
                         <a class="service-action" href="exames.html" target="_blank" rel="noopener">Solicitação de exames</a>
                         <a class="service-action" href="atestado.html" target="_blank" rel="noopener">Atestado</a>
                         <a class="service-action" href="#pagamentos">Pagamento</a>
@@ -1235,10 +1237,16 @@
         let agendaAutosaveTimer = null;
         let isApplyingScheduleData = false;
         let collaborativeRefreshTimer = null;
+        let realtimeChannel = null;
         let lastPaymentsSignature = "";
         let lastEvaluationsSignature = "";
         let lastLocalAgendaChangeAt = 0;
         let lastUserInteractionAt = Date.now();
+        let lastSharedRefreshAt = 0;
+        const sharedRefreshInterval = 300000;
+        const sharedRefreshMinGap = 10000;
+        const paymentsSelectColumns = "id, paciente, forma, valor, data, pago_por, sessoes";
+        const realtimeRefreshTimers = {};
 
         function serializeData(value) {
             try {
@@ -2288,7 +2296,7 @@
             if (supabaseClient) {
                 const { data } = await supabaseClient
                     .from("pagamentos")
-                    .select("*")
+                    .select(paymentsSelectColumns)
                     .order("data", { ascending: false });
                 paymentsBody.innerHTML = "";
                 (data || []).forEach(appendPaymentRow);
@@ -3045,6 +3053,7 @@
         let evalEditingIndex = null;
         let evalCache = [];
         let evalUseLocalFallback = false;
+        const evalListSelectColumns = "id, nome, telefone, queixa, dataNascimento, created_at";
         const finalNotesPrefix = "__CONSIDERACOES_FINAIS__:";
 
         function normalizeEvolutionEntries(item) {
@@ -3318,6 +3327,14 @@ ${finalNotes}`;
             return value ? formatDateBr(value) : "-";
         }
 
+        function markEvaluationDetailLoaded(item) {
+            return item ? { ...item, __detailLoaded: true } : item;
+        }
+
+        function isEvaluationDetailLoaded(item) {
+            return !supabaseClient || evalUseLocalFallback || item?.__detailLoaded;
+        }
+
         const evaluationProfessionals = [
             {
                 name: "Dr. George Fernandes",
@@ -3471,7 +3488,7 @@ ${finalNotes}`;
                 try {
                     const { data, error } = await supabaseClient
                         .from("avaliacoes")
-                        .select("*")
+                        .select(evalListSelectColumns)
                         .order("created_at", { ascending: false });
                     if (error) {
                         throw error;
@@ -3486,6 +3503,38 @@ ${finalNotes}`;
             }
             const raw = localStorage.getItem(evalKey);
             evalCache = raw ? JSON.parse(raw) : [];
+        }
+
+        async function loadEvaluationDetail(item, index) {
+            if (!item) return null;
+            if (isEvaluationDetailLoaded(item)) return item;
+
+            evalDetail.innerHTML = `<p>Carregando ficha de ${escapeHtml(item.nome || "paciente")}...</p>`;
+            const { data, error } = await supabaseClient
+                .from("avaliacoes")
+                .select("*")
+                .eq("id", item.id)
+                .maybeSingle();
+
+            if (error) {
+                console.warn("Falha ao carregar ficha completa.", error);
+                evalDetail.innerHTML = "<p>Nao consegui carregar a ficha completa agora.</p>";
+                return null;
+            }
+
+            const fullItem = markEvaluationDetailLoaded(data || item);
+            if (index !== null && index !== undefined && evalCache[index]) {
+                evalCache[index] = { ...evalCache[index], ...fullItem };
+            }
+            return fullItem;
+        }
+
+        async function openEvaluationDetail(item, index) {
+            evalEditingIndex = null;
+            const fullItem = await loadEvaluationDetail(item, index);
+            if (fullItem) {
+                renderEvalDetail(fullItem, index);
+            }
         }
 
         function saveEvaluationsLocal(list) {
@@ -3507,8 +3556,7 @@ ${finalNotes}`;
                 button.className = "eval-item";
                 button.textContent = item.nome || `Paciente ${index + 1}`;
                 button.addEventListener("click", () => {
-                    evalEditingIndex = null;
-                    renderEvalDetail(item, index);
+                    openEvaluationDetail(item, index);
                 });
                 evalItems.appendChild(button);
             });
@@ -3569,7 +3617,7 @@ ${finalNotes}`;
             deleteBtn.addEventListener("click", async () => {
                 if (supabaseClient && !evalUseLocalFallback) {
                     try {
-                        const id = evalCache[index]?.id;
+                        const id = item.id || evalCache[index]?.id;
                         if (id) {
                             const { error } = await supabaseClient.from("avaliacoes").delete().eq("id", id);
                             if (error) {
@@ -3639,15 +3687,19 @@ ${finalNotes}`;
                     }
                     await loadEvaluations();
                     renderEvalList();
-                    renderEvalDetail(evalCache[0], 0);
+                    if (evalCache[0]) {
+                        openEvaluationDetail(evalCache[0], 0);
+                    } else {
+                        evalDetail.innerHTML = "";
+                    }
                 } catch (error) {
                     console.warn("Falha ao salvar avaliação no Supabase. Salvando localmente para teste.", error);
                     evalUseLocalFallback = true;
                     const list = evalCache.slice();
                     if (evalEditingIndex !== null && list[evalEditingIndex]) {
-                        list[evalEditingIndex] = item;
+                        list[evalEditingIndex] = markEvaluationDetailLoaded(item);
                     } else {
-                        list.unshift(item);
+                        list.unshift(markEvaluationDetailLoaded(item));
                     }
                     evalCache = list;
                     saveEvaluationsLocal(list);
@@ -3657,9 +3709,9 @@ ${finalNotes}`;
             } else {
                 const list = evalCache.slice();
                 if (evalEditingIndex !== null && list[evalEditingIndex]) {
-                    list[evalEditingIndex] = item;
+                    list[evalEditingIndex] = markEvaluationDetailLoaded(item);
                 } else {
-                    list.unshift(item);
+                    list.unshift(markEvaluationDetailLoaded(item));
                 }
                 evalCache = list;
                 saveEvaluationsLocal(list);
@@ -3717,7 +3769,7 @@ ${finalNotes}`;
             if (!supabaseClient || document.hidden || !paymentsBody) return;
             const { data } = await supabaseClient
                 .from("pagamentos")
-                .select("*")
+                .select(paymentsSelectColumns)
                 .order("data", { ascending: false });
             const signature = serializeData(data || []);
             if (signature === lastPaymentsSignature) return;
@@ -3731,22 +3783,23 @@ ${finalNotes}`;
             if (!supabaseClient || document.hidden || evalUseLocalFallback) return;
             const { data } = await supabaseClient
                 .from("avaliacoes")
-                .select("*")
+                .select(evalListSelectColumns)
                 .order("created_at", { ascending: false });
             const signature = serializeData(data || []);
             if (signature === lastEvaluationsSignature) return;
             lastEvaluationsSignature = signature;
             evalCache = data || [];
             renderEvalList();
-            if (evalCache.length) {
-                renderEvalDetail(evalCache[0], 0);
-            } else {
+            if (!evalCache.length) {
                 evalDetail.innerHTML = "";
             }
         }
 
         async function refreshSharedData() {
             if (!supabaseClient || document.hidden) return;
+            const now = Date.now();
+            if (now - lastSharedRefreshAt < sharedRefreshMinGap) return;
+            lastSharedRefreshAt = now;
             try {
                 await refreshAgendaFromRemote();
                 await refreshPaymentsFromRemote();
@@ -3756,10 +3809,58 @@ ${finalNotes}`;
             }
         }
 
+        function scheduleRealtimeRefresh(key, refresh) {
+            if (document.hidden) return;
+            if (realtimeRefreshTimers[key]) {
+                clearTimeout(realtimeRefreshTimers[key]);
+            }
+            realtimeRefreshTimers[key] = window.setTimeout(async () => {
+                realtimeRefreshTimers[key] = null;
+                try {
+                    await refresh();
+                } catch (error) {
+                    console.error("Falha ao sincronizar dados em tempo real", error);
+                }
+            }, 300);
+        }
+
+        function subscribeToRealtimeChanges() {
+            if (!supabaseClient || realtimeChannel) return;
+
+            realtimeChannel = supabaseClient
+                .channel("clinica-db-changes")
+                .on(
+                    "postgres_changes",
+                    { event: "*", schema: "public", table: "agendas" },
+                    () => scheduleRealtimeRefresh("agendas", refreshAgendaFromRemote)
+                )
+                .on(
+                    "postgres_changes",
+                    { event: "*", schema: "public", table: "pagamentos" },
+                    () => scheduleRealtimeRefresh("pagamentos", refreshPaymentsFromRemote)
+                )
+                .on(
+                    "postgres_changes",
+                    { event: "*", schema: "public", table: "avaliacoes" },
+                    () => scheduleRealtimeRefresh("avaliacoes", refreshEvaluationsFromRemote)
+                )
+                .on(
+                    "postgres_changes",
+                    { event: "*", schema: "public", table: supplyTable },
+                    () => scheduleRealtimeRefresh("produtos_faltando", loadSupplyItems)
+                )
+                .subscribe((status) => {
+                    if (status === "SUBSCRIBED") {
+                        console.info("Supabase Realtime conectado.");
+                    }
+                });
+        }
+
         if (supabaseClient) {
             document.addEventListener("pointerdown", markUserInteraction, true);
             document.addEventListener("keydown", markUserInteraction, true);
-            collaborativeRefreshTimer = window.setInterval(refreshSharedData, 1000);
+            subscribeToRealtimeChanges();
+            collaborativeRefreshTimer = window.setInterval(refreshSharedData, sharedRefreshInterval);
             document.addEventListener("visibilitychange", () => {
                 if (!document.hidden) {
                     markUserInteraction();
