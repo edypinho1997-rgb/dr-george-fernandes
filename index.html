@@ -1193,6 +1193,13 @@
         const cells = document.querySelectorAll(".cell");
         const paletteButtons = document.querySelectorAll(".color-btn");
         const patientControls = document.querySelectorAll(".add-patient");
+        const patientSuggestionKey = "agenda-pacientes-sugestoes-v1";
+        const patientSuggestionList = document.createElement("datalist");
+        patientSuggestionList.id = "patient-suggestions";
+        document.body.appendChild(patientSuggestionList);
+        document.querySelectorAll(".patient-input").forEach((input) => {
+            input.setAttribute("autocomplete", "off");
+        });
         const sessionsMonth = document.getElementById("sessions-month");
         const summaryMonthLabel = document.getElementById("summary-month-label");
         const summaryMonthInline = document.getElementById("summary-month-inline");
@@ -1358,6 +1365,63 @@
             }, 500);
         }
 
+        function normalizePatientSuggestion(name) {
+            return `${name || ""}`.replace(/\s+/g, " ").trim();
+        }
+
+        function readPatientSuggestions() {
+            try {
+                const raw = localStorage.getItem(patientSuggestionKey);
+                const list = raw ? JSON.parse(raw) : [];
+                return Array.isArray(list) ? list.map(normalizePatientSuggestion).filter(Boolean) : [];
+            } catch (error) {
+                console.warn("Falha ao ler sugestoes de pacientes.", error);
+                return [];
+            }
+        }
+
+        function writePatientSuggestions(list) {
+            const unique = [];
+            list.forEach((name) => {
+                const normalized = normalizePatientSuggestion(name);
+                if (!normalized) return;
+                const exists = unique.some((item) => item.toLowerCase() === normalized.toLowerCase());
+                if (!exists) unique.push(normalized);
+            });
+            unique.sort((a, b) => a.localeCompare(b, "pt-BR"));
+            localStorage.setItem(patientSuggestionKey, JSON.stringify(unique));
+            return unique;
+        }
+
+        function collectVisiblePatientNames() {
+            return Array.from(document.querySelectorAll(".chip-text"))
+                .map((chip) => normalizePatientSuggestion(chip.textContent))
+                .filter(Boolean);
+        }
+
+        function updatePatientSuggestions(extraNames = []) {
+            const names = writePatientSuggestions([
+                ...readPatientSuggestions(),
+                ...collectVisiblePatientNames(),
+                ...extraNames
+            ]);
+            patientSuggestionList.innerHTML = "";
+            names.forEach((name) => {
+                const option = document.createElement("option");
+                option.value = name;
+                patientSuggestionList.appendChild(option);
+            });
+        }
+
+        function syncPatientSuggestionVisibility(input) {
+            if (!input) return;
+            if (input.value.trim()) {
+                input.setAttribute("list", patientSuggestionList.id);
+            } else {
+                input.removeAttribute("list");
+            }
+        }
+
         function createChip(name) {
             const wrapper = document.createElement("span");
             wrapper.className = "patient-chip chip-black";
@@ -1383,6 +1447,7 @@
                     clearActiveChip();
                 }
                 wrapper.remove();
+                updatePatientSuggestions();
                 updateCounts();
                 scheduleAgendaAutosave();
             });
@@ -1399,6 +1464,8 @@
             const chip = createChip(name);
             activeCell.appendChild(chip);
             input.value = "";
+            syncPatientSuggestionVisibility(input);
+            updatePatientSuggestions([name]);
             setActiveChip(chip);
             updateCounts();
             scheduleAgendaAutosave();
@@ -1421,6 +1488,14 @@
                     event.preventDefault();
                     addPatientFromInput(input);
                 }
+            });
+
+            input.addEventListener("input", () => {
+                syncPatientSuggestionVisibility(input);
+            });
+
+            input.addEventListener("focus", () => {
+                syncPatientSuggestionVisibility(input);
             });
         }
 
@@ -1487,6 +1562,7 @@
             });
             isApplyingScheduleData = false;
             updateCounts();
+            updatePatientSuggestions();
         }
 
         function getHistoryKey(month) {
@@ -1735,6 +1811,7 @@
         });
 
         patientControls.forEach(bindPatientControl);
+        updatePatientSuggestions();
 
         paletteButtons.forEach((button) => {
             button.addEventListener("click", () => {
