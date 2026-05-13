@@ -795,6 +795,30 @@
             <div class="eval-detail" id="eval-detail"></div>
         </div>
     </section>
+    <button class="supply-toggle" type="button" id="supply-toggle" aria-controls="supply-drawer" aria-expanded="false">
+        Faltas <span id="supply-count">0</span>
+    </button>
+    <aside class="supply-drawer" id="supply-drawer" aria-hidden="true">
+        <div class="supply-head">
+            <div>
+                <strong>O que falta</strong>
+                <small>Produtos para comprar</small>
+            </div>
+            <button type="button" id="supply-close" aria-label="Fechar lista">Fechar</button>
+        </div>
+        <form class="supply-form" id="supply-form">
+            <input id="supply-input" type="text" placeholder="Ex: sabao, papel, luva" autocomplete="off">
+            <button type="submit">Adicionar</button>
+        </form>
+        <div class="supply-list" id="supply-list"></div>
+        <div class="supply-saved">
+            <div class="supply-saved-title">
+                <strong>Itens salvos</strong>
+                <small>Clique para colocar na lista</small>
+            </div>
+            <div class="supply-suggestions" id="supply-suggestions"></div>
+        </div>
+    </aside>
     <button class="floating-upload" type="button" id="floating-upload">Subir</button>
         <script>
         const loginGate = document.getElementById("login-gate");
@@ -807,6 +831,17 @@
         const allowedLogin = "reg";
         const allowedPassword = "123";
 
+        const supplyToggle = document.getElementById("supply-toggle");
+        const supplyDrawer = document.getElementById("supply-drawer");
+        const supplyClose = document.getElementById("supply-close");
+        const supplyForm = document.getElementById("supply-form");
+        const supplyInput = document.getElementById("supply-input");
+        const supplyList = document.getElementById("supply-list");
+        const supplySuggestions = document.getElementById("supply-suggestions");
+        const supplyCount = document.getElementById("supply-count");
+        const supplyMissingKey = "clinica-produtos-faltando";
+        const supplyCatalogKey = "clinica-produtos-salvos";
+
         function unlockSite() {
             loginGate.classList.add("hidden");
             localStorage.setItem(loginSessionKey, "true");
@@ -817,6 +852,166 @@
         } else {
             loginUser.focus();
         }
+
+        function readJsonList(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || "[]");
+                return Array.isArray(value) ? value : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveJsonList(key, list) {
+            localStorage.setItem(key, JSON.stringify(list));
+        }
+
+        function normalizeSupplyName(name) {
+            return name.trim().replace(/\s+/g, " ");
+        }
+
+        function supplyHasItem(list, name) {
+            return list.some((item) => item.toLowerCase() === name.toLowerCase());
+        }
+
+        function openSupplyDrawer() {
+            supplyDrawer.classList.add("open");
+            supplyDrawer.setAttribute("aria-hidden", "false");
+            supplyToggle.setAttribute("aria-expanded", "true");
+            supplyInput.focus();
+        }
+
+        function closeSupplyDrawer() {
+            supplyDrawer.classList.remove("open");
+            supplyDrawer.setAttribute("aria-hidden", "true");
+            supplyToggle.setAttribute("aria-expanded", "false");
+        }
+
+        function addSupplyItem(rawName) {
+            const name = normalizeSupplyName(rawName);
+            if (!name) return;
+
+            const missing = readJsonList(supplyMissingKey);
+            const catalog = readJsonList(supplyCatalogKey);
+
+            if (!supplyHasItem(missing, name)) {
+                missing.push(name);
+                saveJsonList(supplyMissingKey, missing);
+            }
+
+            if (!supplyHasItem(catalog, name)) {
+                catalog.push(name);
+                catalog.sort((a, b) => a.localeCompare(b, "pt-BR"));
+                saveJsonList(supplyCatalogKey, catalog);
+            }
+
+            renderSupplyDrawer();
+        }
+
+        function removeSupplyMissing(name) {
+            const missing = readJsonList(supplyMissingKey).filter((item) => item.toLowerCase() !== name.toLowerCase());
+            saveJsonList(supplyMissingKey, missing);
+            renderSupplyDrawer();
+        }
+
+        function removeSupplySaved(name) {
+            const catalog = readJsonList(supplyCatalogKey).filter((item) => item.toLowerCase() !== name.toLowerCase());
+            saveJsonList(supplyCatalogKey, catalog);
+            renderSupplyDrawer();
+        }
+
+        function renderSupplyDrawer() {
+            const missing = readJsonList(supplyMissingKey);
+            const catalog = readJsonList(supplyCatalogKey);
+
+            supplyCount.textContent = missing.length;
+            supplyList.innerHTML = "";
+            supplySuggestions.innerHTML = "";
+
+            if (!missing.length) {
+                const empty = document.createElement("p");
+                empty.className = "supply-empty";
+                empty.textContent = "Nada marcado como faltando.";
+                supplyList.appendChild(empty);
+            } else {
+                missing.forEach((name) => {
+                    const row = document.createElement("div");
+                    row.className = "supply-row";
+
+                    const label = document.createElement("label");
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.addEventListener("change", () => removeSupplyMissing(name));
+
+                    const text = document.createElement("span");
+                    text.textContent = name;
+
+                    const removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.textContent = "Remover";
+                    removeButton.addEventListener("click", () => removeSupplyMissing(name));
+
+                    label.appendChild(checkbox);
+                    label.appendChild(text);
+                    row.appendChild(label);
+                    row.appendChild(removeButton);
+                    supplyList.appendChild(row);
+                });
+            }
+
+            if (!catalog.length) {
+                const empty = document.createElement("p");
+                empty.className = "supply-empty";
+                empty.textContent = "Os itens adicionados ficam salvos aqui.";
+                supplySuggestions.appendChild(empty);
+            } else {
+                catalog.forEach((name) => {
+                    const chip = document.createElement("div");
+                    chip.className = "supply-chip";
+
+                    const addButton = document.createElement("button");
+                    addButton.type = "button";
+                    addButton.textContent = name;
+                    addButton.disabled = supplyHasItem(missing, name);
+                    addButton.addEventListener("click", () => addSupplyItem(name));
+
+                    const removeButton = document.createElement("button");
+                    removeButton.type = "button";
+                    removeButton.textContent = "x";
+                    removeButton.setAttribute("aria-label", `Apagar ${name} dos itens salvos`);
+                    removeButton.addEventListener("click", () => removeSupplySaved(name));
+
+                    chip.appendChild(addButton);
+                    chip.appendChild(removeButton);
+                    supplySuggestions.appendChild(chip);
+                });
+            }
+        }
+
+        supplyToggle.addEventListener("click", () => {
+            if (supplyDrawer.classList.contains("open")) {
+                closeSupplyDrawer();
+            } else {
+                openSupplyDrawer();
+            }
+        });
+
+        supplyClose.addEventListener("click", closeSupplyDrawer);
+
+        supplyForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            addSupplyItem(supplyInput.value);
+            supplyInput.value = "";
+            supplyInput.focus();
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && supplyDrawer.classList.contains("open")) {
+                closeSupplyDrawer();
+            }
+        });
+
+        renderSupplyDrawer();
 
         loginForm.addEventListener("submit", (event) => {
             event.preventDefault();
