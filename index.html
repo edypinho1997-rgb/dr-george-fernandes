@@ -29,41 +29,63 @@
             <button type="submit">Entrar</button>
         </form>
     </div>
-    <header class="hero">
-        <nav class="topbar">
+    <div class="app-shell">
+        <aside class="side-panel">
             <div class="brand">
                 <span class="brand-mark">P</span>
                 <div>
                     <p class="brand-name">Dr. George Fernandes</p>
-                    <small class="brand-sub">Fisioterapia & Bem-estar</small>
+                    <small class="brand-sub">Painel da clinica</small>
                 </div>
             </div>
-            <div class="nav-links">
-                <a href="#servicos">Servicos</a>
+            <nav class="nav-links">
+                <a href="#inicio">Inicio</a>
                 <a href="#agenda">Agenda</a>
+                <a href="#pacientes">Pacientes</a>
+                <a href="#avaliacao">Avaliacao</a>
                 <a href="#pagamentos">Pagamentos</a>
-                <a href="atlas.html" target="_blank" rel="noopener">Atlas</a>
                 <a href="exames.html" target="_blank" rel="noopener">Exames</a>
                 <a href="atestado.html" target="_blank" rel="noopener">Atestado</a>
-            </div>
+            </nav>
             <div class="topbar-actions">
+                <button class="supply-toggle" type="button" id="supply-toggle" aria-controls="supply-drawer" aria-expanded="false">
+                    Faltas <span id="supply-count">0</span>
+                </button>
                 <button class="logout-btn" id="logout-btn" type="button">Sair</button>
             </div>
-        </nav>
+        </aside>
 
-        <div class="hero-grid">
+        <main class="app-main">
+    <header class="hero" id="inicio">
+        <div class="dashboard-top">
+            <div>
+                <p class="dashboard-kicker">Painel da clinica</p>
+                <h1>Ola, Dr. George!</h1>
+                <p>Veja o que esta acontecendo na sua clinica hoje.</p>
+            </div>
+            <div class="dashboard-actions">
+                <label class="dashboard-search">
+                    <input type="search" placeholder="Buscar paciente...">
+                </label>
+                <div class="doctor-chip">
+                    <span>Dr. George Fernandes</span>
+                    <small>Administrador</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-page">
             <div class="hero-text">
-                <p class="eyebrow">Atendimento humanizado</p>
-                <h1>Fisioterapia com carinho, tecnica e resultados.</h1>
+                <p class="eyebrow">Painel da recepcao</p>
+                <h1>Resumo rapido da clinica</h1>
                 <div class="hero-services" id="servicos">
                     <div class="section-head">
-                        <h2>Servicos</h2>
-                        <p>Atendimentos personalizados para cada fase da sua rotina.</p>
+                        <h2>Acessos rapidos</h2>
+                        <p>Atalhos principais para a rotina da secretaria.</p>
                     </div>
                     <div class="service-actions">
                         <a class="service-action" href="#agenda">Agenda semanal</a>
                         <a class="service-action" href="#avaliacao">Avaliação</a>
-                        <a class="service-action" href="atlas.html" target="_blank" rel="noopener">Atlas visual</a>
                         <a class="service-action" href="exames.html" target="_blank" rel="noopener">Solicitação de exames</a>
                         <a class="service-action" href="atestado.html" target="_blank" rel="noopener">Atestado</a>
                         <a class="service-action" href="#pagamentos">Pagamento</a>
@@ -71,12 +93,33 @@
                 </div>
             </div>
             <div class="hero-card">
+                <div class="dashboard-month-card">
+                    <p class="eyebrow">Mes da agenda</p>
+                    <div class="month-picker dashboard-month-picker">
+                        <input id="view-month" type="month">
+                    </div>
+                    <small>Controla a agenda, os pacientes e os pagamentos deste painel.</small>
+                </div>
                 <div class="hero-card-top">
-                    <h3>Resumo rapido</h3>
-                    <p>Confira os atendimentos e recebimentos de <span id="summary-month-label">Abril</span> em um unico lugar.</p>
+                    <p class="eyebrow">Hoje</p>
+                    <h3>Pacientes hoje</h3>
+                    <strong class="today-total" id="today-patients-count">0</strong>
+                    <span id="summary-month-label" hidden>Abril</span>
+                    <small>Use a agenda abaixo para acompanhar os horarios.</small>
+                </div>
+                <div class="consult-stat-card">
+                    <p class="eyebrow">Semana</p>
+                    <h3>Pacientes da semana</h3>
+                    <strong id="week-patients-count">0</strong>
+                    <small>Semana atual da agenda</small>
                 </div>
                 <div class="hero-summary-grid">
+                    <div class="hero-total-block">
+                        <strong id="sessions-month">0</strong>
+                        <small>Pacientes do mes em <span id="summary-month-inline">Abril</span></small>
+                    </div>
                     <div class="hero-week-list">
+                        <p class="summary-label">Pacientes da semana</p>
                         <div class="hero-week-row">
                             <strong id="week-1-count">0</strong>
                             <small>semana 1</small>
@@ -94,22 +137,42 @@
                             <small>semana 4</small>
                         </div>
                     </div>
-                    <div class="hero-total-block">
-                        <strong id="sessions-month">0</strong>
-                        <small>Sessoes em <span id="summary-month-inline">Abril</span></small>
-                    </div>
-                </div>
-                <div class="hero-receipts">
-                    <div class="hero-receipts-topline">
-                        <strong id="receipts-total">R$ 0,00</strong>
-                        <button type="button" class="money-toggle" id="money-toggle" aria-label="Ocultar valor" aria-pressed="false" title="Ocultar valor"></button>
-                    </div>
-                    <small>Recebimentos de <span id="summary-month-payments">Abril</span></small>
                 </div>
                 <div class="hero-birthday-summary" id="summary-birthdays">
                     <strong id="summary-birthdays-title">Aniversariantes do mes</strong>
                     <div id="summary-birthdays-list">Nenhum aniversariante cadastrado.</div>
                 </div>
+            </div>
+
+            <div class="dashboard-content-grid">
+                <section class="dash-panel agenda-preview">
+                    <div class="dash-panel-head">
+                        <h2 id="today-agenda-title">Agenda de hoje</h2>
+                        <a href="#agenda">Ver agenda completa</a>
+                    </div>
+                    <div class="appointment-list" id="today-appointment-list">
+                        <p class="appointment-empty">Os pacientes do dia aparecem aqui conforme a agenda semanal.</p>
+                    </div>
+                </section>
+
+                <aside class="dashboard-side-stack">
+                    <section class="dash-panel">
+                        <div class="dash-panel-head">
+                            <h2>Resumo financeiro (<span id="finance-month-label">Abril</span>)</h2>
+                            <a href="#pagamentos">Ver pagamentos</a>
+                        </div>
+                        <div class="finance-total-card">
+                            <p>Total recebido no mes</p>
+                            <div class="hero-receipts-topline">
+                                <strong id="finance-receipts-total">R$ 0,00</strong>
+                                <button type="button" class="money-toggle" id="finance-money-toggle" aria-label="Ocultar valor" aria-pressed="false" title="Ocultar valor"></button>
+                            </div>
+                        </div>
+                        <div class="finance-payment-list" id="finance-payment-list">
+                            <p class="appointment-empty">Os pagamentos do mes aparecem aqui.</p>
+                        </div>
+                    </section>
+                </aside>
             </div>
         </div>
     </header>
@@ -125,10 +188,6 @@
                 <button id="patient-add" class="patient-add" type="button">Adicionar</button>
             </div>
             <button class="print-selected" type="button">Imprimir mes</button>
-            <div class="month-picker">
-                <input id="view-month" type="month">
-                <button id="view-month-btn" type="button">Selecionar mes</button>
-            </div>
             <div class="color-palette" aria-label="Paleta de cores">
                 <button class="color-btn black active" type="button" data-color="black">Preto</button>
                 <button class="color-btn green" type="button" data-color="green">Verde</button>
@@ -797,9 +856,8 @@
             <div class="eval-detail" id="eval-detail"></div>
         </div>
     </section>
-    <button class="supply-toggle" type="button" id="supply-toggle" aria-controls="supply-drawer" aria-expanded="false">
-        Faltas <span id="supply-count">0</span>
-    </button>
+        </main>
+    </div>
     <aside class="supply-drawer" id="supply-drawer" aria-hidden="true">
         <div class="supply-head">
             <div>
@@ -1212,12 +1270,19 @@
             input.setAttribute("autocomplete", "off");
         });
         const sessionsMonth = document.getElementById("sessions-month");
+        const todayPatientsCount = document.getElementById("today-patients-count");
+        const weekPatientsCount = document.getElementById("week-patients-count");
+        const todayAgendaTitle = document.getElementById("today-agenda-title");
+        const todayAppointmentList = document.getElementById("today-appointment-list");
         const summaryMonthLabel = document.getElementById("summary-month-label");
         const summaryMonthInline = document.getElementById("summary-month-inline");
-        const summaryMonthPayments = document.getElementById("summary-month-payments");
+        const financeMonthLabel = document.getElementById("finance-month-label");
         const summaryBirthdaysTitle = document.getElementById("summary-birthdays-title");
         const summaryBirthdaysList = document.getElementById("summary-birthdays-list");
         const moneyToggle = document.getElementById("money-toggle");
+        const financeMoneyToggle = document.getElementById("finance-money-toggle");
+        const financeReceiptsTotal = document.getElementById("finance-receipts-total");
+        const financePaymentList = document.getElementById("finance-payment-list");
         const weekCountElements = [
             document.getElementById("week-1-count"),
             document.getElementById("week-2-count"),
@@ -1233,13 +1298,13 @@
         const historyList = document.getElementById("history-list");
         const historyPreview = document.getElementById("history-preview");
         const viewMonth = document.getElementById("view-month");
-        const viewMonthBtn = document.getElementById("view-month-btn");
         const weekTitles = document.querySelectorAll(".week-title");
         let paymentsBody = null;
         let receiptsTotal = null;
         const storageKey = "agenda-historico-v1";
         const storageIndexKey = "agenda-historico-index";
         const selectedViewMonthKey = "agenda-mes-selecionado";
+        const selectedViewMonthRemoteKey = "0000-00";
         const supabaseUrl = "https://lhnglzxyeazxlxihobzx.supabase.co";
         const supabaseAnonKey = "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9";
         const supabaseClient = window.supabase
@@ -1311,8 +1376,10 @@
                 month.querySelectorAll(".patient-chip").length
             );
             setWeeklyCounts(weeklyCounts);
+            updateWeekPatientsCount(weeklyCounts);
             const totalSessions = weeklyCounts.reduce((sum, count) => sum + count, 0);
             sessionsMonth.textContent = totalSessions.toString();
+            updateTodayAgenda();
             updateReceiptsTotal();
         }
 
@@ -1343,6 +1410,147 @@
                 const value = weeklyCounts[index] || 0;
                 element.textContent = value.toString();
             });
+        }
+
+        function getSelectedWeekIndex() {
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+            if (selectedMonth !== currentMonth) return 0;
+            const ranges = getCalendarWeekRanges(selectedMonth);
+            const currentDay = now.getDate();
+            const weekIndex = ranges.findIndex((range) => currentDay >= range.start && currentDay <= range.end);
+            return weekIndex >= 0 ? weekIndex : 0;
+        }
+
+        function updateWeekPatientsCount(weeklyCounts) {
+            if (!weekPatientsCount) return;
+            const weekIndex = getSelectedWeekIndex();
+            weekPatientsCount.textContent = String(weeklyCounts[weekIndex] || 0);
+        }
+
+        function getTodayAgendaItems() {
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+            const dayIndex = now.getDay() - 1;
+            if (selectedMonth !== currentMonth || dayIndex < 0 || dayIndex > 5) {
+                return [];
+            }
+
+            const ranges = getCalendarWeekRanges(selectedMonth);
+            const currentDay = now.getDate();
+            const weekIndex = ranges.findIndex((range) => currentDay >= range.start && currentDay <= range.end);
+            const month = getVisibleMonths()[weekIndex];
+            if (!month) {
+                return [];
+            }
+
+            const cells = Array.from(month.querySelectorAll(".cell"));
+            return cells
+                .map((cell, index) => ({ cell, index }))
+                .filter((item) => item.index % 6 === dayIndex)
+                .flatMap((item) => {
+                    const row = item.cell.closest(".schedule-row");
+                    const time = row?.querySelector("span")?.textContent.trim() || "";
+                    return Array.from(item.cell.querySelectorAll(".patient-chip")).map((chip) => ({
+                        time,
+                        name: chip.querySelector(".chip-text")?.textContent.trim() || chip.textContent.trim()
+                    }));
+                })
+                .filter((item) => item.name);
+        }
+
+        function getInitials(name) {
+            return name
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part[0])
+                .join("")
+                .toUpperCase();
+        }
+
+        function updateTodayAgenda() {
+            const now = new Date();
+            const dayIndex = now.getDay() - 1;
+            if (todayAgendaTitle) {
+                todayAgendaTitle.textContent = dayIndex >= 0 && dayIndex <= 5
+                    ? `Agenda de hoje - ${getDayName(dayIndex)}`
+                    : "Agenda de hoje";
+            }
+
+            const items = getTodayAgendaItems();
+            if (todayPatientsCount) {
+                todayPatientsCount.textContent = items.length.toString();
+            }
+
+            if (!todayAppointmentList) return;
+            todayAppointmentList.innerHTML = "";
+
+            if (!items.length) {
+                const empty = document.createElement("p");
+                empty.className = "appointment-empty";
+                empty.textContent = "Nenhum paciente marcado para hoje na agenda semanal.";
+                todayAppointmentList.appendChild(empty);
+                return;
+            }
+
+            items.forEach((item) => {
+                const row = document.createElement("div");
+                row.className = "appointment-row";
+
+                const time = document.createElement("time");
+                time.textContent = item.time || "--:--";
+
+                const avatar = document.createElement("span");
+                avatar.className = "avatar";
+                avatar.textContent = getInitials(item.name) || "P";
+
+                const info = document.createElement("div");
+                const name = document.createElement("strong");
+                name.textContent = item.name;
+                const note = document.createElement("small");
+                note.textContent = "Paciente da agenda semanal";
+                info.appendChild(name);
+                info.appendChild(note);
+
+                const status = document.createElement("em");
+                status.textContent = "Agendado";
+
+                row.appendChild(time);
+                row.appendChild(avatar);
+                row.appendChild(info);
+                row.appendChild(status);
+                todayAppointmentList.appendChild(row);
+            });
+        }
+
+        function updateTodayPatientsCount() {
+            if (!todayPatientsCount) return;
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+            const dayIndex = now.getDay() - 1;
+            if (selectedMonth !== currentMonth || dayIndex < 0 || dayIndex > 5) {
+                todayPatientsCount.textContent = "0";
+                return;
+            }
+
+            const ranges = getCalendarWeekRanges(selectedMonth);
+            const currentDay = now.getDate();
+            const weekIndex = ranges.findIndex((range) => currentDay >= range.start && currentDay <= range.end);
+            const month = getVisibleMonths()[weekIndex];
+            if (!month) {
+                todayPatientsCount.textContent = "0";
+                return;
+            }
+
+            const cells = Array.from(month.querySelectorAll(".cell"));
+            const total = cells
+                .filter((cell, index) => index % 6 === dayIndex)
+                .reduce((sum, cell) => sum + cell.querySelectorAll(".patient-chip").length, 0);
+            todayPatientsCount.textContent = total.toString();
         }
 
         async function saveAgendaForCurrentMonth() {
@@ -1731,7 +1939,7 @@
             const monthName = getMonthName(monthValue) || "este mes";
             summaryMonthLabel.textContent = monthName;
             summaryMonthInline.textContent = monthName;
-            summaryMonthPayments.textContent = monthName;
+            if (financeMonthLabel) financeMonthLabel.textContent = monthName;
             updateReceiptsTotal();
         }
 
@@ -1768,10 +1976,14 @@
                     .from("agendas")
                     .select("month")
                     .order("month", { ascending: false });
-                list = data ? data.map((row) => row.month) : [];
+                list = data
+                    ? data.map((row) => row.month).filter((month) => isValidMonthValue(month) && month !== selectedViewMonthRemoteKey)
+                    : [];
             } else {
                 const raw = localStorage.getItem(storageIndexKey);
-                list = raw ? JSON.parse(raw) : [];
+                list = raw
+                    ? JSON.parse(raw).filter((month) => isValidMonthValue(month) && month !== selectedViewMonthRemoteKey)
+                    : [];
             }
             historyList.innerHTML = "";
             if (!list.length) {
@@ -1955,6 +2167,34 @@
             }
         }
 
+        async function saveSharedSelectedViewMonth(month) {
+            if (!supabaseClient || !isValidMonthValue(month)) return;
+            const { error } = await supabaseClient
+                .from("agendas")
+                .upsert({
+                    month: selectedViewMonthRemoteKey,
+                    data: { selectedMonth: month }
+                }, { onConflict: "month" });
+            if (error) {
+                console.warn("Falha ao salvar mes selecionado no Supabase.", error);
+            }
+        }
+
+        async function getSharedSelectedViewMonth() {
+            if (!supabaseClient) return "";
+            const { data, error } = await supabaseClient
+                .from("agendas")
+                .select("data")
+                .eq("month", selectedViewMonthRemoteKey)
+                .maybeSingle();
+            if (error) {
+                console.warn("Falha ao carregar mes selecionado no Supabase.", error);
+                return "";
+            }
+            const month = data?.data?.selectedMonth;
+            return isValidMonthValue(month) ? month : "";
+        }
+
         function getDefaultViewMonth() {
             const savedMonth = localStorage.getItem(selectedViewMonthKey);
             if (isValidMonthValue(savedMonth)) {
@@ -1979,11 +2219,14 @@
             return formatted;
         }
 
-        async function loadSelectedMonth(monthValue) {
+        async function loadSelectedMonth(monthValue, options = {}) {
             const month = monthValue || normalizeViewMonth();
             viewMonth.value = month;
             historyMonth.value = month;
             saveSelectedViewMonth(month);
+            if (options.syncShared !== false) {
+                await saveSharedSelectedViewMonth(month);
+            }
             updateSummaryMonth(month);
             syncPaymentDateWithSelectedMonth();
             updatePaymentsVisibility();
@@ -2020,15 +2263,21 @@
             }
         }
 
-        viewMonthBtn.addEventListener("click", async () => {
-            await loadSelectedMonth(viewMonth.value || normalizeViewMonth());
-        });
-
         viewMonth.addEventListener("change", async () => {
             await loadSelectedMonth(viewMonth.value || normalizeViewMonth());
         });
 
-        loadSelectedMonth(normalizeViewMonth());
+        viewMonth.parentElement?.addEventListener("click", () => {
+            viewMonth.focus();
+            if (typeof viewMonth.showPicker === "function") {
+                viewMonth.showPicker();
+            }
+        });
+
+        (async () => {
+            const sharedMonth = await getSharedSelectedViewMonth();
+            await loadSelectedMonth(sharedMonth || normalizeViewMonth(), { syncShared: !sharedMonth });
+        })();
 
         paymentsBody = document.getElementById("payments-body");
         const payPaciente = document.getElementById("pay-paciente");
@@ -2039,7 +2288,7 @@
         const paySessoes = document.getElementById("pay-sessoes");
         const payAdd = document.getElementById("pay-add");
         const printPayments = document.getElementById("print-payments");
-        receiptsTotal = document.getElementById("receipts-total");
+        receiptsTotal = document.getElementById("finance-receipts-total");
 
         function formatCurrency(value) {
             if (!value) return "R$ 0,00";
@@ -2252,23 +2501,26 @@
         }
 
         function renderReceiptsTotal() {
-            if (!receiptsTotal) return;
-            receiptsTotal.textContent = receiptsVisible
+            const text = receiptsVisible
                 ? formatCurrency(currentReceiptsTotal)
                 : formatHiddenCurrency(currentReceiptsTotal);
+            if (receiptsTotal) receiptsTotal.textContent = text;
+            if (financeReceiptsTotal) financeReceiptsTotal.textContent = text;
         }
 
         function syncMoneyToggleState() {
-            if (!moneyToggle) return;
             const label = receiptsVisible ? "Ocultar valor" : "Mostrar valor";
-            moneyToggle.innerHTML = receiptsVisible ? moneyToggleIcons.visible : moneyToggleIcons.hidden;
-            moneyToggle.setAttribute("aria-label", label);
-            moneyToggle.setAttribute("title", label);
-            moneyToggle.setAttribute("aria-pressed", receiptsVisible ? "false" : "true");
+            [moneyToggle, financeMoneyToggle].forEach((button) => {
+                if (!button) return;
+                button.innerHTML = receiptsVisible ? moneyToggleIcons.visible : moneyToggleIcons.hidden;
+                button.setAttribute("aria-label", label);
+                button.setAttribute("title", label);
+                button.setAttribute("aria-pressed", receiptsVisible ? "false" : "true");
+            });
         }
 
         function updateReceiptsTotal() {
-            if (!paymentsBody || !receiptsTotal) return;
+            if (!paymentsBody) return;
             const rows = Array.from(paymentsBody.querySelectorAll("tr"));
             const selectedMonth = viewMonth.value || normalizeViewMonth();
             const sum = rows.reduce((total, row) => {
@@ -2282,6 +2534,42 @@
             }, 0);
             currentReceiptsTotal = sum;
             renderReceiptsTotal();
+            updateFinancePaymentList();
+        }
+
+        function updateFinancePaymentList() {
+            if (!financePaymentList || !paymentsBody) return;
+            const rows = Array.from(paymentsBody.querySelectorAll("tr")).filter((row) => !row.hidden);
+            financePaymentList.innerHTML = "";
+
+            if (!rows.length) {
+                const empty = document.createElement("p");
+                empty.className = "appointment-empty";
+                empty.textContent = "Nenhum pagamento registrado neste mes.";
+                financePaymentList.appendChild(empty);
+                return;
+            }
+
+            rows.slice(0, 8).forEach((row) => {
+                const cells = row.querySelectorAll("td");
+                const item = document.createElement("div");
+                item.className = "finance-payment-row";
+
+                const info = document.createElement("div");
+                const name = document.createElement("strong");
+                name.textContent = cells[0]?.textContent.trim() || "Paciente";
+                const date = document.createElement("small");
+                date.textContent = cells[3]?.textContent.trim() || "-";
+                info.appendChild(name);
+                info.appendChild(date);
+
+                const value = document.createElement("em");
+                value.textContent = cells[2]?.textContent.trim() || "R$ 0,00";
+
+                item.appendChild(info);
+                item.appendChild(value);
+                financePaymentList.appendChild(item);
+            });
         }
 
         function updatePaymentsVisibility() {
@@ -2395,20 +2683,26 @@
             updatePaymentsVisibility();
         }
 
-        if (moneyToggle) {
-            syncMoneyToggleState();
-            moneyToggle.addEventListener("click", () => {
-                if (!receiptsVisible) {
-                    const enteredPassword = window.prompt("Digite a senha de 3 digitos para mostrar o valor:");
-                    if (enteredPassword !== moneyTogglePassword) {
-                        window.alert("Senha incorreta.");
-                        return;
-                    }
+        function toggleReceiptsVisibility() {
+            if (!receiptsVisible) {
+                const enteredPassword = window.prompt("Digite a senha de 3 digitos para mostrar o valor:");
+                if (enteredPassword !== moneyTogglePassword) {
+                    window.alert("Senha incorreta.");
+                    return;
                 }
-                receiptsVisible = !receiptsVisible;
-                syncMoneyToggleState();
-                renderReceiptsTotal();
-            });
+            }
+            receiptsVisible = !receiptsVisible;
+            syncMoneyToggleState();
+            renderReceiptsTotal();
+        }
+
+        [moneyToggle, financeMoneyToggle].forEach((button) => {
+            if (!button) return;
+            button.addEventListener("click", toggleReceiptsVisibility);
+        });
+
+        if (moneyToggle || financeMoneyToggle) {
+            syncMoneyToggleState();
         }
 
         loadPayments();
