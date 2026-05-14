@@ -202,7 +202,8 @@ a {
     gap: 10px;
 }
 
-.logout-btn {
+.logout-btn,
+.theme-toggle {
     border: none;
     background: rgba(255, 255, 255, 0.06);
     color: #dce8f2;
@@ -212,6 +213,12 @@ a {
     cursor: pointer;
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle {
+    background: rgba(0, 208, 132, 0.1);
+    border-color: rgba(0, 208, 132, 0.22);
+    color: #24eaa7;
 }
 
 .btn {
@@ -1975,7 +1982,8 @@ th {
         margin-left: auto;
     }
 
-    .logout-btn {
+    .logout-btn,
+    .theme-toggle {
         width: auto;
     }
 
@@ -2069,6 +2077,13 @@ th {
 .supply-saved-title small {
     color: var(--muted);
     font-size: 0.8rem;
+}
+
+.supply-head-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .supply-head button {
@@ -3111,6 +3126,271 @@ body:not(.print-window) .chip-remove {
     width: 12px;
     height: 12px;
     font-size: 0.55rem;
+}
+
+body.light-theme {
+    --bg: #dce7f1;
+    --ink: #142033;
+    --muted: #5d6f84;
+    --brand: #2f6f93;
+    --brand-dark: #235b7a;
+    --card: #ffffff;
+    --shadow: 0 14px 30px rgba(28, 48, 70, 0.16);
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(47, 111, 147, 0.12), transparent 32%),
+        linear-gradient(135deg, #e2ecf5 0%, #d8e4ef 58%, #e8eef5 100%);
+}
+
+body.light-theme .login-gate {
+    background: linear-gradient(135deg, #e8f2ff 0%, #f8fbff 50%, #e6f7f2 100%);
+}
+
+body.light-theme .login-box,
+body.light-theme:not(.print-window) .side-panel,
+body.light-theme:not(.print-window) .hero-services,
+body.light-theme:not(.print-window) .card,
+body.light-theme:not(.print-window) .history-card,
+body.light-theme:not(.print-window) .supply-drawer,
+body.light-theme:not(.print-window) .dash-panel,
+body.light-theme:not(.print-window) .schedule,
+body.light-theme:not(.print-window) .table-wrap,
+body.light-theme:not(.print-window) .payment-form,
+body.light-theme:not(.print-window) .fee-simulator,
+body.light-theme:not(.print-window) .eval-card,
+body.light-theme:not(.print-window) .eval-detail,
+body.light-theme:not(.print-window) .eval-list,
+body.light-theme:not(.print-window) .exam-request-card,
+body.light-theme:not(.print-window) .contact-card {
+    background: rgba(247, 250, 253, 0.94);
+    border-color: #cbd9e7;
+    color: #142033;
+    box-shadow: var(--shadow);
+}
+
+body.light-theme:not(.print-window) .side-panel {
+    background: #eef4fa;
+    border-right-color: #c6d5e4;
+}
+
+body.light-theme .brand-mark,
+body.light-theme:not(.print-window) .quick-action span {
+    background: rgba(47, 111, 147, 0.12);
+    color: #235b7a;
+}
+
+body.light-theme .brand-sub,
+body.light-theme .nav-links,
+body.light-theme .dashboard-top p,
+body.light-theme:not(.print-window) .fee-results small,
+body.light-theme:not(.print-window) .schedule-row > span {
+    color: #5d6f84;
+}
+
+body.light-theme .nav-links a:hover,
+body.light-theme .nav-links a:focus {
+    background: rgba(47, 111, 147, 0.1);
+    color: #235b7a;
+}
+
+body.light-theme:not(.print-window) .dashboard-month-card,
+body.light-theme:not(.print-window) .hero-card-top,
+body.light-theme:not(.print-window) .quick-action,
+body.light-theme:not(.print-window) .service-action,
+body.light-theme:not(.print-window) .finance-total-card,
+body.light-theme:not(.print-window) .finance-mini,
+body.light-theme:not(.print-window) .dashboard-search,
+body.light-theme:not(.print-window) .doctor-chip,
+body.light-theme:not(.print-window) .hero-week-list,
+body.light-theme:not(.print-window) .hero-total-block,
+body.light-theme:not(.print-window) .hero-receipts,
+body.light-theme:not(.print-window) .consult-stat-card {
+    background: #f7fafd;
+    border-color: #cbd9e7;
+    color: #142033;
+    box-shadow: var(--shadow);
+}
+
+body.light-theme:not(.print-window) .dashboard-search input {
+    background: transparent;
+    border: 0;
+}
+
+body.light-theme:not(.print-window) .today-total,
+body.light-theme:not(.print-window) .finance-total-card strong,
+body.light-theme:not(.print-window) .finance-mini strong,
+body.light-theme:not(.print-window) .hero-receipts strong,
+body.light-theme:not(.print-window) .hero-total-block strong,
+body.light-theme:not(.print-window) .appointment-row strong,
+body.light-theme:not(.print-window) .patient-mini-list strong {
+    color: #142033;
+}
+
+body.light-theme:not(.print-window) .appointment-row,
+body.light-theme:not(.print-window) .finance-payment-row,
+body.light-theme:not(.print-window) .patient-mini-list > div {
+    border-bottom-color: #dce6f2;
+}
+
+body.light-theme:not(.print-window) .add-patient,
+body.light-theme:not(.print-window) .month-picker,
+body.light-theme:not(.print-window) .dashboard-month-picker,
+body.light-theme:not(.print-window) .print-selected,
+body.light-theme:not(.print-window) .week-print,
+body.light-theme:not(.print-window) .history-save,
+body.light-theme:not(.print-window) .history-load,
+body.light-theme:not(.print-window) .history-item,
+body.light-theme:not(.print-window) .color-btn,
+body.light-theme .logout-btn,
+body.light-theme .theme-toggle {
+    background: #e9f0f7;
+    border-color: #c6d5e4;
+    color: #142033;
+    box-shadow: none;
+}
+
+body.light-theme:not(.print-window) input,
+body.light-theme:not(.print-window) select,
+body.light-theme:not(.print-window) textarea,
+body.light-theme:not(.print-window) .dashboard-month-picker input {
+    background: #f8fbfe;
+    border-color: #c4d4e4;
+    color: #142033;
+    color-scheme: light;
+}
+
+body.light-theme:not(.print-window) input::placeholder,
+body.light-theme:not(.print-window) textarea::placeholder {
+    color: #8a9aac;
+}
+
+body.light-theme:not(.print-window) .schedule-header,
+body.light-theme:not(.print-window) th {
+    background: #c9d8e8;
+    color: #142033;
+}
+
+body.light-theme:not(.print-window) .schedule-header span {
+    color: #43566c;
+}
+
+body.light-theme:not(.print-window) .week-title {
+    background: #b5cae6;
+    border-color: #9db6d5;
+    color: #16324c;
+}
+
+body.light-theme:not(.print-window) .cell {
+    background: #dde8f2;
+    border-color: #b7c9dc;
+    color: #142033;
+}
+
+body.light-theme:not(.print-window) .cell:hover,
+body.light-theme:not(.print-window) .cell-active {
+    background: #d0deeb;
+    outline-color: #2f6f93;
+}
+
+body.light-theme:not(.print-window) td {
+    color: #142033;
+    border-color: #dce6f2;
+}
+
+body.light-theme:not(.print-window) .supply-toggle,
+body.light-theme:not(.print-window) .btn.primary,
+body.light-theme:not(.print-window) .supply-form button,
+body.light-theme:not(.print-window) .dashboard-month-picker button,
+body.light-theme:not(.print-window) .month-picker button,
+body.light-theme:not(.print-window) .add-patient button,
+body.light-theme:not(.print-window) .history-save.schedule-save,
+body.light-theme:not(.print-window) .payment-actions button,
+body.light-theme:not(.print-window) .exam-actions button,
+body.light-theme:not(.print-window) #eval-salvar,
+body.light-theme:not(.print-window) .eval-add-evolution,
+body.light-theme:not(.print-window) .eval-question-actions button,
+body.light-theme:not(.print-window) .eval-print {
+    background: linear-gradient(135deg, #2f6f93, #235b7a);
+    border-color: transparent;
+    color: #ffffff;
+}
+
+body.light-theme:not(.print-window) .supply-toggle span {
+    background: #f7fafd;
+    color: #235b7a;
+}
+
+body.light-theme:not(.print-window) .supply-row,
+body.light-theme:not(.print-window) .supply-chip,
+body.light-theme:not(.print-window) .supply-empty,
+body.light-theme:not(.print-window) .fee-results div,
+body.light-theme:not(.print-window) .eval-evolution-entry,
+body.light-theme:not(.print-window) .eval-question-answer,
+body.light-theme:not(.print-window) .eval-professional {
+    background: #dce8f2;
+    border-color: #b7c9dc;
+    color: #142033;
+}
+
+body.light-theme:not(.print-window) .fee-results small {
+    color: #465b72;
+}
+
+body.light-theme:not(.print-window) .fee-results strong {
+    color: #142033;
+}
+
+body.light-theme:not(.print-window) .patient-chip.chip-black {
+    background: #eef2f7;
+    border-color: #b8c2cf;
+    color: #1f2937;
+}
+
+body.light-theme:not(.print-window) .patient-chip.chip-green {
+    background: #dfeee9;
+    border-color: #9ebfb4;
+    color: #326556;
+}
+
+body.light-theme:not(.print-window) .patient-chip.chip-blue {
+    background: #e3ecff;
+    border-color: #9db8ed;
+    color: #24528f;
+}
+
+body.light-theme:not(.print-window) .patient-chip.chip-orange {
+    background: #fff0dc;
+    border-color: #e5bd8d;
+    color: #8a541f;
+}
+
+body.light-theme:not(.print-window) .eval-item,
+body.light-theme:not(.print-window) .name-tag.status-green,
+body.light-theme:not(.print-window) .legend .green,
+body.light-theme:not(.print-window) .summary-label,
+body.light-theme:not(.print-window) .dashboard-kicker,
+body.light-theme:not(.print-window) .dash-panel-head a,
+body.light-theme:not(.print-window) .appointment-row time {
+    color: #235b7a;
+}
+
+body.light-theme:not(.print-window) .color-btn.green,
+body.light-theme:not(.print-window) .cell.status-green,
+body.light-theme:not(.print-window) .exam-options label,
+body.light-theme:not(.print-window) .eval-item,
+body.light-theme:not(.print-window) .eval-detail,
+body.light-theme:not(.print-window) .eval-question-answer,
+body.light-theme:not(.print-window) .eval-professional,
+body.light-theme:not(.print-window) .fee-results div {
+    background: #dce8f2;
+    border-color: #b7c9dc;
+    color: #235b7a;
+}
+
+body.light-theme:not(.print-window) .appointment-row em,
+body.light-theme:not(.print-window) .patient-mini-list em {
+    background: #e2edf6;
+    color: #235b7a;
 }
 
 @media print {

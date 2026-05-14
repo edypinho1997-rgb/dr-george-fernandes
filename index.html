@@ -41,7 +41,6 @@
             <nav class="nav-links">
                 <a href="#inicio">Inicio</a>
                 <a href="#agenda">Agenda</a>
-                <a href="#pacientes">Pacientes</a>
                 <a href="#avaliacao">Avaliacao</a>
                 <a href="#pagamentos">Pagamentos</a>
                 <a href="exames.html" target="_blank" rel="noopener">Exames</a>
@@ -49,8 +48,9 @@
             </nav>
             <div class="topbar-actions">
                 <button class="supply-toggle" type="button" id="supply-toggle" aria-controls="supply-drawer" aria-expanded="false">
-                    Faltas <span id="supply-count">0</span>
+                    Compras <span id="supply-count">0</span>
                 </button>
+                <button class="theme-toggle" id="theme-toggle" type="button">Mudar tema</button>
                 <button class="logout-btn" id="logout-btn" type="button">Sair</button>
             </div>
         </aside>
@@ -861,10 +861,13 @@
     <aside class="supply-drawer" id="supply-drawer" aria-hidden="true">
         <div class="supply-head">
             <div>
-                <strong>O que falta</strong>
+                <strong>Compras</strong>
                 <small>Produtos para comprar</small>
             </div>
-            <button type="button" id="supply-close" aria-label="Fechar lista">Fechar</button>
+            <div class="supply-head-actions">
+                <button type="button" id="supply-print">Imprimir lista</button>
+                <button type="button" id="supply-close" aria-label="Fechar lista">Fechar</button>
+            </div>
         </div>
         <form class="supply-form" id="supply-form">
             <input id="supply-input" type="text" placeholder="Ex: sabao, papel, luva" autocomplete="off">
@@ -887,13 +890,16 @@
         const loginPassword = document.getElementById("login-password");
         const loginError = document.getElementById("login-error");
         const logoutBtn = document.getElementById("logout-btn");
+        const themeToggle = document.getElementById("theme-toggle");
         const loginSessionKey = "clinica-login-liberado";
+        const themePreferenceKey = "clinica-tema-preferido";
         const allowedLogin = "reg";
         const allowedPassword = "123";
 
         const supplyToggle = document.getElementById("supply-toggle");
         const supplyDrawer = document.getElementById("supply-drawer");
         const supplyClose = document.getElementById("supply-close");
+        const supplyPrint = document.getElementById("supply-print");
         const supplyForm = document.getElementById("supply-form");
         const supplyInput = document.getElementById("supply-input");
         const supplyList = document.getElementById("supply-list");
@@ -906,6 +912,29 @@
         let supplyCatalogState = [];
         let supplyUseLocalFallback = false;
         let supplyLocalMigrationAttempted = false;
+
+        function applyTheme(theme) {
+            const light = theme === "light";
+            document.body.classList.toggle("light-theme", light);
+            document.body.classList.toggle("dark-theme", !light);
+            if (themeToggle) {
+                themeToggle.setAttribute("aria-pressed", light ? "true" : "false");
+                themeToggle.title = light ? "Tema claro ativo" : "Tema escuro ativo";
+            }
+        }
+
+        function getPreferredTheme() {
+            const savedTheme = localStorage.getItem(themePreferenceKey);
+            return savedTheme === "light" ? "light" : "dark";
+        }
+
+        function toggleTheme() {
+            const nextTheme = document.body.classList.contains("light-theme") ? "dark" : "light";
+            localStorage.setItem(themePreferenceKey, nextTheme);
+            applyTheme(nextTheme);
+        }
+
+        applyTheme(getPreferredTheme());
 
         function unlockSite() {
             loginGate.classList.add("hidden");
@@ -1063,7 +1092,7 @@
             if (!missing.length) {
                 const empty = document.createElement("p");
                 empty.className = "supply-empty";
-                empty.textContent = "Nada marcado como faltando.";
+                empty.textContent = "Nada na lista de compras.";
                 supplyList.appendChild(empty);
             } else {
                 missing.forEach((name) => {
@@ -1126,6 +1155,42 @@
                     supplySuggestions.appendChild(chip);
                 });
             }
+        }
+
+        function printSupplyList() {
+            const items = supplyMissingState.length ? supplyMissingState : readJsonList(supplyMissingKey);
+            const printWindow = window.open("", "_blank", "width=760,height=700");
+            if (!printWindow) return;
+
+            const today = new Date().toLocaleDateString("pt-BR");
+            const listItems = items.length
+                ? items.map((item) => `<li><span></span>${escapeHtml(item)}</li>`).join("")
+                : "<li>Nenhum produto marcado para comprar.</li>";
+            const html = `<!doctype html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Lista de compras</title>
+                    <style>
+                        body { margin: 0; padding: 18mm; color: #111827; font-family: Arial, sans-serif; }
+                        h1 { margin: 0 0 4mm; font-size: 18pt; }
+                        p { margin: 0 0 8mm; color: #4b5563; }
+                        ul { display: grid; gap: 5mm; margin: 0; padding: 0; list-style: none; }
+                        li { display: flex; align-items: center; gap: 4mm; font-size: 13pt; border-bottom: 1px solid #d1d5db; padding-bottom: 3mm; }
+                        li span { width: 5mm; height: 5mm; border: 1.5px solid #111827; border-radius: 2px; flex: 0 0 auto; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Lista de compras</h1>
+                    <p>Impresso em ${escapeHtml(today)}</p>
+                    <ul>${listItems}</ul>
+                    <script>window.onload = () => window.print();<\/script>
+                </body>
+                </html>`;
+
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
         }
 
         async function migrateLocalSupplyItemsToSupabase() {
@@ -1203,6 +1268,8 @@
         });
 
         supplyClose.addEventListener("click", closeSupplyDrawer);
+        supplyPrint.addEventListener("click", printSupplyList);
+        themeToggle.addEventListener("click", toggleTheme);
 
         supplyForm.addEventListener("submit", (event) => {
             event.preventDefault();
