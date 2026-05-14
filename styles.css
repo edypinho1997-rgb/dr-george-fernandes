@@ -3141,52 +3141,133 @@ body:not(.print-window) .chip-remove {
 
     body.print-window {
         background: #fff;
+        color: #111;
+        padding: 7mm;
     }
 
     body.print-window .month {
+        margin: 0 0 5mm;
         page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    body.print-window .month:nth-of-type(2n) {
+        page-break-after: always;
+        break-after: page;
+    }
+
+    body.print-window .week-header {
+        display: block;
+        margin: 0 0 2mm;
+    }
+
+    body.print-window .week-title {
+        min-width: 0;
+        width: 100%;
+        border-radius: 6px;
+        padding: 4px 6px;
+        background: #e7eef7;
+        color: #111827;
+        font-size: 9pt;
+        line-height: 1.15;
+    }
+
+    body.print-window .schedule {
+        margin-top: 0;
+        padding: 0;
+        overflow: visible;
+        border-radius: 6px;
+        border: 1px solid #cfd8e3;
+        box-shadow: none;
+        background: #fff;
+    }
+
+    body.print-window .schedule-header,
+    body.print-window .schedule-row {
+        grid-template-columns: 34px repeat(6, minmax(0, 1fr));
+        gap: 0;
+    }
+
+    body.print-window .schedule-header {
+        margin: 0;
+        background: #eef3f8;
+    }
+
+    body.print-window .schedule-header span,
+    body.print-window .schedule-row > span {
+        color: #111827;
+        font-size: 6.8pt;
+        line-height: 1.1;
+        padding: 2px;
+        border-right: 1px solid #d6dee8;
+    }
+
+    body.print-window .cell {
+        min-height: 15px;
+        border-radius: 0;
+        padding: 1px 2px;
+        border: 1px solid #d6dee8;
+        border-width: 0 0 1px 1px;
+        background: #fff;
+        color: #111827;
+        font-size: 6.8pt;
+        line-height: 1.05;
     }
 
     body.print-window .patient-chip,
     body.print-mode .patient-chip {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        color: #fff !important;
         text-shadow: none;
         box-shadow: none;
         border-width: 1px;
         border-style: solid;
     }
 
+    body.print-window .patient-chip {
+        padding: 0 3px;
+        margin: 0 1px 1px 0;
+        font-size: 6.4pt;
+        line-height: 1.05;
+    }
+
     body.print-window .patient-chip.chip-black,
     body.print-mode .patient-chip.chip-black {
-        background: #000 !important;
-        border-color: #000 !important;
+        background: #e9edf2 !important;
+        border-color: #9aa4b2 !important;
+        color: #1f2937 !important;
     }
 
     body.print-window .patient-chip.chip-green,
     body.print-mode .patient-chip.chip-green {
-        background: #006d1d !important;
-        border-color: #004f15 !important;
+        background: #dff6ec !important;
+        border-color: #7ac5a2 !important;
+        color: #176247 !important;
     }
 
     body.print-window .patient-chip.chip-blue,
     body.print-mode .patient-chip.chip-blue {
-        background: #004ab8 !important;
-        border-color: #00368a !important;
+        background: #e1ecff !important;
+        border-color: #86a9e8 !important;
+        color: #24528f !important;
     }
 
     body.print-window .patient-chip.chip-orange,
     body.print-mode .patient-chip.chip-orange {
-        background: #b85a00 !important;
-        border-color: #8a4300 !important;
+        background: #fff0dc !important;
+        border-color: #e2ae72 !important;
+        color: #8a541f !important;
     }
 
     body.print-window .chip-remove,
     body.print-mode .chip-remove {
-        background: rgba(255, 255, 255, 0.18) !important;
-        border-color: rgba(255, 255, 255, 0.55) !important;
-        color: #fff !important;
+        background: rgba(31, 41, 55, 0.08) !important;
+        border-color: rgba(31, 41, 55, 0.18) !important;
+        color: inherit !important;
+    }
+
+    body.print-window .chip-remove {
+        display: none !important;
     }
 
     body.payments-print-window .payment-remove,
