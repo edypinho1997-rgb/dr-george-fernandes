@@ -871,6 +871,7 @@
         </div>
         <form class="supply-form" id="supply-form">
             <input id="supply-input" type="text" placeholder="Ex: sabao, papel, luva" autocomplete="off">
+            <input id="supply-quantity" class="supply-quantity" type="text" placeholder="Qtd" autocomplete="off">
             <button type="submit">Adicionar</button>
         </form>
         <div class="supply-list" id="supply-list"></div>
@@ -902,6 +903,7 @@
         const supplyPrint = document.getElementById("supply-print");
         const supplyForm = document.getElementById("supply-form");
         const supplyInput = document.getElementById("supply-input");
+        const supplyQuantity = document.getElementById("supply-quantity");
         const supplyList = document.getElementById("supply-list");
         const supplySuggestions = document.getElementById("supply-suggestions");
         const supplyCount = document.getElementById("supply-count");
@@ -964,6 +966,17 @@
             return name.trim().replace(/\s+/g, " ");
         }
 
+        function normalizeSupplyQuantity(quantity) {
+            return quantity.trim().replace(/\s+/g, " ");
+        }
+
+        function formatSupplyName(rawName, rawQuantity = "") {
+            const name = normalizeSupplyName(rawName);
+            if (!name) return "";
+            const quantity = normalizeSupplyQuantity(rawQuantity);
+            return quantity ? `${name} - ${quantity}` : name;
+        }
+
         function supplyHasItem(list, name) {
             return list.some((item) => item.toLowerCase() === name.toLowerCase());
         }
@@ -993,8 +1006,8 @@
             supplyToggle.setAttribute("aria-expanded", "false");
         }
 
-        async function addSupplyItem(rawName) {
-            const name = normalizeSupplyName(rawName);
+        async function addSupplyItem(rawName, rawQuantity = "") {
+            const name = formatSupplyName(rawName, rawQuantity);
             if (!name) return;
 
             if (supabaseClient && !supplyUseLocalFallback) {
@@ -1273,8 +1286,9 @@
 
         supplyForm.addEventListener("submit", (event) => {
             event.preventDefault();
-            addSupplyItem(supplyInput.value);
+            addSupplyItem(supplyInput.value, supplyQuantity.value);
             supplyInput.value = "";
+            supplyQuantity.value = "";
             supplyInput.focus();
         });
 

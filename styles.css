@@ -2115,6 +2115,11 @@ th {
     font-size: 0.9rem;
 }
 
+.supply-form .supply-quantity {
+    flex: 0 0 64px;
+    text-align: center;
+}
+
 .supply-form input::placeholder {
     color: #7f8da0;
 }
@@ -3216,6 +3221,16 @@ body.light-theme:not(.print-window) .dashboard-search input {
     border: 0;
 }
 
+body.light-theme:not(.print-window) .week-inline-tools .add-patient input {
+    background: #f8fbfe;
+    border-color: #c4d4e4;
+    color: #142033;
+}
+
+body.light-theme:not(.print-window) .week-inline-tools .add-patient input::placeholder {
+    color: #8a9aac;
+}
+
 body.light-theme:not(.print-window) .today-total,
 body.light-theme:not(.print-window) .finance-total-card strong,
 body.light-theme:not(.print-window) .finance-mini strong,
@@ -3331,6 +3346,19 @@ body.light-theme:not(.print-window) .eval-professional {
     background: #dce8f2;
     border-color: #b7c9dc;
     color: #142033;
+}
+
+body.light-theme:not(.print-window) .supply-chip button {
+    color: #235b7a;
+}
+
+body.light-theme:not(.print-window) .supply-chip button:disabled {
+    color: #52677d;
+}
+
+body.light-theme:not(.print-window) .supply-chip button + button {
+    border-left-color: #b7c9dc;
+    color: #d04f39;
 }
 
 body.light-theme:not(.print-window) .fee-results small {
