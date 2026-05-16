@@ -43,6 +43,7 @@
                 <a href="#agenda">Agenda</a>
                 <a href="#avaliacao">Avaliacao</a>
                 <a href="#pagamentos">Pagamentos</a>
+                <a href="#gastos-mensais">Gastos mensais</a>
                 <a href="exames.html" target="_blank" rel="noopener">Exames</a>
                 <a href="atestado.html" target="_blank" rel="noopener">Atestado</a>
             </nav>
@@ -170,6 +171,42 @@
                         </div>
                         <div class="finance-payment-list" id="finance-payment-list">
                             <p class="appointment-empty">Os pagamentos do mes aparecem aqui.</p>
+                        </div>
+                    </section>
+                    <section class="dash-panel monthly-expenses-panel" id="gastos-mensais">
+                        <div class="monthly-expenses-head">
+                            <div>
+                                <h3>Gastos do mes</h3>
+                                <p>Despesas do mes selecionado na agenda.</p>
+                            </div>
+                            <button id="expense-print" type="button" class="print-expenses">Imprimir</button>
+                        </div>
+                        <div class="expense-total-card">
+                            <small>Total de gastos</small>
+                            <strong id="expense-total">R$ 0,00</strong>
+                        </div>
+                        <div class="expense-form">
+                            <label class="payment-field" for="expense-item">
+                                Item
+                                <input id="expense-item" type="text" placeholder="Ex: aluguel, luz">
+                            </label>
+                            <label class="payment-field" for="expense-value">
+                                Valor
+                                <input id="expense-value" type="number" step="0.01" placeholder="0,00">
+                            </label>
+                            <button id="expense-add" type="button">Adicionar gasto</button>
+                        </div>
+                        <div class="expense-table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Valor</th>
+                                        <th>Acao</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-body"></tbody>
+                            </table>
                         </div>
                     </section>
                 </aside>
@@ -1381,11 +1418,13 @@
         const viewMonth = document.getElementById("view-month");
         const weekTitles = document.querySelectorAll(".week-title");
         let paymentsBody = null;
+        let expensesBody = null;
         let receiptsTotal = null;
         const storageKey = "agenda-historico-v1";
         const storageIndexKey = "agenda-historico-index";
         const selectedViewMonthKey = "agenda-mes-selecionado";
         const selectedViewMonthRemoteKey = "0000-00";
+        const monthlyExpensesLocalKey = "gastos-mensais-local-v1";
         const supabaseUrl = "https://lhnglzxyeazxlxihobzx.supabase.co";
         const supabaseAnonKey = "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9";
         const supabaseClient = window.supabase
@@ -1403,6 +1442,7 @@
         let collaborativeRefreshTimer = null;
         let realtimeChannel = null;
         let lastPaymentsSignature = "";
+        let lastExpensesSignature = "";
         let lastEvaluationsSignature = "";
         let lastLocalAgendaChangeAt = 0;
         let lastUserInteractionAt = Date.now();
@@ -1410,6 +1450,7 @@
         const sharedRefreshInterval = 300000;
         const sharedRefreshMinGap = 10000;
         const paymentsSelectColumns = "id, paciente, forma, valor, data, pago_por, sessoes";
+        const expensesSelectColumns = "id, item, valor, mes";
         const realtimeRefreshTimers = {};
 
         function serializeData(value) {
@@ -2311,6 +2352,7 @@
             updateSummaryMonth(month);
             syncPaymentDateWithSelectedMonth();
             updatePaymentsVisibility();
+            updateExpensesVisibility();
             setWeekTitlesForMonth(month);
             if (supabaseClient) {
                 const { data } = await supabaseClient
@@ -2361,6 +2403,12 @@
         })();
 
         paymentsBody = document.getElementById("payments-body");
+        expensesBody = document.getElementById("expenses-body");
+        const expenseItem = document.getElementById("expense-item");
+        const expenseValue = document.getElementById("expense-value");
+        const expenseAdd = document.getElementById("expense-add");
+        const expensePrint = document.getElementById("expense-print");
+        const expenseTotal = document.getElementById("expense-total");
         const payPaciente = document.getElementById("pay-paciente");
         const payForma = document.getElementById("pay-forma");
         const payValor = document.getElementById("pay-valor");
@@ -2664,6 +2712,26 @@
             updateReceiptsTotal();
         }
 
+        function updateExpensesTotal() {
+            if (!expensesBody || !expenseTotal) return;
+            const rows = Array.from(expensesBody.querySelectorAll("tr")).filter((row) => !row.hidden);
+            const sum = rows.reduce((total, row) => {
+                const value = Number(row.dataset.value || 0);
+                return total + (Number.isFinite(value) ? value : 0);
+            }, 0);
+            expenseTotal.textContent = formatCurrency(sum);
+        }
+
+        function updateExpensesVisibility() {
+            if (!expensesBody) return;
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            Array.from(expensesBody.querySelectorAll("tr")).forEach((row) => {
+                const rowMonth = row.dataset.month || "";
+                row.hidden = Boolean(selectedMonth && rowMonth && rowMonth !== selectedMonth);
+            });
+            updateExpensesTotal();
+        }
+
         function syncPaymentDateWithSelectedMonth() {
             const selectedMonth = viewMonth.value || normalizeViewMonth();
             if (!selectedMonth) return;
@@ -2673,6 +2741,249 @@
             if (!currentValue || !currentValue.startsWith(selectedMonth)) {
                 paymentDateInput.value = `${selectedMonth}-01`;
             }
+        }
+
+        function readLocalExpenses() {
+            try {
+                const raw = localStorage.getItem(monthlyExpensesLocalKey);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                console.warn("Falha ao carregar gastos locais.", error);
+                return [];
+            }
+        }
+
+        function writeLocalExpenses(items) {
+            localStorage.setItem(monthlyExpensesLocalKey, JSON.stringify(items));
+        }
+
+        function saveLocalExpense(item) {
+            const localItem = {
+                ...item,
+                local_id: item.local_id || `local-${Date.now()}-${Math.random().toString(16).slice(2)}`
+            };
+            const items = readLocalExpenses();
+            items.unshift(localItem);
+            writeLocalExpenses(items);
+            return localItem;
+        }
+
+        function removeLocalExpense(localId) {
+            if (!localId) return;
+            writeLocalExpenses(readLocalExpenses().filter((item) => item.local_id !== localId));
+        }
+
+        async function migrateLocalExpensesToSupabase() {
+            if (!supabaseClient) return null;
+            const localItems = readLocalExpenses();
+            if (!localItems.length) return [];
+
+            const payload = localItems.map((item) => ({
+                item: item.item,
+                valor: Number(item.valor || 0),
+                mes: item.mes
+            }));
+            const { data, error } = await supabaseClient
+                .from("gastos_mensais")
+                .insert(payload)
+                .select();
+
+            if (error) {
+                console.warn("Falha ao migrar gastos locais para o Supabase.", error);
+                return null;
+            }
+
+            writeLocalExpenses([]);
+            return data || [];
+        }
+
+        function appendExpenseRow(item) {
+            if (!expensesBody) return;
+            const row = document.createElement("tr");
+            if (item.id) row.dataset.id = item.id;
+            if (item.local_id) row.dataset.localId = item.local_id;
+            row.dataset.value = String(Number(item.valor || 0));
+            row.dataset.month = item.mes || "";
+
+            const itemCell = document.createElement("td");
+            itemCell.textContent = item.item || "";
+            const valueCell = document.createElement("td");
+            valueCell.textContent = formatCurrency(item.valor);
+            const actionCell = document.createElement("td");
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "expense-remove";
+            removeButton.textContent = "Remover";
+            actionCell.appendChild(removeButton);
+
+            row.appendChild(itemCell);
+            row.appendChild(valueCell);
+            row.appendChild(actionCell);
+            expensesBody.appendChild(row);
+            updateExpensesVisibility();
+        }
+
+        async function addExpense() {
+            const item = expenseItem.value.trim();
+            const valor = expenseValue.value;
+            const mes = viewMonth.value || normalizeViewMonth();
+            if (!item || !valor || !mes) return;
+
+            if (supabaseClient) {
+                const { data: inserted, error } = await supabaseClient
+                    .from("gastos_mensais")
+                    .insert({
+                        item,
+                        valor: Number(valor),
+                        mes
+                    })
+                    .select()
+                    .single();
+                if (error) {
+                    console.warn("Falha ao salvar gasto no Supabase. Salvando localmente.", error);
+                    appendExpenseRow(saveLocalExpense({
+                        item,
+                        valor: Number(valor),
+                        mes
+                    }));
+                } else if (inserted) {
+                    appendExpenseRow(inserted);
+                }
+            } else {
+                appendExpenseRow(saveLocalExpense({
+                    item,
+                    valor: Number(valor),
+                    mes
+                }));
+            }
+
+            expenseItem.value = "";
+            expenseValue.value = "";
+            expenseItem.focus();
+        }
+
+        async function loadExpenses() {
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient
+                    .from("gastos_mensais")
+                    .select(expensesSelectColumns)
+                    .order("mes", { ascending: false })
+                    .order("id", { ascending: false });
+                expensesBody.innerHTML = "";
+                if (error) {
+                    console.warn("Falha ao carregar gastos do Supabase. Usando gastos locais.", error);
+                    readLocalExpenses().forEach(appendExpenseRow);
+                    lastExpensesSignature = "";
+                    updateExpensesVisibility();
+                    return;
+                }
+                const migrated = await migrateLocalExpensesToSupabase();
+                const rows = migrated === null
+                    ? [...readLocalExpenses(), ...(data || [])]
+                    : [...(migrated || []), ...(data || [])];
+                rows.forEach(appendExpenseRow);
+                lastExpensesSignature = serializeData(data || []);
+                updateExpensesVisibility();
+                return;
+            }
+            expensesBody.innerHTML = "";
+            readLocalExpenses().forEach(appendExpenseRow);
+            updateExpensesVisibility();
+        }
+
+        function printExpensesMonth() {
+            if (!expensesBody) return;
+            const selectedMonth = viewMonth.value || normalizeViewMonth();
+            const monthName = getMonthName(selectedMonth) || selectedMonth;
+            const visibleRows = Array.from(expensesBody.querySelectorAll("tr")).filter((row) => !row.hidden);
+            if (!visibleRows.length) return;
+
+            const total = visibleRows.reduce((sum, row) => {
+                const value = Number(row.dataset.value || 0);
+                return sum + (Number.isFinite(value) ? value : 0);
+            }, 0);
+            const styleTag = document.querySelector("link[rel='stylesheet']");
+            const cssHref = styleTag ? styleTag.getAttribute("href") : "styles.css";
+            const tableRows = visibleRows.map((row) => `
+                <tr>
+                    <td>${escapeHtml(row.children[0]?.textContent || "")}</td>
+                    <td>${escapeHtml(row.children[1]?.textContent || "")}</td>
+                </tr>
+            `).join("");
+            const html = `<!doctype html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>Gastos ${monthName}</title>
+                    <link rel="stylesheet" href="${cssHref}">
+                </head>
+                <body class="print-window payments-print-window">
+                    <section class="section">
+                        <div class="section-head">
+                            <h2>Gastos de ${monthName}</h2>
+                            <p>Despesas do mes selecionado na agenda.</p>
+                        </div>
+                        <div class="expense-total-card">
+                            <small>Total de gastos</small>
+                            <strong>${formatCurrency(total)}</strong>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="payments-print-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${tableRows}</tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <script>
+                        window.onload = () => window.print();
+                    <\/script>
+                </body>
+                </html>`;
+
+            const printWindow = window.open("", "_blank", "width=760,height=700");
+            if (!printWindow) return;
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
+
+        if (expenseAdd) {
+            expenseAdd.addEventListener("click", addExpense);
+        }
+
+        if (expenseValue) {
+            expenseValue.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") addExpense();
+            });
+        }
+
+        if (expensesBody) {
+            expensesBody.addEventListener("click", async (event) => {
+                const button = event.target.closest(".expense-remove");
+                if (!button) return;
+                const row = button.closest("tr");
+                if (row?.dataset.localId) {
+                    removeLocalExpense(row.dataset.localId);
+                } else if (row && supabaseClient && row.dataset.id) {
+                    const { error } = await supabaseClient.from("gastos_mensais").delete().eq("id", row.dataset.id);
+                    if (error) {
+                        console.warn("Falha ao remover gasto do Supabase.", error);
+                    }
+                }
+                if (row) row.remove();
+                updateExpensesTotal();
+            });
+        }
+
+        if (expensePrint) {
+            expensePrint.addEventListener("click", printExpensesMonth);
         }
 
         payAdd.addEventListener("click", async () => {
@@ -2787,6 +3098,7 @@
         }
 
         loadPayments();
+        loadExpenses();
 
         function printPaymentsMonth() {
             const selectedMonth = viewMonth.value || normalizeViewMonth();
@@ -4242,6 +4554,25 @@ ${finalNotes}`;
             updatePaymentsVisibility();
         }
 
+        async function refreshExpensesFromRemote() {
+            if (!supabaseClient || document.hidden || !expensesBody) return;
+            const { data, error } = await supabaseClient
+                .from("gastos_mensais")
+                .select(expensesSelectColumns)
+                .order("mes", { ascending: false })
+                .order("id", { ascending: false });
+            if (error) {
+                console.warn("Falha ao atualizar gastos do Supabase.", error);
+                return;
+            }
+            const signature = serializeData(data || []);
+            if (signature === lastExpensesSignature) return;
+            lastExpensesSignature = signature;
+            expensesBody.innerHTML = "";
+            [...readLocalExpenses(), ...(data || [])].forEach(appendExpenseRow);
+            updateExpensesVisibility();
+        }
+
         async function refreshEvaluationsFromRemote() {
             if (!supabaseClient || document.hidden || evalUseLocalFallback) return;
             const { data } = await supabaseClient
@@ -4266,6 +4597,7 @@ ${finalNotes}`;
             try {
                 await refreshAgendaFromRemote();
                 await refreshPaymentsFromRemote();
+                await refreshExpensesFromRemote();
                 await refreshEvaluationsFromRemote();
             } catch (error) {
                 console.error("Falha ao atualizar dados automaticamente", error);
@@ -4301,6 +4633,11 @@ ${finalNotes}`;
                     "postgres_changes",
                     { event: "*", schema: "public", table: "pagamentos" },
                     () => scheduleRealtimeRefresh("pagamentos", refreshPaymentsFromRemote)
+                )
+                .on(
+                    "postgres_changes",
+                    { event: "*", schema: "public", table: "gastos_mensais" },
+                    () => scheduleRealtimeRefresh("gastos_mensais", refreshExpensesFromRemote)
                 )
                 .on(
                     "postgres_changes",

@@ -1637,6 +1637,86 @@ th {
     overflow-x: auto;
 }
 
+.monthly-expenses-panel {
+    margin-top: 18px;
+    background: var(--card);
+    padding: 18px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 14px;
+}
+
+.dashboard-side-stack .monthly-expenses-panel {
+    margin-top: 0;
+}
+
+.monthly-expenses-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.monthly-expenses-head h3,
+.monthly-expenses-head p {
+    margin: 0;
+}
+
+.monthly-expenses-head p {
+    color: var(--muted);
+    font-size: 0.86rem;
+    margin-top: 4px;
+}
+
+.print-expenses {
+    border: none;
+    background: #222;
+    color: #fff;
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 0.86rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.expense-total-card {
+    display: grid;
+    gap: 4px;
+    border: 1px solid rgba(255, 138, 89, 0.22);
+    border-radius: 12px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(255, 138, 89, 0.13) 0%, rgba(255, 255, 255, 0.05) 78%);
+}
+
+.expense-total-card small {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.expense-total-card strong {
+    font-size: 1.25rem;
+}
+
+.expense-form {
+    display: grid;
+    gap: 12px;
+}
+
+.expense-form button {
+    border: none;
+    background: #1b5fbe;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.expense-table-wrap {
+    overflow-x: auto;
+}
+
 .payment-form {
     margin-top: 18px;
     background: var(--card);
@@ -1760,7 +1840,8 @@ th {
     font-size: 1.1rem;
 }
 
-.payment-remove {
+.payment-remove,
+.expense-remove {
     border: none;
     background: #f0f3f9;
     color: #1b2430;
@@ -2898,6 +2979,7 @@ body:not(.print-window) .chip-remove {
     border-color: rgba(255, 255, 255, 0.28);
 }
 
+body:not(.print-window) .monthly-expenses-panel,
 body:not(.print-window) .payment-form,
 body:not(.print-window) .fee-simulator,
 body:not(.print-window) .table-wrap,
@@ -2912,6 +2994,7 @@ body:not(.print-window) .contact-card {
 }
 
 body:not(.print-window) .fee-result,
+body:not(.print-window) .expense-total-card,
 body:not(.print-window) .fee-results div,
 body:not(.print-window) .eval-evolution-entry,
 body:not(.print-window) .eval-question-answer,
@@ -3049,6 +3132,7 @@ body:not(.print-window) .legend .green {
 }
 
 body:not(.print-window) .payment-actions button,
+body:not(.print-window) .expense-form button,
 body:not(.print-window) .exam-actions button,
 body:not(.print-window) #eval-salvar,
 body:not(.print-window) .eval-add-evolution,
@@ -3159,6 +3243,7 @@ body.light-theme:not(.print-window) .history-card,
 body.light-theme:not(.print-window) .supply-drawer,
 body.light-theme:not(.print-window) .dash-panel,
 body.light-theme:not(.print-window) .schedule,
+body.light-theme:not(.print-window) .monthly-expenses-panel,
 body.light-theme:not(.print-window) .table-wrap,
 body.light-theme:not(.print-window) .payment-form,
 body.light-theme:not(.print-window) .fee-simulator,
@@ -3203,6 +3288,7 @@ body.light-theme:not(.print-window) .hero-card-top,
 body.light-theme:not(.print-window) .quick-action,
 body.light-theme:not(.print-window) .service-action,
 body.light-theme:not(.print-window) .finance-total-card,
+body.light-theme:not(.print-window) .expense-total-card,
 body.light-theme:not(.print-window) .finance-mini,
 body.light-theme:not(.print-window) .dashboard-search,
 body.light-theme:not(.print-window) .doctor-chip,
@@ -3321,6 +3407,7 @@ body.light-theme:not(.print-window) .month-picker button,
 body.light-theme:not(.print-window) .add-patient button,
 body.light-theme:not(.print-window) .history-save.schedule-save,
 body.light-theme:not(.print-window) .payment-actions button,
+body.light-theme:not(.print-window) .expense-form button,
 body.light-theme:not(.print-window) .exam-actions button,
 body.light-theme:not(.print-window) #eval-salvar,
 body.light-theme:not(.print-window) .eval-add-evolution,
@@ -3580,7 +3667,9 @@ body.light-theme:not(.print-window) .patient-mini-list em {
     }
 
     body.payments-print-window .payment-remove,
-    body.payments-print-window .print-payments {
+    body.payments-print-window .expense-remove,
+    body.payments-print-window .print-payments,
+    body.payments-print-window .print-expenses {
         display: none !important;
     }
 
