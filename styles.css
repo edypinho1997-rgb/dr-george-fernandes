@@ -3423,6 +3423,12 @@ body.light-theme:not(.print-window) .supply-toggle span {
     color: #235b7a;
 }
 
+body.light-theme:not(.print-window) .payment-remove {
+    background: #eef4fa;
+    border: 1px solid #cbd9e7;
+    color: #142033;
+}
+
 body.light-theme:not(.print-window) .supply-row,
 body.light-theme:not(.print-window) .supply-chip,
 body.light-theme:not(.print-window) .supply-empty,
