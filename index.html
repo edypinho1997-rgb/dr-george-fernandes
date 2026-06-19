@@ -908,7 +908,6 @@
         </div>
         <form class="supply-form" id="supply-form">
             <input id="supply-input" type="text" placeholder="Ex: sabao, papel, luva" autocomplete="off">
-            <input id="supply-quantity" class="supply-quantity" type="text" placeholder="Qtd" autocomplete="off">
             <button type="submit">Adicionar</button>
         </form>
         <div class="supply-list" id="supply-list"></div>
@@ -940,15 +939,16 @@
         const supplyPrint = document.getElementById("supply-print");
         const supplyForm = document.getElementById("supply-form");
         const supplyInput = document.getElementById("supply-input");
-        const supplyQuantity = document.getElementById("supply-quantity");
         const supplyList = document.getElementById("supply-list");
         const supplySuggestions = document.getElementById("supply-suggestions");
         const supplyCount = document.getElementById("supply-count");
         const supplyMissingKey = "clinica-produtos-faltando";
         const supplyCatalogKey = "clinica-produtos-salvos";
+        const supplyQuantityKey = "clinica-produtos-quantidades";
         const supplyTable = "produtos_faltando";
         let supplyMissingState = [];
         let supplyCatalogState = [];
+        let supplyQuantityState = {};
         let supplyUseLocalFallback = false;
         let supplyLocalMigrationAttempted = false;
 
@@ -999,6 +999,19 @@
             localStorage.setItem(key, JSON.stringify(list));
         }
 
+        function readJsonObject(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || "{}");
+                return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function saveJsonObject(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
         function normalizeSupplyName(name) {
             return name.trim().replace(/\s+/g, " ");
         }
@@ -1007,11 +1020,22 @@
             return quantity.trim().replace(/\s+/g, " ");
         }
 
-        function formatSupplyName(rawName, rawQuantity = "") {
-            const name = normalizeSupplyName(rawName);
-            if (!name) return "";
-            const quantity = normalizeSupplyQuantity(rawQuantity);
-            return quantity ? `${name} - ${quantity}` : name;
+        function getSupplyQuantity(name) {
+            return supplyQuantityState[getSupplyNormalizedName(name)] || "";
+        }
+
+        function saveSupplyQuantity(name, quantity) {
+            const normalized = getSupplyNormalizedName(name);
+            if (!normalized) return;
+
+            const nextQuantity = normalizeSupplyQuantity(quantity);
+            if (nextQuantity) {
+                supplyQuantityState[normalized] = nextQuantity;
+            } else {
+                delete supplyQuantityState[normalized];
+            }
+
+            saveJsonObject(supplyQuantityKey, supplyQuantityState);
         }
 
         function supplyHasItem(list, name) {
@@ -1043,8 +1067,8 @@
             supplyToggle.setAttribute("aria-expanded", "false");
         }
 
-        async function addSupplyItem(rawName, rawQuantity = "") {
-            const name = formatSupplyName(rawName, rawQuantity);
+        async function addSupplyItem(rawName) {
+            const name = normalizeSupplyName(rawName);
             if (!name) return;
 
             if (supabaseClient && !supplyUseLocalFallback) {
@@ -1085,6 +1109,8 @@
         }
 
         async function removeSupplyMissing(name) {
+            saveSupplyQuantity(name, "");
+
             if (supabaseClient && !supplyUseLocalFallback) {
                 const { error } = await supabaseClient
                     .from(supplyTable)
@@ -1107,6 +1133,8 @@
         }
 
         async function removeSupplySaved(name) {
+            saveSupplyQuantity(name, "");
+
             if (supabaseClient && !supplyUseLocalFallback) {
                 const { error } = await supabaseClient
                     .from(supplyTable)
@@ -1159,6 +1187,16 @@
                     const text = document.createElement("span");
                     text.textContent = name;
 
+                    const quantityInput = document.createElement("input");
+                    quantityInput.className = "supply-row-quantity";
+                    quantityInput.type = "text";
+                    quantityInput.placeholder = "Qtd";
+                    quantityInput.value = getSupplyQuantity(name);
+                    quantityInput.setAttribute("aria-label", `Quantidade de ${name}`);
+                    quantityInput.addEventListener("input", () => {
+                        saveSupplyQuantity(name, quantityInput.value);
+                    });
+
                     const removeButton = document.createElement("button");
                     removeButton.type = "button";
                     removeButton.textContent = "Remover";
@@ -1169,6 +1207,7 @@
                     label.appendChild(checkbox);
                     label.appendChild(text);
                     row.appendChild(label);
+                    row.appendChild(quantityInput);
                     row.appendChild(removeButton);
                     supplyList.appendChild(row);
                 });
@@ -1214,7 +1253,11 @@
 
             const today = new Date().toLocaleDateString("pt-BR");
             const listItems = items.length
-                ? items.map((item) => `<li><span></span>${escapeHtml(item)}</li>`).join("")
+                ? items.map((item) => {
+                    const quantity = getSupplyQuantity(item);
+                    const text = quantity ? `${item} - ${quantity}` : item;
+                    return `<li><span></span>${escapeHtml(text)}</li>`;
+                }).join("")
                 : "<li>Nenhum produto marcado para comprar.</li>";
             const html = `<!doctype html>
                 <html lang="pt-BR">
@@ -1273,6 +1316,8 @@
         }
 
         async function loadSupplyItems() {
+            supplyQuantityState = readJsonObject(supplyQuantityKey);
+
             if (supabaseClient && !supplyUseLocalFallback) {
                 setSupplyMessage("Carregando produtos...");
 
@@ -1323,9 +1368,8 @@
 
         supplyForm.addEventListener("submit", (event) => {
             event.preventDefault();
-            addSupplyItem(supplyInput.value, supplyQuantity.value);
+            addSupplyItem(supplyInput.value);
             supplyInput.value = "";
-            supplyQuantity.value = "";
             supplyInput.focus();
         });
 
