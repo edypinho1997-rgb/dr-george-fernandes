@@ -189,7 +189,7 @@
                         .section-title { margin: 18px 0 10px; font-weight: 700; }
                         ul { margin: 8px 0 18px 24px; padding: 0; line-height: 1.5; overflow-wrap: anywhere; }
                         p { margin: 0 0 12px; line-height: 1.45; text-align: justify; overflow-wrap: anywhere; }
-                        .request-date { margin: 110px 0 28px; text-align: left; }
+                        .request-date { margin: 0 0 7px; text-align: center; font-size: 11px; font-weight: 700; }
                         .document-closing { padding-top: 0; z-index: 1; }
                         .signature { width: 330px; margin: 0; text-align: center; page-break-inside: avoid; }
                         .signature-line { width: 100%; margin: 0 auto 8px; border-top: 1px solid #111; }
@@ -221,7 +221,6 @@
                             <ul>${examItems}</ul>
                             ${notes ? `<div class="section-title">Observações:</div><p>${escapeHtml(notes)}</p>` : ""}
                             <p>Solicito a realização dos exames acima para avaliação e acompanhamento fisioterapêutico do paciente.</p>
-                            ${requestDate ? `<div class="request-date">Itinga do Maranhão, ${escapeHtml(requestDate)}.</div>` : ""}
                             <div class="document-closing">
                                 <div class="signature">
                                     <div class="signature-line"></div>
@@ -231,6 +230,7 @@
                             </div>
                         </section>
                         <footer class="letter-footer">
+                            ${requestDate ? `<div class="request-date">Itinga do Maranhão, ${escapeHtml(requestDate)}.</div>` : ""}
                             G F da C Silva Fisioterapia LTDA<br>
                             CNPJ: 53.828.385/0001-46<br>
                             Rua das Jacas, 291 - Vila Emanuela<br>

@@ -3339,8 +3339,10 @@
                         }
 
                         .request-date {
-                            margin: 110px 0 28px;
-                            text-align: left;
+                            margin: 0 0 7px;
+                            text-align: center;
+                            font-size: 11px;
+                            font-weight: 700;
                         }
 
                         .document-closing {
@@ -3424,7 +3426,6 @@
                             <ul>${examItems}</ul>
                             ${notes ? `<div class="section-title">Observações:</div><p>${escapeHtml(notes)}</p>` : ""}
                             <p>Solicito a realização dos exames acima para avaliação e acompanhamento fisioterapêutico do paciente.</p>
-                            ${requestDate ? `<div class="request-date">Itinga do Maranhão, ${escapeHtml(requestDate)}.</div>` : ""}
                             <div class="document-closing">
                                 <div class="signature">
                                     <div class="signature-line"></div>
@@ -3434,6 +3435,7 @@
                             </div>
                         </section>
                         <footer class="letter-footer">
+                            ${requestDate ? `<div class="request-date">Itinga do Maranhão, ${escapeHtml(requestDate)}.</div>` : ""}
                             G F da C Silva Fisioterapia LTDA<br>
                             CNPJ: 53.828.385/0001-46<br>
                             Rua das Jacas, 291 - Vila Emanuela<br>
