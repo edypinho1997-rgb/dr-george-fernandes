@@ -178,7 +178,7 @@
                         @page { size: A4; margin: 0; }
                         * { box-sizing: border-box; }
                         body { margin: 0; background: #fff; color: #111; font-family: Arial, sans-serif; font-size: 12pt; }
-                        .letter-page { position: relative; width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm 15mm 32mm; overflow: hidden; }
+                        .letter-page { position: relative; width: 210mm; height: 297mm; margin: 0 auto; background: #fff; padding: 18mm 15mm 32mm; overflow: hidden; }
                         .letter-header { display: flex; justify-content: center; margin-bottom: 22px; }
                         .header-logo { display: block; width: 150px; height: auto; }
                         .watermark { position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%); pointer-events: none; opacity: 0.48; z-index: 0; }
@@ -189,7 +189,8 @@
                         .section-title { margin: 18px 0 10px; font-weight: 700; }
                         ul { margin: 8px 0 18px 24px; padding: 0; line-height: 1.5; overflow-wrap: anywhere; }
                         p { margin: 0 0 12px; line-height: 1.45; text-align: justify; overflow-wrap: anywhere; }
-                        .document-closing { position: absolute; left: 21mm; bottom: 82mm; padding-top: 0; z-index: 1; }
+                        .request-date { margin: 110px 0 28px; text-align: left; }
+                        .document-closing { padding-top: 0; z-index: 1; }
                         .signature { width: 330px; margin: 0; text-align: center; page-break-inside: avoid; }
                         .signature-line { width: 100%; margin: 0 auto 8px; border-top: 1px solid #111; }
                         .signature strong, .signature span { display: block; overflow-wrap: normal; word-break: keep-all; white-space: nowrap; }
@@ -197,8 +198,7 @@
                         .letter-footer { position: absolute; left: 15mm; right: 15mm; bottom: 10mm; text-align: center; font-size: 10px; line-height: 1.35; z-index: 1; page-break-inside: avoid; }
                         @media print {
                             body { background: #fff; }
-                            .letter-page { width: auto; min-height: 297mm; margin: 0; padding: 18mm 15mm 32mm; overflow: visible; }
-                            .document-closing { position: fixed; left: 21mm; bottom: 82mm; }
+                            .letter-page { width: 210mm; height: 297mm; margin: 0; padding: 18mm 15mm 32mm; overflow: hidden; }
                             .letter-footer { position: fixed; left: 15mm; right: 15mm; bottom: 12mm; }
                         }
                     </style>
@@ -215,13 +215,13 @@
                                 <div><strong>Paciente:</strong> ${escapeHtml(patient)}</div>
                                 ${examCpf.value.trim() ? `<div><strong>CPF:</strong> ${escapeHtml(examCpf.value.trim())}</div>` : ""}
                                 ${examNascimento.value ? `<div><strong>Data de nascimento:</strong> ${escapeHtml(formatDateBr(examNascimento.value))}</div>` : ""}
-                                ${requestDate ? `<div><strong>Data:</strong> ${escapeHtml(requestDate)}</div>` : ""}
                             </div>
                             ${diagnosis ? `<div class="section-title">Indicação clínica:</div><p>${escapeHtml(diagnosis)}</p>` : ""}
                             <div class="section-title">Exames solicitados:</div>
                             <ul>${examItems}</ul>
                             ${notes ? `<div class="section-title">Observações:</div><p>${escapeHtml(notes)}</p>` : ""}
                             <p>Solicito a realização dos exames acima para avaliação e acompanhamento fisioterapêutico do paciente.</p>
+                            ${requestDate ? `<div class="request-date">Itinga do Maranhão, ${escapeHtml(requestDate)}.</div>` : ""}
                             <div class="document-closing">
                                 <div class="signature">
                                     <div class="signature-line"></div>

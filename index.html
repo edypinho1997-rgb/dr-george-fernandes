@@ -3266,7 +3266,7 @@
                         .letter-page {
                             position: relative;
                             width: 210mm;
-                            min-height: 297mm;
+                            height: 297mm;
                             margin: 0 auto;
                             background: #fff;
                             padding: 18mm 15mm 32mm;
@@ -3338,8 +3338,12 @@
                             overflow-wrap: anywhere;
                         }
 
+                        .request-date {
+                            margin: 110px 0 28px;
+                            text-align: left;
+                        }
+
                         .document-closing {
-                            margin-top: 190px;
                             padding-top: 0;
                         }
 
@@ -3386,11 +3390,11 @@
                             }
 
                             .letter-page {
-                                width: auto;
-                                min-height: 297mm;
+                                width: 210mm;
+                                height: 297mm;
                                 margin: 0;
                                 padding: 18mm 15mm 32mm;
-                                overflow: visible;
+                                overflow: hidden;
                             }
 
                             .letter-footer {
@@ -3414,13 +3418,13 @@
                                 <div><strong>Paciente:</strong> ${escapeHtml(patient)}</div>
                                 ${examCpf.value.trim() ? `<div><strong>CPF:</strong> ${escapeHtml(examCpf.value.trim())}</div>` : ""}
                                 ${examNascimento.value ? `<div><strong>Data de nascimento:</strong> ${escapeHtml(formatDateBr(examNascimento.value))}</div>` : ""}
-                                ${requestDate ? `<div><strong>Data:</strong> ${escapeHtml(requestDate)}</div>` : ""}
                             </div>
                             ${diagnosis ? `<div class="section-title">Indicação clínica:</div><p>${escapeHtml(diagnosis)}</p>` : ""}
                             <div class="section-title">Exames solicitados:</div>
                             <ul>${examItems}</ul>
                             ${notes ? `<div class="section-title">Observações:</div><p>${escapeHtml(notes)}</p>` : ""}
                             <p>Solicito a realização dos exames acima para avaliação e acompanhamento fisioterapêutico do paciente.</p>
+                            ${requestDate ? `<div class="request-date">Itinga do Maranhão, ${escapeHtml(requestDate)}.</div>` : ""}
                             <div class="document-closing">
                                 <div class="signature">
                                     <div class="signature-line"></div>
