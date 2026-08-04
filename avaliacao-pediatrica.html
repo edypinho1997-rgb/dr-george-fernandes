@@ -88,6 +88,10 @@
         .patients { display:block; }
         @media (max-width:760px) { .patients-toggle { top:auto; bottom:91px; transform:none; padding:8px 10px 8px 7px; border-radius:0 13px 13px 0; }.patients-toggle b { font-size:.65rem; }.patients-toggle span { font-size:1rem; }.patients { width:min(320px,88vw); padding:16px!important; }.patients.open { transform:translateX(0); } }
     </style>
+    <style>
+        .patients-toggle { right:0; left:auto; gap:0; padding:10px 8px 10px 11px; border-radius:16px 0 0 16px; box-shadow:-5px 8px 18px #8e425a38; }.patients { right:0; left:auto; border-radius:24px 0 0 24px!important; transform:translateX(105%); box-shadow:-13px 0 35px #76334835; }.patients.open { transform:translateX(0); }
+        @media (max-width:760px) { .patients-toggle { right:0; left:auto; padding:8px 7px 8px 10px; border-radius:13px 0 0 13px; }.patients { right:0; left:auto; }.patients.open { transform:translateX(0); } }
+    </style>
 </head>
 <body>
 <main class="page">
@@ -97,7 +101,7 @@
         <a class="back" href="index.html">&larr; Voltar ao painel</a>
     </header>
     <nav class="care-path" aria-label="Etapas da avaliação"><span><b>1</b> Boas-vindas</span><i></i><span><b>2</b> Avaliação</span><i></i><span><b>3</b> Orientações</span><i></i><span><b>4</b> Relatório</span></nav>
-    <button class="patients-toggle" id="patients-toggle" type="button" aria-controls="patient-drawer" aria-expanded="false"><span>👧🏻👦🏻</span><b>Crianças</b></button>
+    <button class="patients-toggle" id="patients-toggle" type="button" aria-label="Abrir crianças avaliadas" aria-controls="patient-drawer" aria-expanded="false"><span>👧🏻👦🏻</span></button>
     <section class="consultation-flow" aria-label="Fluxo da avaliação pediátrica">
         <div class="flow-intro"><span>✨</span><div><strong>Como funciona a avaliação?</strong><small>Um caminho simples para transformar observação em cuidado em casa.</small></div></div>
         <div class="flow-steps">
