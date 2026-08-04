@@ -62,6 +62,9 @@
         .form-grid > .wide:has(> label:first-child:not(:has(input))) { position:relative; padding:14px 16px; border-radius:17px; border:1px dashed #e7a8bd; background:linear-gradient(100deg,#fff0f5,#fffafc); }.form-grid > .wide:has(> label:first-child:not(:has(input))) label { color:#a05572; font-size:.95rem; }.calc-note { padding:8px 10px; border-radius:10px; background:#fff9fb; color:#95667a; }
         .actions { position:sticky; bottom:14px; z-index:4; justify-content:center; border:1px solid #fff; box-shadow:0 13px 25px #99445e27; }.actions::before { content:"Pronto para finalizar a ficha?"; align-self:center; margin-right:auto; color:#91566f; font-size:.78rem; font-weight:700; }
         @media (max-width:760px) { .care-path { justify-content:flex-start; overflow:auto; margin:0 0 20px; border-radius:18px; }.care-path i { min-width:15px; }.consultation-flow { grid-template-columns:1fr; margin-bottom:20px; }.flow-steps { overflow:auto; justify-content:flex-start; padding-bottom:4px; }.flow-step { min-width:112px; }.flow-steps > i { min-width:22px; }.actions { position:static; }.actions::before { width:100%; }.form-grid > .choice-grid { padding:8px; } }
+        .flow-step { padding:3px; border:0; background:transparent!important; color:#6e596a!important; transition:transform .2s ease; }.flow-step:hover,.flow-step.active { transform:translateY(-4px); }.flow-step > span { transition:box-shadow .2s ease,outline .2s ease; }.flow-step.active > span { outline:4px solid #fff; box-shadow:0 0 0 4px #d96991,0 8px 14px #9c587b32; }
+        .consultation-flow.side-flow { position:fixed; z-index:20; top:50%; right:18px; display:block; width:auto; margin:0; padding:10px 7px; border-radius:28px; transform:translateY(-50%); background:#fffafd; box-shadow:0 12px 26px #853d592e; }.side-flow .flow-intro,.side-flow .flow-steps > i,.side-flow .flow-step strong,.side-flow .flow-step small { display:none; }.side-flow .flow-steps { display:grid; gap:9px; }.side-flow .flow-step { min-width:0; padding:1px; }.side-flow .flow-step > span { width:40px; height:40px; font-size:1.12rem; }
+        @media (max-width:760px) { .consultation-flow.side-flow { right:8px; padding:8px 5px; }.side-flow .flow-step { min-width:0; } }
     </style>
 </head>
 <body>
@@ -75,17 +78,17 @@
     <section class="consultation-flow" aria-label="Fluxo da avaliação pediátrica">
         <div class="flow-intro"><span>✨</span><div><strong>Como funciona a avaliação?</strong><small>Um caminho simples para transformar observação em cuidado em casa.</small></div></div>
         <div class="flow-steps">
-            <div class="flow-step observe"><span>👀</span><strong>Observar</strong><small>Postura, marcos e rotina</small></div><i>➜</i>
-            <div class="flow-step measure"><span>📏</span><strong>Avaliar</strong><small>Medidas e assimetrias</small></div><i>➜</i>
-            <div class="flow-step guide"><span>💗</span><strong>Orientar</strong><small>Escolhas para a família</small></div><i>➜</i>
-            <div class="flow-step follow"><span>🌱</span><strong>Acompanhar</strong><small>Plano e reavaliação</small></div>
+            <button class="flow-step observe" type="button" data-target="etapa-observar" aria-label="Ir para observar"><span>👀</span><strong>Observar</strong><small>Postura, marcos e rotina</small></button><i>➜</i>
+            <button class="flow-step measure" type="button" data-target="etapa-avaliar" aria-label="Ir para avaliar"><span>📏</span><strong>Avaliar</strong><small>Medidas e assimetrias</small></button><i>➜</i>
+            <button class="flow-step guide" type="button" data-target="etapa-orientar" aria-label="Ir para orientar"><span>💗</span><strong>Orientar</strong><small>Escolhas para a família</small></button><i>➜</i>
+            <button class="flow-step follow" type="button" data-target="etapa-acompanhar" aria-label="Ir para acompanhar"><span>🌱</span><strong>Acompanhar</strong><small>Plano e reavaliação</small></button>
         </div>
     </section>
     <div class="notice" id="notice">A tabela pediátrica ainda não está disponível no banco. Esta ficha está sendo salva somente neste navegador.</div>
     <div class="layout">
         <section class="card">
             <form id="pediatric-form">
-                <h2 class="section-title"><span>👶</span> Identificação</h2>
+                <h2 class="section-title" id="etapa-observar"><span>👶</span> Identificação</h2>
                 <div class="form-grid">
                     <label>Nome da criança<input id="nome" required placeholder="Nome completo"></label>
                     <label>Data de nascimento<input id="nascimento" type="date"></label>
@@ -100,7 +103,7 @@
                     <div class="choice-grid"><label><input id="gestacao-sem-intercorrencias" type="checkbox"> Gestação sem intercorrências</label><label><input id="uti-neonatal" type="checkbox"> Passou por UTI neonatal</label><label><input id="gemeos" type="checkbox"> Gestação gemelar</label><label><input id="refluxo" type="checkbox"> Refluxo relatado</label></div>
                     <label class="wide">Observações do nascimento<textarea id="gestacao" placeholder="Use apenas se houver algo importante a registrar"></textarea></label>
                 </div>
-                <h2 class="section-title"><span>🌈</span> Torcicolo e assimetria craniana</h2>
+                <h2 class="section-title" id="etapa-avaliar"><span>🌈</span> Torcicolo e assimetria craniana</h2>
                 <div class="form-grid">
                     <label>Preferência postural<select id="preferencia"><option value="">Não observado</option><option>Olha mais para a direita</option><option>Olha mais para a esquerda</option><option>Sem preferência</option></select></label>
                     <label>Grau de assimetria<select id="grau-assimetria"><option value="">Não classificado</option><option>Ausente</option><option>Leve</option><option>Moderada</option><option>Importante</option></select></label>
@@ -130,7 +133,7 @@
                     </div>
                     <label class="wide">Medidas e observações clínicas<textarea id="cranio" placeholder="Complementos das medidas, rotação/inclinação e outros achados"></textarea></label>
                 </div>
-                <h2 class="section-title"><span>🧸</span> Desenvolvimento e conduta</h2>
+                <h2 class="section-title" id="etapa-orientar"><span>🧸</span> Desenvolvimento e conduta</h2>
                 <div class="form-grid">
                     <div class="choice-grid"><label><input id="rola" type="checkbox"> Rola</label><label><input id="senta-apoio" type="checkbox"> Senta com apoio</label><label><input id="senta-sem-apoio" type="checkbox"> Senta sem apoio</label><label><input id="engatinha" type="checkbox"> Engatinha</label><label><input id="anda" type="checkbox"> Anda</label><label><input id="marcos-adequados" type="checkbox"> Marcos adequados à idade</label></div>
                     <div class="wide">
@@ -153,7 +156,7 @@
                     </div>
                     <label>Desenvolvimento / observações<textarea id="desenvolvimento" placeholder="Registre apenas informações importantes"></textarea></label>
                     <label>Outras orientações<textarea id="orientacoes" placeholder="Registre orientações adicionais, se necessário"></textarea></label>
-                    <label class="wide">Plano terapêutico e retorno<textarea id="plano" placeholder="Objetivos, frequência, condutas e previsão de retorno"></textarea></label>
+                    <label class="wide" id="etapa-acompanhar">Plano terapêutico e retorno<textarea id="plano" placeholder="Objetivos, frequência, condutas e previsão de retorno"></textarea></label>
                     <label class="wide">Evolução / observações finais<textarea id="evolucao" placeholder="Registre as evoluções nas consultas seguintes"></textarea></label>
                 </div>
                 <div class="actions"><button class="primary" type="submit">Salvar ficha</button><button type="button" id="new-record">Nova ficha</button><button type="button" id="family-handout">Ficha para a família</button><button type="button" id="print-record">Imprimir relatório</button><button class="danger" type="button" id="delete-record" hidden>Apagar ficha</button></div>
@@ -226,6 +229,17 @@
     });
     el("new-record").onclick = clear; el("family-handout").onclick = familyHandout; el("print-record").onclick = () => window.print();
     remove.onclick = async () => { if (!currentId || !confirm("Apagar esta ficha pediátrica?")) return; if (!localOnly) { const { error } = await client.from(table).delete().eq("id", currentId); if (!error) { clear(); return load(); } } records = records.filter(r => String(r.id) !== String(currentId)); localSave(); clear(); };
+    const flow = document.querySelector(".consultation-flow"), flowButtons = [...document.querySelectorAll(".flow-step[data-target]")];
+    function updateFlow() {
+        flow.classList.toggle("side-flow", window.scrollY > flow.offsetTop + flow.offsetHeight);
+        let current = flowButtons[0];
+        flowButtons.forEach(button => { const target = el(button.dataset.target); if (target && target.getBoundingClientRect().top < window.innerHeight * .42) current = button; });
+        flowButtons.forEach(button => button.classList.toggle("active", button === current));
+    }
+    flowButtons.forEach(button => button.addEventListener("click", () => { const target = el(button.dataset.target); if (target) target.scrollIntoView({ behavior:"smooth", block:"center" }); }));
+    window.addEventListener("scroll", updateFlow, { passive:true });
+    window.addEventListener("resize", updateFlow);
+    updateFlow();
     load();
 })();
 </script>
