@@ -83,6 +83,11 @@
             .layout { gap:12px; }.card { padding:10px; }.patients { display:none; }form > .section-title + .form-grid { padding:10px; }.section-title { margin-top:12px!important; }.actions { padding:8px; }.actions::before { display:none; }
         }
     </style>
+    <style>
+        .layout { grid-template-columns:minmax(0,1fr); }.patients-toggle { position:fixed; z-index:25; left:0; top:50%; display:flex; align-items:center; gap:7px; padding:11px 12px 11px 8px; border-radius:0 16px 16px 0; background:linear-gradient(135deg,#ef779a,#cf6689)!important; color:#fff!important; box-shadow:5px 8px 18px #8e425a38; transform:translateY(-50%); }.patients-toggle span { font-size:1.22rem; }.patients-toggle b { font-size:.74rem; }.patients { position:fixed; z-index:40; top:0; bottom:0; left:0; width:min(350px,88vw); padding:22px!important; border-radius:0 24px 24px 0!important; transform:translateX(-105%); transition:transform .25s ease; background:linear-gradient(160deg,#fff8fb,#f7dce7)!important; box-shadow:13px 0 35px #76334835; overflow:auto; }.patients.open { transform:translateX(0); }.drawer-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }.drawer-head h2 { font-size:1.15rem; }.drawer-head p { margin:3px 0 8px; }.drawer-head button { width:34px; height:34px; padding:0; border-radius:50%; font-size:1.45rem; line-height:1; }.patient { display:flex; align-items:center; gap:10px; }.patient-baby { display:grid; place-items:center; width:37px; height:37px; border-radius:50%; background:#fff; font-size:1.3rem; }.patient small { display:block; }
+        .patients { display:block; }
+        @media (max-width:760px) { .patients-toggle { top:auto; bottom:91px; transform:none; padding:8px 10px 8px 7px; border-radius:0 13px 13px 0; }.patients-toggle b { font-size:.65rem; }.patients-toggle span { font-size:1rem; }.patients { width:min(320px,88vw); padding:16px!important; }.patients.open { transform:translateX(0); } }
+    </style>
 </head>
 <body>
 <main class="page">
@@ -92,6 +97,7 @@
         <a class="back" href="index.html">&larr; Voltar ao painel</a>
     </header>
     <nav class="care-path" aria-label="Etapas da avaliação"><span><b>1</b> Boas-vindas</span><i></i><span><b>2</b> Avaliação</span><i></i><span><b>3</b> Orientações</span><i></i><span><b>4</b> Relatório</span></nav>
+    <button class="patients-toggle" id="patients-toggle" type="button" aria-controls="patient-drawer" aria-expanded="false"><span>👧🏻👦🏻</span><b>Crianças</b></button>
     <section class="consultation-flow" aria-label="Fluxo da avaliação pediátrica">
         <div class="flow-intro"><span>✨</span><div><strong>Como funciona a avaliação?</strong><small>Um caminho simples para transformar observação em cuidado em casa.</small></div></div>
         <div class="flow-steps">
@@ -108,6 +114,7 @@
                 <h2 class="section-title" id="etapa-observar"><span>👶</span> Identificação</h2>
                 <div class="form-grid">
                     <label>Nome da criança<input id="nome" required placeholder="Nome completo"></label>
+                    <label>Sexo<select id="sexo"><option value="">Não informado</option><option value="masculino">Menino</option><option value="feminino">Menina</option></select></label>
                     <label>Data de nascimento<input id="nascimento" type="date"></label>
                     <label>Responsável<input id="responsavel" placeholder="Nome do responsável"></label>
                     <label>Telefone<input id="telefone" type="tel" placeholder="(00) 00000-0000"></label>
@@ -179,14 +186,14 @@
                 <div class="actions"><button class="primary" type="submit">Salvar ficha</button><button type="button" id="new-record">Nova ficha</button><button type="button" id="family-handout">Ficha para a família</button><button type="button" id="print-record">Imprimir relatório</button><button class="danger" type="button" id="delete-record" hidden>Apagar ficha</button></div>
             </form>
         </section>
-        <aside class="card patients"><h2>Crianças avaliadas</h2><p>As fichas pediátricas ficam separadas da avaliação geral.</p><div id="patient-list"><span class="empty">Nenhuma ficha salva ainda.</span></div></aside>
+        <aside class="card patients" id="patient-drawer"><div class="drawer-head"><div><h2>Crianças avaliadas</h2><p>Suas fichas pediátricas salvas.</p></div><button id="close-patients" type="button" aria-label="Fechar lista de crianças">×</button></div><div id="patient-list"><span class="empty">Nenhuma ficha salva ainda.</span></div></aside>
     </div>
 </main>
 <script>
 (() => {
     const client = window.supabase ? window.supabase.createClient("https://lhnglzxyeazxlxihobzx.supabase.co", "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9") : null;
     const table = "avaliacoes_pediatricas", key = "avaliacoes-pediatricas-v1";
-    const ids = ["nome","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-olhar-esquerda","orientacao-olhar-direita","orientacao-torcicolo-direita","orientacao-torcicolo-esquerda","orientacao-torcicolo-alongamento","orientacao-alternar-colo","orientacao-tummy","orientacao-variar-posicoes","orientacao-reduzir-cadeirinha","orientacao-estimulos","orientacao-sono-seguro","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
+    const ids = ["nome","sexo","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-olhar-esquerda","orientacao-olhar-direita","orientacao-torcicolo-direita","orientacao-torcicolo-esquerda","orientacao-torcicolo-alongamento","orientacao-alternar-colo","orientacao-tummy","orientacao-variar-posicoes","orientacao-reduzir-cadeirinha","orientacao-estimulos","orientacao-sono-seguro","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
     const form = document.getElementById("pediatric-form"), list = document.getElementById("patient-list"), notice = document.getElementById("notice"), remove = document.getElementById("delete-record");
     let records = [], currentId = null, localOnly = !client;
     const el = id => document.getElementById(id);
@@ -199,7 +206,7 @@
     function updateAssessment(shape, title, description, showSides) { el("assessment-card").classList.add("visible"); el("assessment-shape").className = `head-shape ${shape}`; el("assessment-title").textContent = title; el("assessment-description").textContent = description; el("side-picker").classList.toggle("visible", showSides); if (!showSides) el("lado-plagio").value = ""; document.querySelectorAll("[data-side]").forEach(button => button.classList.toggle("selected", button.dataset.side === el("lado-plagio").value)); }
     function calculateIndices() { const maior = Number(el("diagonal-maior").value), menor = Number(el("diagonal-menor").value), largura = Number(el("largura-biparietal").value), comprimento = Number(el("comprimento-ap").value); let cvai = null, ci = null; if (maior > 0 && menor > 0) { cvai = ((maior - menor) / maior) * 100; const text = `${cvai.toFixed(2)}%`; el("cvai-result").textContent = text; el("cvai-classification").textContent = classificationCvai(cvai); el("cvai-salvo").value = `${text} — ${classificationCvai(cvai)}`; } else { el("cvai-result").textContent = "Aguardando medidas"; el("cvai-classification").textContent = "(Diagonal maior − diagonal menor) ÷ diagonal maior × 100"; el("cvai-salvo").value = ""; } if (largura > 0 && comprimento > 0) { ci = (largura / comprimento) * 100; const text = `${ci.toFixed(2)}%`; el("ci-result").textContent = text; el("ci-classification").textContent = classificationCi(ci); el("ci-salvo").value = `${text} — ${classificationCi(ci)}`; } else { el("ci-result").textContent = "Aguardando medidas"; el("ci-classification").textContent = "Largura biparietal ÷ comprimento anteroposterior × 100"; el("ci-salvo").value = ""; } if (cvai !== null) { const level = classificationCvai(cvai); updateAssessment(level === "Normal" ? "normal" : "plagio", level === "Normal" ? `CVAI ${cvai.toFixed(2)}% — Normal` : `CVAI ${cvai.toFixed(2)}% — Plagiocefalia ${level.toLowerCase()}`, level === "Normal" ? "O formato apresenta assimetria dentro da faixa de normalidade." : "Registre o lado predominante do achatamento abaixo.", level !== "Normal"); } else if (ci !== null) { const level = classificationCi(ci), shape = level === "Normal" ? "normal" : level === "Escafocefalia" ? "escafo" : "braqui"; updateAssessment(shape, `CI ${ci.toFixed(2)}% — ${level}`, level === "Normal" ? "O índice cefalométrico está dentro da faixa de normalidade." : "Resultado calculado a partir das medidas informadas.", false); } else { el("assessment-card").classList.remove("visible"); } }
     function clear() { form.reset(); calculateIndices(); currentId = null; remove.hidden = true; render(); }
-    function render() { list.innerHTML = ""; if (!records.length) { list.innerHTML = '<span class="empty">Nenhuma ficha salva ainda.</span>'; return; } records.forEach(record => { const b = document.createElement("button"), d = record.dados || record; b.className = "patient" + (String(record.id) === String(currentId) ? " active" : ""); b.type = "button"; b.innerHTML = `${escapeHtml(record.nome || d.nome)}<small>${escapeHtml(record.data_nascimento || d.nascimento || "Sem data de nascimento")}</small>`; b.onclick = () => fill(record); list.appendChild(b); }); }
+    function render() { list.innerHTML = ""; if (!records.length) { list.innerHTML = '<span class="empty">Nenhuma ficha salva ainda.</span>'; return; } records.forEach(record => { const b = document.createElement("button"), d = record.dados || record, baby = d.sexo === "feminino" ? "👧🏻" : d.sexo === "masculino" ? "👦🏻" : "👶🏻"; b.className = "patient" + (String(record.id) === String(currentId) ? " active" : ""); b.type = "button"; b.innerHTML = `<span class="patient-baby">${baby}</span><span>${escapeHtml(record.nome || d.nome)}<small>${escapeHtml(record.data_nascimento || d.nascimento || "Sem data de nascimento")}</small></span>`; b.onclick = () => { fill(record); el("patient-drawer").classList.remove("open"); el("patients-toggle").setAttribute("aria-expanded", "false"); }; list.appendChild(b); }); }
     function escapeHtml(text) { const div = document.createElement("div"); div.textContent = text || ""; return div.innerHTML; }
     function selectedGuidance() {
         const options = [
@@ -246,9 +253,13 @@
     });
     el("new-record").onclick = clear; el("family-handout").onclick = familyHandout; el("print-record").onclick = () => window.print();
     remove.onclick = async () => { if (!currentId || !confirm("Apagar esta ficha pediátrica?")) return; if (!localOnly) { const { error } = await client.from(table).delete().eq("id", currentId); if (!error) { clear(); return load(); } } records = records.filter(r => String(r.id) !== String(currentId)); localSave(); clear(); };
+    const patientDrawer = el("patient-drawer"), patientToggle = el("patients-toggle");
+    function setPatientDrawer(open) { patientDrawer.classList.toggle("open", open); patientToggle.setAttribute("aria-expanded", String(open)); }
+    patientToggle.onclick = () => setPatientDrawer(!patientDrawer.classList.contains("open"));
+    el("close-patients").onclick = () => setPatientDrawer(false);
     const flow = document.querySelector(".consultation-flow"), flowButtons = [...document.querySelectorAll(".flow-step[data-target]")];
     function updateFlow() {
-        flow.classList.toggle("side-flow", window.scrollY > flow.offsetTop + flow.offsetHeight);
+        flow.classList.toggle("side-flow", window.innerWidth > 760 && window.scrollY > flow.offsetTop + flow.offsetHeight);
         let current = flowButtons[0];
         flowButtons.forEach(button => { const target = el(button.dataset.target); if (target && target.getBoundingClientRect().top < window.innerHeight * .42) current = button; });
         flowButtons.forEach(button => button.classList.toggle("active", button === current));
