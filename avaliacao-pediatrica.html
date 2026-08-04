@@ -219,6 +219,7 @@
     .auth-card p { margin:0 0 18px; font-size:.88rem; }
     .auth-card form { display:grid; gap:13px; }
     .auth-card button { margin-top:5px; background:linear-gradient(135deg,#cc7595,#ae6383); color:#fff; }
+    .auth-card .auth-link { margin-top:0; background:#f5dce6; color:#92546f; }
     .auth-message { min-height:20px; margin:4px 0 0!important; color:#a14d62; }
 </style>
 <section class="auth-overlay" id="auth-overlay" aria-labelledby="auth-title">
@@ -229,6 +230,7 @@
             <label>E-mail<input id="auth-email" type="email" autocomplete="email" required></label>
             <label>Senha<input id="auth-password" type="password" autocomplete="current-password" required></label>
             <button type="submit">Entrar</button>
+            <button class="auth-link" id="auth-magic-link" type="button">Receber link de acesso no e-mail</button>
         </form>
         <p class="auth-message" id="auth-message" role="alert"></p>
     </div>
@@ -257,6 +259,13 @@
         authOverlay.hidden = true;
         localOnly = false;
         await load();
+    });
+    el("auth-magic-link").addEventListener("click", async () => {
+        const email = el("auth-email").value.trim();
+        if (!email) { authMessage.textContent = "Digite seu e-mail primeiro."; el("auth-email").focus(); return; }
+        authMessage.textContent = "Enviando link...";
+        const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+        authMessage.textContent = error ? "Não foi possível enviar o link. Tente novamente." : "Link enviado. Abra seu e-mail e clique nele para entrar.";
     });
     const localRead = () => { try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; } };
     const localSave = () => localStorage.setItem(key, JSON.stringify(records));
