@@ -77,7 +77,21 @@
                 <h2 class="section-title">Desenvolvimento e conduta</h2>
                 <div class="form-grid">
                     <div class="choice-grid"><label><input id="rola" type="checkbox"> Rola</label><label><input id="senta-apoio" type="checkbox"> Senta com apoio</label><label><input id="senta-sem-apoio" type="checkbox"> Senta sem apoio</label><label><input id="engatinha" type="checkbox"> Engatinha</label><label><input id="anda" type="checkbox"> Anda</label><label><input id="marcos-adequados" type="checkbox"> Marcos adequados à idade</label></div>
-                    <div class="choice-grid"><label><input id="orientacao-posicionamento" type="checkbox"> Orientado posicionamento</label><label><input id="orientacao-tummy" type="checkbox"> Orientado tummy time</label><label><input id="orientacao-estimulos" type="checkbox"> Orientados estímulos motores</label><label><input id="orientacao-retorno" type="checkbox"> Retorno orientado</label></div>
+                    <div class="wide">
+                        <label>Orientações para a família</label>
+                        <p class="calc-note">Marque somente o que foi orientado nesta consulta. As opções selecionadas aparecerão automaticamente na ficha da família.</p>
+                    </div>
+                    <div class="choice-grid">
+                        <label><input id="orientacao-olhar-esquerda" type="checkbox"> Estimular o olhar à esquerda</label>
+                        <label><input id="orientacao-olhar-direita" type="checkbox"> Estimular o olhar à direita</label>
+                        <label><input id="orientacao-alternar-colo" type="checkbox"> Alternar lado no colo e mamada</label>
+                        <label><input id="orientacao-tummy" type="checkbox"> Tummy time supervisionado</label>
+                        <label><input id="orientacao-variar-posicoes" type="checkbox"> Variar posições acordado</label>
+                        <label><input id="orientacao-reduzir-cadeirinha" type="checkbox"> Reduzir tempo em cadeirinha</label>
+                        <label><input id="orientacao-estimulos" type="checkbox"> Estímulos motores e brincadeiras</label>
+                        <label><input id="orientacao-sono-seguro" type="checkbox"> Reforçar sono seguro</label>
+                        <label><input id="orientacao-retorno" type="checkbox"> Retorno para reavaliação</label>
+                    </div>
                     <label>Desenvolvimento / observações<textarea id="desenvolvimento" placeholder="Registre apenas informações importantes"></textarea></label>
                     <label>Outras orientações<textarea id="orientacoes" placeholder="Registre orientações adicionais, se necessário"></textarea></label>
                     <label class="wide">Plano terapêutico e retorno<textarea id="plano" placeholder="Objetivos, frequência, condutas e previsão de retorno"></textarea></label>
@@ -93,7 +107,7 @@
 (() => {
     const client = window.supabase ? window.supabase.createClient("https://lhnglzxyeazxlxihobzx.supabase.co", "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9") : null;
     const table = "avaliacoes_pediatricas", key = "avaliacoes-pediatricas-v1";
-    const ids = ["nome","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-posicionamento","orientacao-tummy","orientacao-estimulos","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
+    const ids = ["nome","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-olhar-esquerda","orientacao-olhar-direita","orientacao-alternar-colo","orientacao-tummy","orientacao-variar-posicoes","orientacao-reduzir-cadeirinha","orientacao-estimulos","orientacao-sono-seguro","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
     const form = document.getElementById("pediatric-form"), list = document.getElementById("patient-list"), notice = document.getElementById("notice"), remove = document.getElementById("delete-record");
     let records = [], currentId = null, localOnly = !client;
     const el = id => document.getElementById(id);
@@ -108,18 +122,38 @@
     function clear() { form.reset(); calculateIndices(); currentId = null; remove.hidden = true; render(); }
     function render() { list.innerHTML = ""; if (!records.length) { list.innerHTML = '<span class="empty">Nenhuma ficha salva ainda.</span>'; return; } records.forEach(record => { const b = document.createElement("button"), d = record.dados || record; b.className = "patient" + (String(record.id) === String(currentId) ? " active" : ""); b.type = "button"; b.innerHTML = `${escapeHtml(record.nome || d.nome)}<small>${escapeHtml(record.data_nascimento || d.nascimento || "Sem data de nascimento")}</small>`; b.onclick = () => fill(record); list.appendChild(b); }); }
     function escapeHtml(text) { const div = document.createElement("div"); div.textContent = text || ""; return div.innerHTML; }
+    function selectedGuidance() {
+        const options = [
+            ["orientacao-olhar-esquerda", "Durante os momentos em que estiver acordado e supervisionado, estimule o bebê a olhar e interagir mais para o lado esquerdo, usando brinquedos, voz e estímulos desse lado."],
+            ["orientacao-olhar-direita", "Durante os momentos em que estiver acordado e supervisionado, estimule o bebê a olhar e interagir mais para o lado direito, usando brinquedos, voz e estímulos desse lado."],
+            ["orientacao-alternar-colo", "Alterne os lados no colo, nas mamadas e nas trocas, para favorecer experiências nos dois lados do corpo."],
+            ["orientacao-tummy", "Faça períodos de barriga para baixo (tummy time) somente com o bebê acordado e supervisionado. Comece com poucos minutos e aumente gradualmente conforme a tolerância e a orientação profissional."],
+            ["orientacao-variar-posicoes", "Nos momentos acordado, varie as posições entre colo, brincadeiras no chão e interações dos dois lados."],
+            ["orientacao-reduzir-cadeirinha", "Evite manter o bebê por longos períodos seguidos em bebê-conforto, cadeirinha ou outras posições com pressão constante na cabeça, quando não estiverem sendo usados para transporte ou segurança."],
+            ["orientacao-estimulos", "Inclua brincadeiras e estímulos motores adequados à idade, respeitando o conforto e o ritmo da criança."],
+            ["orientacao-sono-seguro", "Para dormir, mantenha sempre o bebê de barriga para cima, em superfície firme e plana, sem travesseiros, posicionadores ou objetos soltos."],
+            ["orientacao-retorno", "Realize retorno para reavaliação conforme orientado pelo profissional responsável."]
+        ];
+        return options.filter(([id]) => el(id).checked).map(([, text]) => text);
+    }
     function familyHandout() {
         calculateIndices();
         const name = el("nome").value.trim() || "a criança";
         const result = el("assessment-card").classList.contains("visible") ? el("assessment-title").textContent : "Avaliação em acompanhamento";
         const side = el("lado-plagio").value ? ` Lado predominante registrado: ${el("lado-plagio").value.toLowerCase()}.` : "";
-        const personalised = el("orientacoes").value.trim();
+        const additionalGuidance = el("orientacoes").value.trim();
+        const personalised = [...selectedGuidance(), ...(additionalGuidance ? [additionalGuidance] : [])].join("\n\n");
         const plan = el("plano").value.trim();
         const handout = window.open("", "_blank");
         if (!handout) { window.alert("Permita a abertura de nova janela para gerar a ficha da família."); return; }
         handout.document.open();
         handout.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Orientações para a família</title><style>body{font-family:Arial,sans-serif;color:#38536b;max-width:760px;margin:0 auto;padding:35px;line-height:1.55}header{background:#eef8f4;border-radius:18px;padding:22px}h1{margin:0;color:#4a8b84;font-size:27px}h2{font-size:18px;color:#5d7693;margin-top:27px}.print{float:right;border:0;border-radius:9px;padding:10px 13px;background:#6eafa4;color:#fff;font-weight:bold;cursor:pointer}.result{background:#f2efff;border-radius:14px;padding:16px;font-weight:bold;color:#655f91}.box{border:1px solid #dbe8e7;border-radius:14px;padding:16px;margin-top:12px}li{margin:8px 0}.footer{font-size:11px;color:#687e8f;margin-top:30px;border-top:1px solid #dbe8e7;padding-top:12px}@media print{body{padding:20px}.print{display:none}}</style></head><body><header><button class="print" onclick="window.print()">Imprimir / salvar PDF</button><h1>Orientações para a família</h1><p><strong>Paciente:</strong> ${escapeHtml(name)}</p><p>Este material foi preparado para apoiar os cuidados em casa e o acompanhamento profissional.</p></header><h2>Resultado da avaliação</h2><div class="result">${escapeHtml(result)}${escapeHtml(side)}</div><h2>Cuidados no dia a dia</h2><div class="box"><ul><li>Durante o sono, mantenha o bebê <strong>de barriga para cima</strong>, em superfície firme e plana.</li><li>O tempo de barriga para baixo deve ser feito somente com o bebê <strong>acordado e supervisionado</strong>. Comece com períodos curtos e aumente conforme a tolerância e a orientação profissional.</li><li>Nos momentos acordado, varie as posições: colo, brincadeiras no chão e interação nos dois lados.</li><li>Evite manter o bebê por longos períodos seguidos em bebê-conforto, cadeirinha ou outras posições com pressão constante na cabeça, quando não estiverem sendo usados para transporte ou segurança.</li><li>Não use travesseiros, posicionadores ou objetos soltos para moldar a cabeça durante o sono.</li></ul></div><h2>Orientações personalizadas</h2><div class="box">${personalised ? escapeHtml(personalised).replace(/\n/g,"<br>") : "Siga as orientações passadas na consulta e registre aqui as recomendações específicas da família."}</div><h2>Plano de acompanhamento</h2><div class="box">${plan ? escapeHtml(plan).replace(/\n/g,"<br>") : "Retorno conforme orientação do profissional responsável."}</div><p class="footer">Este documento complementa a avaliação profissional e não substitui o acompanhamento com pediatra e fisioterapeuta. As orientações de sono seguro e tummy time supervisionado seguem recomendações da American Academy of Pediatrics: HealthyChildren.org.</p></body></html>`);
         handout.document.close();
+        const printStyle = handout.document.createElement("style");
+        printStyle.textContent = "h2:nth-of-type(2),h2:nth-of-type(2)+.box{display:none}";
+        handout.document.head.appendChild(printStyle);
+        const headings = handout.document.querySelectorAll("h2");
+        if (headings[2]) headings[2].textContent = "Orientações selecionadas";
         handout.focus();
     }
     async function load() { if (!localOnly) { const { data, error } = await client.from(table).select("*").order("created_at", { ascending:false }); if (!error) { records = data || []; render(); return; } localOnly = true; notice.style.display = "block"; } records = localRead(); render(); }
