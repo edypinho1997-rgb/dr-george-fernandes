@@ -100,7 +100,7 @@
         .flow-step.new-file > span { background:#b879d5; }.side-flow .flow-step.new-file > span { box-shadow:0 6px 12px #80529e45; }.side-flow ~ .layout #new-record { display:none; }
     </style>
     <style>
-        @media (max-width:900px) {
+        @media (max-width:1200px) {
             body { padding-bottom:62px; }.consultation-flow,.consultation-flow.side-flow { position:fixed; z-index:30; display:block; left:12px!important; right:12px!important; top:auto!important; bottom:7px; width:auto; margin:0; padding:2px 4px; border:0; border-radius:0; transform:none; background:transparent; box-shadow:none; }.consultation-flow .flow-intro,.consultation-flow .flow-steps > i,.consultation-flow .flow-step strong,.consultation-flow .flow-step small { display:none; }.consultation-flow .flow-steps { display:flex; justify-content:space-around; overflow:visible; padding:0; }.consultation-flow .flow-step { min-width:0; padding:0; }.consultation-flow .flow-step > span { width:34px; height:34px; font-size:.95rem; box-shadow:0 4px 8px #74415335; }.consultation-flow .flow-step.active > span { outline-width:2px; box-shadow:0 0 0 2px #d96991,0 4px 8px #9c587b32; }
         }
     </style>
@@ -281,7 +281,7 @@
     el("close-patients").onclick = () => setPatientDrawer(false);
     const flow = document.querySelector(".consultation-flow"), flowButtons = [...document.querySelectorAll(".flow-step[data-target]")];
     function updateFlow() {
-        flow.classList.toggle("side-flow", window.innerWidth > 900);
+        flow.classList.toggle("side-flow", window.innerWidth > 1200);
         let current = flowButtons[0];
         flowButtons.forEach(button => { const target = el(button.dataset.target); if (target && target.getBoundingClientRect().top < window.innerHeight * .42) current = button; });
         flowButtons.forEach(button => button.classList.toggle("active", button === current));
