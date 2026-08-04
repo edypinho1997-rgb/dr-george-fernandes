@@ -9,27 +9,73 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
-        :root { --ink:#39536c; --blue:#4e97c9; --soft:#f7f3ed; --line:#dbe8e7; --card:#fffdfa; --peach:#fff0e8; --mint:#eaf7f1; --lavender:#f1efff; }
-        * { box-sizing:border-box; } body { margin:0; background:radial-gradient(circle at 6% 5%,#fce7da 0 9%,transparent 23%),radial-gradient(circle at 95% 12%,#dff2ef 0 10%,transparent 25%),var(--soft); color:var(--ink); font-family:Poppins,Arial,sans-serif; }
-        .page { max-width:1300px; margin:auto; padding:34px 24px 60px; } header { position:relative; overflow:hidden; display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:28px; padding:30px; border-radius:24px; background:linear-gradient(120deg,#fff0e8,#f3f0ff 54%,#e7f8f1); } header::after { content:'♥  ✦  ●'; position:absolute; right:9%; bottom:-24px; color:#fff; font-size:5rem; letter-spacing:15px; opacity:.72; } h1,h2,h3 { margin:0; } h1 { position:relative; z-index:1; font:700 clamp(1.75rem,4vw,2.45rem) 'Playfair Display',serif; color:#466f84; } header p { position:relative; z-index:1; margin:8px 0 0; color:#637f8d; } .back { position:relative; z-index:1; padding:9px 13px; border-radius:99px; background:#fffdfb; color:#4b849e; font-weight:600; text-decoration:none; white-space:nowrap; }
+        :root { --ink:#39536c; --blue:#4e97c9; --soft:#f8dce4; --line:#e4b9c7; --card:#fff7f9; --peach:#ffdce8; --mint:#f7dfe9; --lavender:#f5e6f1; }
+        * { box-sizing:border-box; } body { margin:0; background:radial-gradient(circle at 6% 5%,#f7b9cb 0 10%,transparent 25%),radial-gradient(circle at 95% 12%,#ecc5d5 0 11%,transparent 26%),var(--soft); color:var(--ink); font-family:Poppins,Arial,sans-serif; }
+        .page { max-width:1300px; margin:auto; padding:34px 24px 60px; } header { position:relative; overflow:hidden; display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:28px; padding:30px; border-radius:24px; background:linear-gradient(120deg,#ffc9da,#f2d9ec 54%,#f7cddd); } header::after { content:'♥  ✦  ●'; position:absolute; right:9%; bottom:-24px; color:#fff; font-size:5rem; letter-spacing:15px; opacity:.72; } h1,h2,h3 { margin:0; } h1 { position:relative; z-index:1; font:700 clamp(1.75rem,4vw,2.45rem) 'Playfair Display',serif; color:#466f84; } header p { position:relative; z-index:1; margin:8px 0 0; color:#637f8d; } .back { position:relative; z-index:1; padding:9px 13px; border-radius:99px; background:#fff7fa; color:#4b849e; font-weight:600; text-decoration:none; white-space:nowrap; }
         .layout { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:22px; } .card { background:var(--card); border:1px solid #fff; border-radius:22px; box-shadow:0 12px 32px #697b6a14; padding:24px; } .section-title { margin:30px 0 14px; padding:9px 13px; border-radius:12px; font-size:1rem; color:#4e8196; background:var(--mint); } .section-title:first-child { margin-top:0; } .section-title::before { content:'✦ '; color:#ea9b79; } .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .wide { grid-column:1/-1; } label { display:grid; gap:6px; color:#5a7286; font-size:.84rem; font-weight:600; } input,select,textarea { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 11px; font:inherit; color:var(--ink); background:#fff; } input:focus,select:focus,textarea:focus { outline:3px solid #dceff1; border-color:#83bbc3; } textarea { resize:vertical; min-height:86px; } .checks { display:flex; flex-wrap:wrap; gap:10px 18px; padding:4px 0; } .checks label { display:flex; flex-direction:row; align-items:center; font-weight:400; } .checks input { width:auto; accent-color:var(--blue); }
         .choice-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px; grid-column:1/-1; } .choice-grid label { display:flex; flex-direction:row; align-items:center; gap:8px; padding:10px; border:1px solid #e4ece6; border-radius:13px; background:#fbfdfb; color:#547082; font-weight:500; cursor:pointer; } .choice-grid label:has(input:checked) { background:#e8f7f0; border-color:#8cc9bc; color:#397d78; } .choice-grid input { width:auto; accent-color:#64ae9d; } .calc-box { grid-column:1/-1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:18px; border:1px solid #ddd6f3; border-radius:17px; background:var(--lavender); } .calc-box h3 { grid-column:1/-1; font-size:1rem; color:#7667a5; } .calc-box h3::before { content:'⌁ '; } .head-guide { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px; border-radius:14px; background:#fffaff; } .head-figure { display:grid; justify-items:center; gap:6px; text-align:center; color:#6f6d91; font-size:.67rem; font-weight:600; } .head-shape { position:relative; display:block; width:49px; height:66px; border:2px solid #ce966e; border-radius:52% 48% 48% 52%; background:linear-gradient(120deg,#ffd1a9,#f3ac7f); box-shadow:inset -6px -4px 8px #c9845d3a; } .head-shape::before,.head-shape::after { content:''; position:absolute; top:28px; width:8px; height:13px; border-radius:50%; background:#f2ac7f; border:1px solid #ce966e; } .head-shape::before { left:-7px; } .head-shape::after { right:-7px; } .head-shape.normal { border-radius:50%; } .head-shape.escafo { width:40px; height:72px; } .head-shape.braqui { width:68px; height:52px; margin-top:7px; border-radius:45%; } .head-shape.plagio { transform:rotate(-12deg); border-radius:58% 39% 52% 46%; } .head-figure small { font-size:.62rem; color:#9290a8; line-height:1.25; } .calc-result { padding:13px; border-radius:13px; background:#fff; border:1px solid #e5dff5; } .calc-result strong { display:block; font-size:1.25rem; color:#6b6395; } .calc-result small { color:#748095; } .assessment-card { grid-column:1/-1; display:none; grid-template-columns:100px 1fr; align-items:center; gap:18px; padding:17px; border-radius:16px; background:#fff; border:1px solid #ded8f2; } .assessment-card.visible { display:grid; } .assessment-card .head-shape { justify-self:center; transform:none; } .assessment-card .head-shape.plagio { transform:rotate(-12deg); } .assessment-card p { margin:4px 0 0; color:#6e7e91; font-size:.82rem; } .assessment-card strong { color:#5e6794; font-size:1.15rem; } .side-picker { display:none; grid-column:1/-1; gap:8px; margin-top:8px; } .side-picker.visible { display:grid; } .side-picker span { color:#67778c; font-size:.8rem; font-weight:600; } .side-buttons { display:flex; flex-wrap:wrap; gap:8px; } .side-buttons button { border:1px solid #d9e6df; background:#f8fcfa; } .side-buttons button.selected { background:#dff2ea; border-color:#7dbdae; color:#397d70; } .calc-note { grid-column:1/-1; margin:0; color:#6d7591; font-size:.75rem; } .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; } button { border:0; border-radius:12px; padding:11px 15px; font:600 .9rem Poppins,sans-serif; cursor:pointer; background:#e8f4ef; color:#4a8178; } button.primary { background:#6eafa4; color:#fff; box-shadow:0 5px 10px #5e9c9130; } button.danger { color:#a85c5c; background:#fff0f0; } .patients { background:linear-gradient(#fffdfa,#fff8f2); } .patients h2 { font-size:1.1rem; color:#5f8e9e; } .patients h2::before { content:'☼ '; color:#eba47f; } .patients p { color:#778895; font-size:.82rem; } #patient-list { display:grid; gap:8px; margin-top:15px; } .patient { width:100%; text-align:left; border:1px solid #e5ece7; background:#fff; color:var(--ink); } .patient.active { border-color:#8dc9bd; background:#eaf7f1; } .patient small { display:block; color:#7a9197; font-weight:400; margin-top:2px; }
         .notice { display:none; margin:0 0 16px; padding:10px 12px; background:#fff9e6; color:#795b0b; border-radius:10px; font-size:.82rem; } .empty { color:#71849c; font-size:.88rem; }
         @media (max-width:850px) { .layout { grid-template-columns:1fr; } .patients { order:-1; } } @media (max-width:560px) { .page { padding:22px 14px; } header { display:block; } .back { display:inline-block; margin-top:14px; } .card { padding:17px; } .form-grid { grid-template-columns:1fr; } }
         @media print { body { background:#fff; } .patients, .back, .actions, .notice { display:none!important; } .page { max-width:none; padding:0; } .card { border:0; box-shadow:none; padding:0; } input,select,textarea { border:0; padding:0; appearance:none; -webkit-appearance:none; } }
     </style>
+    <style>
+        body::before, body::after { content:""; position:fixed; z-index:-1; border-radius:50%; filter:blur(2px); opacity:.65; pointer-events:none; }
+        body::before { width:320px; height:320px; left:-150px; bottom:10%; background:#f2a7bf; }
+        body::after { width:260px; height:260px; right:-110px; bottom:5%; background:#eab6d0; }
+        .card { position:relative; overflow:hidden; border-color:#fff9fb; box-shadow:0 18px 38px #a45d7820; }
+        .card::before { content:""; position:absolute; width:130px; height:130px; right:-72px; top:-72px; border-radius:50%; background:radial-gradient(circle,#f9c5d5 0 27%,transparent 28% 42%,#fce0e8 43% 55%,transparent 56%); opacity:.72; pointer-events:none; }
+        .section-title { position:relative; overflow:hidden; padding:11px 15px; border:1px solid #f2c8d5; color:#8a5470; background:linear-gradient(90deg,#ffe4ec,#f8e6f0); box-shadow:0 5px 12px #bc6e8a12; }
+        .section-title::after { content:"✦  ✿  ✦"; position:absolute; right:14px; color:#d994ad; letter-spacing:4px; font-size:.8rem; }
+        label { color:#715c70; }
+        input,select,textarea { border-color:#ecc6d2; background:#fffdfd; box-shadow:inset 0 1px 2px #b6728810; }
+        input:focus,select:focus,textarea:focus { outline-color:#f3c6d7; border-color:#d88ba8; }
+        .choice-grid { gap:11px; }
+        .choice-grid label { position:relative; min-height:54px; padding:12px 13px; border-color:#f0c8d4; background:linear-gradient(135deg,#fffefe,#fff4f7); box-shadow:0 5px 12px #b05d7b10; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
+        .choice-grid label:hover { transform:translateY(-2px); border-color:#df9bb2; box-shadow:0 9px 17px #b05d7b1d; }
+        .choice-grid label:has(input:checked) { background:linear-gradient(135deg,#f9cddb,#fbe9f0); border-color:#d888a5; color:#874c68; box-shadow:0 8px 16px #b05d7b22; }
+        .choice-grid input { accent-color:#ce7898; }
+        .calc-box { border-color:#ead0dd; background:linear-gradient(145deg,#faedf4,#f3e9fb); box-shadow:inset 0 1px #fff; }
+        .calc-result { border-color:#eed6e1; background:#fffafb; }
+        .assessment-card { border-color:#eccfdd; background:linear-gradient(135deg,#fffafd,#f9eff5); }
+        .patients { background:linear-gradient(155deg,#fff8fa,#f8e4ed); }
+        .patient { border-color:#f0cbd6; border-radius:15px; box-shadow:0 4px 10px #a8597410; }
+        .patient.active { border-color:#d584a2; background:#f8d9e4; }
+        .actions { padding:15px; border-radius:17px; background:#fbe7ee; }
+        button.primary { background:linear-gradient(135deg,#cc7595,#ae6383); box-shadow:0 7px 14px #a14d6d38; }
+        button:not(.primary):not(.danger) { background:#f5dce6; color:#92546f; }
+        .pediatric-hero { min-height:270px; align-items:center; isolation:isolate; padding:40px 43% 44px 42px; background:linear-gradient(115deg,#ff8eaa 0%,#fb7399 47%,#ffb457 100%); box-shadow:0 18px 35px #b54f742d; }
+        .pediatric-hero::before { content:""; position:absolute; z-index:-1; left:-5%; right:-5%; bottom:-1px; height:52px; border-radius:50% 50% 0 0/100% 100% 0 0; background:#f8dce4; }
+        .pediatric-hero::after { content:""; position:absolute; z-index:-1; left:20%; right:36%; bottom:22px; height:40px; border-radius:50%; background:#ffd363; opacity:.8; transform:rotate(-3deg); }
+        .hero-copy { position:relative; z-index:2; }.hero-kicker { display:inline-block; padding:6px 11px; border-radius:99px; background:#ffffff45; color:#fff; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+        .pediatric-hero h1 { margin-top:11px; color:#fff; text-shadow:0 2px 0 #be4c7038; font-size:clamp(2rem,4vw,3rem); }.pediatric-hero p { max-width:450px; color:#fff7f9; font-size:1rem; line-height:1.6; }
+        .hero-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:19px; }.hero-tags span { padding:7px 10px; border:1px solid #ffffff52; border-radius:99px; color:#fff; background:#ffffff25; font-size:.72rem; font-weight:600; backdrop-filter:blur(3px); }
+        .pediatric-hero .back { top:20px; right:22px; position:absolute; color:#a54a6e; box-shadow:0 5px 12px #8f305a2b; }
+        .hero-illustration { position:absolute; z-index:1; right:7%; bottom:22px; width:340px; height:215px; overflow:hidden; }.hero-illustration .sun { position:absolute; right:14px; top:5px; color:#fff5b0; font-size:3.5rem; filter:drop-shadow(0 4px 4px #c75f4340); }
+        .cloud { position:absolute; color:#fff; font-size:3.3rem; opacity:.9; }.cloud-one { left:4px; top:21px; }.cloud-two { right:52px; top:58px; font-size:2.4rem; opacity:.65; }.rainbow { position:absolute; left:39px; bottom:-100px; width:210px; height:210px; border:20px solid #fff6f2; border-bottom:0; border-radius:50% 50% 0 0; box-shadow:0 0 0 15px #e9517d,0 0 0 30px #ffc653,0 0 0 45px #66c8bd; }.teddy { position:absolute; z-index:2; bottom:2px; left:121px; font-size:5rem; filter:drop-shadow(0 7px 5px #94425430); }.star { position:absolute; color:#fff9c5; font-size:1.7rem; }.star-one { left:24px; bottom:70px; }.star-two { right:23px; bottom:33px; }
+        @media (max-width:760px) { .pediatric-hero { min-height:330px; padding:32px 24px 135px; }.hero-illustration { transform:scale(.72); transform-origin:bottom right; right:-5px; bottom:-7px; }.pediatric-hero .back { position:relative; top:auto; right:auto; display:inline-block; margin-top:16px; } }
+        .care-path { display:flex; align-items:center; justify-content:center; gap:10px; margin:-10px auto 26px; padding:11px 18px; max-width:870px; border:1px solid #fff; border-radius:99px; background:#fff9fc; box-shadow:0 10px 21px #a6557720; color:#8b5971; font-size:.76rem; font-weight:700; }
+        .care-path span { display:flex; align-items:center; gap:6px; white-space:nowrap; }.care-path b { display:grid; place-items:center; width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,#f59bb4,#df6f98); color:#fff; font-size:.7rem; }.care-path i { width:26px; height:2px; border-radius:9px; background:#f1bdcd; }
+        form > .section-title + .form-grid { position:relative; margin-bottom:28px; padding:20px; border:1px solid #f5d5df; border-top:0; border-radius:0 0 22px 22px; background:linear-gradient(140deg,#fffefe,#fff7fa); box-shadow:0 12px 23px #a55a7510; }
+        form > .section-title { display:flex; align-items:center; gap:10px; margin:27px 0 0; border-radius:21px 21px 0 0; font-size:1.05rem; }.section-title span { display:grid; place-items:center; width:31px; height:31px; border-radius:11px; background:#fff; box-shadow:0 4px 8px #bb66852b; font-size:1.05rem; }.section-title::before,.section-title::after { display:none; }
+        .form-grid > .choice-grid { padding:10px; border-radius:18px; background:#fff0f5; }.form-grid > .choice-grid label::after { content:""; position:absolute; right:10px; width:7px; height:7px; border-radius:50%; background:#f2adc0; opacity:.65; }.form-grid > .choice-grid label:has(input:checked)::after { background:#bc5178; opacity:1; }
+        .form-grid > .wide:has(> label:first-child:not(:has(input))) { position:relative; padding:14px 16px; border-radius:17px; border:1px dashed #e7a8bd; background:linear-gradient(100deg,#fff0f5,#fffafc); }.form-grid > .wide:has(> label:first-child:not(:has(input))) label { color:#a05572; font-size:.95rem; }.calc-note { padding:8px 10px; border-radius:10px; background:#fff9fb; color:#95667a; }
+        .actions { position:sticky; bottom:14px; z-index:4; justify-content:center; border:1px solid #fff; box-shadow:0 13px 25px #99445e27; }.actions::before { content:"Pronto para finalizar a ficha?"; align-self:center; margin-right:auto; color:#91566f; font-size:.78rem; font-weight:700; }
+        @media (max-width:760px) { .care-path { justify-content:flex-start; overflow:auto; margin:0 0 20px; border-radius:18px; }.care-path i { min-width:15px; }.actions { position:static; }.actions::before { width:100%; }.form-grid > .choice-grid { padding:8px; } }
+    </style>
 </head>
 <body>
 <main class="page">
-    <header>
-        <div><h1>Avaliação Pediátrica</h1><p>Um cuidado atento e acolhedor para acompanhar o desenvolvimento do seu pequeno.</p></div>
+    <header class="pediatric-hero">
+        <div class="hero-copy"><span class="hero-kicker">Crescer, brincar e evoluir</span><h1>Avaliação Pediátrica</h1><p>Um cuidado atento e acolhedor para acompanhar cada pequena conquista.</p><div class="hero-tags"><span>🌱 Desenvolvimento</span><span>🧸 Cuidado leve</span><span>💗 Família junto</span></div></div>
+        <div class="hero-illustration" aria-hidden="true"><span class="sun">☀</span><span class="cloud cloud-one">☁</span><span class="cloud cloud-two">☁</span><span class="rainbow"></span><span class="teddy">🧸</span><span class="star star-one">✦</span><span class="star star-two">✦</span></div>
         <a class="back" href="index.html">&larr; Voltar ao painel</a>
     </header>
+    <nav class="care-path" aria-label="Etapas da avaliação"><span><b>1</b> Boas-vindas</span><i></i><span><b>2</b> Avaliação</span><i></i><span><b>3</b> Orientações</span><i></i><span><b>4</b> Relatório</span></nav>
     <div class="notice" id="notice">A tabela pediátrica ainda não está disponível no banco. Esta ficha está sendo salva somente neste navegador.</div>
     <div class="layout">
         <section class="card">
             <form id="pediatric-form">
-                <h2 class="section-title">Identificação</h2>
+                <h2 class="section-title"><span>👶</span> Identificação</h2>
                 <div class="form-grid">
                     <label>Nome da criança<input id="nome" required placeholder="Nome completo"></label>
                     <label>Data de nascimento<input id="nascimento" type="date"></label>
@@ -37,14 +83,14 @@
                     <label>Telefone<input id="telefone" type="tel" placeholder="(00) 00000-0000"></label>
                     <label class="wide">Queixa principal<textarea id="queixa" placeholder="Motivo da avaliação e percepção da família"></textarea></label>
                 </div>
-                <h2 class="section-title">Histórico gestacional e neonatal</h2>
+                <h2 class="section-title"><span>🌷</span> Histórico gestacional e neonatal</h2>
                 <div class="form-grid">
                     <label>Tipo de parto<select id="tipo-parto"><option value="">Selecione</option><option>Parto vaginal</option><option>Cesárea</option><option>Parto instrumental</option><option>Não informado</option></select></label>
                     <label>Idade gestacional<select id="idade-gestacional"><option value="">Selecione</option><option>A termo (37 semanas ou mais)</option><option>Prematuro</option><option>Pós-termo</option><option>Não informado</option></select></label>
                     <div class="choice-grid"><label><input id="gestacao-sem-intercorrencias" type="checkbox"> Gestação sem intercorrências</label><label><input id="uti-neonatal" type="checkbox"> Passou por UTI neonatal</label><label><input id="gemeos" type="checkbox"> Gestação gemelar</label><label><input id="refluxo" type="checkbox"> Refluxo relatado</label></div>
                     <label class="wide">Observações do nascimento<textarea id="gestacao" placeholder="Use apenas se houver algo importante a registrar"></textarea></label>
                 </div>
-                <h2 class="section-title">Torcicolo e assimetria craniana</h2>
+                <h2 class="section-title"><span>🌈</span> Torcicolo e assimetria craniana</h2>
                 <div class="form-grid">
                     <label>Preferência postural<select id="preferencia"><option value="">Não observado</option><option>Olha mais para a direita</option><option>Olha mais para a esquerda</option><option>Sem preferência</option></select></label>
                     <label>Grau de assimetria<select id="grau-assimetria"><option value="">Não classificado</option><option>Ausente</option><option>Leve</option><option>Moderada</option><option>Importante</option></select></label>
@@ -74,7 +120,7 @@
                     </div>
                     <label class="wide">Medidas e observações clínicas<textarea id="cranio" placeholder="Complementos das medidas, rotação/inclinação e outros achados"></textarea></label>
                 </div>
-                <h2 class="section-title">Desenvolvimento e conduta</h2>
+                <h2 class="section-title"><span>🧸</span> Desenvolvimento e conduta</h2>
                 <div class="form-grid">
                     <div class="choice-grid"><label><input id="rola" type="checkbox"> Rola</label><label><input id="senta-apoio" type="checkbox"> Senta com apoio</label><label><input id="senta-sem-apoio" type="checkbox"> Senta sem apoio</label><label><input id="engatinha" type="checkbox"> Engatinha</label><label><input id="anda" type="checkbox"> Anda</label><label><input id="marcos-adequados" type="checkbox"> Marcos adequados à idade</label></div>
                     <div class="wide">
@@ -84,6 +130,9 @@
                     <div class="choice-grid">
                         <label><input id="orientacao-olhar-esquerda" type="checkbox"> Estimular o olhar à esquerda</label>
                         <label><input id="orientacao-olhar-direita" type="checkbox"> Estimular o olhar à direita</label>
+                        <label><input id="orientacao-torcicolo-direita" type="checkbox"> Torcicolo: estimular rotação à direita</label>
+                        <label><input id="orientacao-torcicolo-esquerda" type="checkbox"> Torcicolo: estimular rotação à esquerda</label>
+                        <label><input id="orientacao-torcicolo-alongamento" type="checkbox"> Exercícios ensinados para torcicolo</label>
                         <label><input id="orientacao-alternar-colo" type="checkbox"> Alternar lado no colo e mamada</label>
                         <label><input id="orientacao-tummy" type="checkbox"> Tummy time supervisionado</label>
                         <label><input id="orientacao-variar-posicoes" type="checkbox"> Variar posições acordado</label>
@@ -107,7 +156,7 @@
 (() => {
     const client = window.supabase ? window.supabase.createClient("https://lhnglzxyeazxlxihobzx.supabase.co", "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9") : null;
     const table = "avaliacoes_pediatricas", key = "avaliacoes-pediatricas-v1";
-    const ids = ["nome","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-olhar-esquerda","orientacao-olhar-direita","orientacao-alternar-colo","orientacao-tummy","orientacao-variar-posicoes","orientacao-reduzir-cadeirinha","orientacao-estimulos","orientacao-sono-seguro","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
+    const ids = ["nome","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-olhar-esquerda","orientacao-olhar-direita","orientacao-torcicolo-direita","orientacao-torcicolo-esquerda","orientacao-torcicolo-alongamento","orientacao-alternar-colo","orientacao-tummy","orientacao-variar-posicoes","orientacao-reduzir-cadeirinha","orientacao-estimulos","orientacao-sono-seguro","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
     const form = document.getElementById("pediatric-form"), list = document.getElementById("patient-list"), notice = document.getElementById("notice"), remove = document.getElementById("delete-record");
     let records = [], currentId = null, localOnly = !client;
     const el = id => document.getElementById(id);
@@ -126,6 +175,9 @@
         const options = [
             ["orientacao-olhar-esquerda", "Durante os momentos em que estiver acordado e supervisionado, estimule o bebê a olhar e interagir mais para o lado esquerdo, usando brinquedos, voz e estímulos desse lado."],
             ["orientacao-olhar-direita", "Durante os momentos em que estiver acordado e supervisionado, estimule o bebê a olhar e interagir mais para o lado direito, usando brinquedos, voz e estímulos desse lado."],
+            ["orientacao-torcicolo-direita", "Durante os momentos acordado e supervisionado, estimule de forma leve o movimento de rotação da cabeça para a direita, com brinquedos, voz e interação desse lado."],
+            ["orientacao-torcicolo-esquerda", "Durante os momentos acordado e supervisionado, estimule de forma leve o movimento de rotação da cabeça para a esquerda, com brinquedos, voz e interação desse lado."],
+            ["orientacao-torcicolo-alongamento", "Realize em casa somente os exercícios e alongamentos demonstrados pelo profissional durante a consulta, respeitando o conforto da criança e sem forçar os movimentos."],
             ["orientacao-alternar-colo", "Alterne os lados no colo, nas mamadas e nas trocas, para favorecer experiências nos dois lados do corpo."],
             ["orientacao-tummy", "Faça períodos de barriga para baixo (tummy time) somente com o bebê acordado e supervisionado. Comece com poucos minutos e aumente gradualmente conforme a tolerância e a orientação profissional."],
             ["orientacao-variar-posicoes", "Nos momentos acordado, varie as posições entre colo, brincadeiras no chão e interações dos dois lados."],
