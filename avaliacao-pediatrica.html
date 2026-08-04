@@ -106,7 +106,7 @@
     </style>
     <style>
         @media (max-width:1200px) {
-            body { padding-bottom:0; }.page { padding-left:36px; }.consultation-flow,.consultation-flow.side-flow { position:fixed; z-index:30; display:block; left:1px!important; right:auto!important; top:50%!important; bottom:auto!important; width:auto; margin:0; padding:2px 3px; border:0; border-radius:18px; transform:translateY(-50%); background:transparent; box-shadow:none; }.consultation-flow .flow-intro,.consultation-flow .flow-steps > i,.consultation-flow .flow-step strong,.consultation-flow .flow-step small { display:none; }.consultation-flow .flow-steps { display:grid; gap:5px; padding:0; }.consultation-flow .flow-step { min-width:0; padding:0; }.consultation-flow .flow-step > span { width:38px; height:38px; font-size:1rem; box-shadow:0 3px 7px #74415335; }.consultation-flow .flow-step.active > span { outline-width:2px; box-shadow:0 0 0 2px #d96991,0 3px 7px #9c587b32; }
+            body { padding-bottom:0; }.page { padding-left:36px; }.consultation-flow,.consultation-flow.side-flow { position:fixed; z-index:30; display:block; left:0!important; right:auto!important; top:50%!important; bottom:auto!important; width:auto; margin:0; padding:2px 3px; border:0; border-radius:18px; transform:translateY(-50%); background:transparent; box-shadow:none; }.consultation-flow .flow-intro,.consultation-flow .flow-steps > i,.consultation-flow .flow-step strong,.consultation-flow .flow-step small { display:none; }.consultation-flow .flow-steps { display:grid; gap:5px; padding:0; }.consultation-flow .flow-step { min-width:0; padding:0; }.consultation-flow .flow-step > span { width:44px; height:44px; font-size:1.12rem; box-shadow:0 3px 7px #74415335; }.consultation-flow .flow-step.active > span { outline-width:2px; box-shadow:0 0 0 2px #d96991,0 3px 7px #9c587b32; }
         }
     </style>
 </head>
@@ -211,14 +211,53 @@
         <aside class="card patients" id="patient-drawer"><div class="drawer-head"><div><h2>Crianças avaliadas</h2><p>Suas fichas pediátricas salvas.</p></div><button id="close-patients" type="button" aria-label="Fechar lista de crianças">×</button></div><div id="patient-list"><span class="empty">Nenhuma ficha salva ainda.</span></div></aside>
     </div>
 </main>
+<style>
+    .auth-overlay { position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:20px; background:rgba(45,32,43,.58); backdrop-filter:blur(5px); }
+    .auth-overlay[hidden] { display:none; }
+    .auth-card { width:min(100%,400px); padding:28px; border-radius:22px; background:#fffafa; box-shadow:0 24px 65px #33132266; color:#715c70; }
+    .auth-card h2 { color:#9d5574; margin-bottom:8px; }
+    .auth-card p { margin:0 0 18px; font-size:.88rem; }
+    .auth-card form { display:grid; gap:13px; }
+    .auth-card button { margin-top:5px; background:linear-gradient(135deg,#cc7595,#ae6383); color:#fff; }
+    .auth-message { min-height:20px; margin:4px 0 0!important; color:#a14d62; }
+</style>
+<section class="auth-overlay" id="auth-overlay" aria-labelledby="auth-title">
+    <div class="auth-card">
+        <h2 id="auth-title">Acesso protegido</h2>
+        <p>Entre com seu e-mail e senha para acessar as fichas pediátricas.</p>
+        <form id="auth-form">
+            <label>E-mail<input id="auth-email" type="email" autocomplete="email" required></label>
+            <label>Senha<input id="auth-password" type="password" autocomplete="current-password" required></label>
+            <button type="submit">Entrar</button>
+        </form>
+        <p class="auth-message" id="auth-message" role="alert"></p>
+    </div>
+</section>
 <script>
 (() => {
     const client = window.supabase ? window.supabase.createClient("https://lhnglzxyeazxlxihobzx.supabase.co", "sb_publishable_SvmOYxmanNQCVTyXmJ6XpQ_lxUtpeI9") : null;
     const table = "avaliacoes_pediatricas", key = "avaliacoes-pediatricas-v1", draftKey = "avaliacoes-pediatricas-draft-v1";
     const ids = ["nome","sexo","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-olhar-esquerda","orientacao-olhar-direita","orientacao-torcicolo-direita","orientacao-torcicolo-esquerda","orientacao-torcicolo-alongamento","orientacao-alternar-colo","orientacao-tummy","orientacao-variar-posicoes","orientacao-reduzir-cadeirinha","orientacao-estimulos","orientacao-sono-seguro","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
     const form = document.getElementById("pediatric-form"), list = document.getElementById("patient-list"), notice = document.getElementById("notice"), remove = document.getElementById("delete-record");
+    const authOverlay = document.getElementById("auth-overlay"), authForm = document.getElementById("auth-form"), authMessage = document.getElementById("auth-message");
     let records = [], currentId = null, localOnly = !client, draftRecord = null;
     const el = id => document.getElementById(id);
+    async function checkAuthentication() {
+        if (!client) { authMessage.textContent = "Não foi possível conectar ao serviço de acesso. Atualize a página e tente novamente."; return false; }
+        const { data: { session } } = await client.auth.getSession();
+        authOverlay.hidden = !!session;
+        return !!session;
+    }
+    authForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        authMessage.textContent = "Entrando...";
+        const { error } = await client.auth.signInWithPassword({ email: el("auth-email").value.trim(), password: el("auth-password").value });
+        if (error) { authMessage.textContent = "E-mail ou senha inválidos."; return; }
+        authMessage.textContent = "";
+        authOverlay.hidden = true;
+        localOnly = false;
+        await load();
+    });
     const localRead = () => { try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; } };
     const localSave = () => localStorage.setItem(key, JSON.stringify(records));
     const draftRead = () => { try { return JSON.parse(localStorage.getItem(draftKey) || "null"); } catch { return null; } };
@@ -295,7 +334,7 @@
     window.addEventListener("scroll", updateFlow, { passive:true });
     window.addEventListener("resize", updateFlow);
     updateFlow();
-    load();
+    checkAuthentication().then(authenticated => { if (authenticated) load(); });
 })();
 </script>
 </body>
