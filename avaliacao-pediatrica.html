@@ -96,6 +96,9 @@
         @media (min-width:761px) { .consultation-flow.side-flow { left:18px!important; right:auto!important; }.side-flow ~ .layout #new-record { position:fixed; z-index:21; top:calc(50% - 145px); left:14px; right:auto; padding:8px 10px; border:1px solid #fff; border-radius:14px; background:linear-gradient(135deg,#f39ab4,#d96f92); color:#fff; box-shadow:0 8px 17px #91456036; font-size:.68rem; } }
         .patient { position:relative; padding-right:42px; }.patient-remove { position:absolute; top:6px; right:6px; display:grid; place-items:center; width:23px; height:23px; border-radius:50%; background:#fff0f4; color:#c64f76; font-size:1.05rem; font-weight:700; }.patient-remove:hover { background:#d85278; color:#fff; }
     </style>
+    <style>
+        .flow-step.new-file > span { background:#b879d5; }.side-flow .flow-step.new-file > span { box-shadow:0 6px 12px #80529e45; }.side-flow ~ .layout #new-record { display:none; }
+    </style>
 </head>
 <body>
 <main class="page">
@@ -109,6 +112,7 @@
     <section class="consultation-flow" aria-label="Fluxo da avaliação pediátrica">
         <div class="flow-intro"><span>✨</span><div><strong>Como funciona a avaliação?</strong><small>Um caminho simples para transformar observação em cuidado em casa.</small></div></div>
         <div class="flow-steps">
+            <button class="flow-step new-file" id="new-record-float" type="button" aria-label="Nova ficha"><span>📒</span><strong>Nova ficha</strong><small>Salvar e começar</small></button><i>➜</i>
             <button class="flow-step observe" type="button" data-target="etapa-observar" aria-label="Ir para observar"><span>👀</span><strong>Observar</strong><small>Postura, marcos e rotina</small></button><i>➜</i>
             <button class="flow-step measure" type="button" data-target="etapa-avaliar" aria-label="Ir para avaliar"><span>📏</span><strong>Avaliar</strong><small>Medidas e assimetrias</small></button><i>➜</i>
             <button class="flow-step guide" type="button" data-target="etapa-orientar" aria-label="Ir para orientar"><span>💗</span><strong>Orientar</strong><small>Escolhas para a família</small></button><i>➜</i>
@@ -263,7 +267,8 @@
     form.addEventListener("submit", async event => { event.preventDefault(); calculateIndices(); const data = values(); const payload = { nome:data.nome, data_nascimento:data.nascimento || null, responsavel:data.responsavel, telefone:data.telefone, dados:data }; if (!localOnly) { const query = currentId ? client.from(table).update(payload).eq("id", currentId) : client.from(table).insert(payload); const { error } = await query; if (!error) { clearDraft(); await load(); const saved = records.find(r => r.id === currentId) || records.find(r => r.nome === data.nome); if (saved) fill(saved); return; } localOnly = true; notice.style.display = "block"; }
         const record = { ...payload, id: currentId || `local-${Date.now()}`, created_at:new Date().toISOString() }; records = currentId ? records.map(r => String(r.id) === String(currentId) ? record : r) : [record, ...records]; currentId = record.id; clearDraft(); localSave(); render(); remove.hidden = false;
     });
-    el("new-record").onclick = () => { const saved = saveDraft(); clear(); if (saved) window.alert("A ficha em andamento foi salva como rascunho neste aparelho."); }; el("family-handout").onclick = familyHandout; el("print-record").onclick = () => window.print();
+    function startNewRecord() { const saved = saveDraft(); clear(); if (saved) window.alert("A ficha em andamento foi salva como rascunho neste aparelho."); }
+    el("new-record").onclick = startNewRecord; el("new-record-float").onclick = startNewRecord; el("family-handout").onclick = familyHandout; el("print-record").onclick = () => window.print();
     remove.onclick = async () => { if (!currentId || !confirm("Apagar esta ficha pediátrica?")) return; if (!localOnly) { const { error } = await client.from(table).delete().eq("id", currentId); if (!error) { clear(); return load(); } } records = records.filter(r => String(r.id) !== String(currentId)); localSave(); clear(); };
     const patientDrawer = el("patient-drawer"), patientToggle = el("patients-toggle");
     function setPatientDrawer(open) { patientDrawer.classList.toggle("open", open); patientToggle.setAttribute("aria-expanded", String(open)); }
