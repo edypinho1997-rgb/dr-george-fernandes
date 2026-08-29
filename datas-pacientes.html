@@ -209,10 +209,16 @@
             return { ...base, datas_sessoes: confirmedDates() };
         }
         function saveRecord() {
+            const wasConfirmed = confirmation.checked;
             try {
+                // Salvar é a confirmação final das datas revisadas nesta tela.
+                confirmation.checked = true;
                 recordFromForm();
                 showStatus("Datas reais conferidas. Você já pode gerar ou imprimir o documento.");
-            } catch (error) { showStatus(error.message || "Não foi possível salvar agora. Revise as datas."); }
+            } catch (error) {
+                confirmation.checked = wasConfirmed;
+                showStatus(error.message || "Não foi possível salvar agora. Revise as datas.");
+            }
         }
         function documentHtml() {
             const record = recordFromForm();
@@ -221,9 +227,11 @@
         }
         function openDocument(printNow = false) {
             try {
+                // Monta a ficha antes de abrir a nova aba, evitando uma aba em branco se houver algum campo inválido.
+                const html = documentHtml();
                 const windowDocument = window.open("", "_blank");
                 if (!windowDocument) throw new Error("Permita a abertura de janelas para gerar o documento.");
-                windowDocument.document.open(); windowDocument.document.write(documentHtml()); windowDocument.document.close();
+                windowDocument.document.open(); windowDocument.document.write(html); windowDocument.document.close();
                 if (printNow) windowDocument.onload = () => windowDocument.print();
             } catch (error) { showStatus(error.message || "Não foi possível gerar o documento."); }
         }
