@@ -30,6 +30,115 @@ body.certificate-page .section {
     min-height: 100vh;
 }
 
+.date-organizer-page .section {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 42px 24px;
+}
+
+.date-organizer-note,
+.date-organizer-status {
+    grid-column: span 3;
+    margin: 0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+}
+
+.date-organizer-note {
+    color: #c8d5e2;
+    background: rgba(0, 208, 132, 0.09);
+    border: 1px solid rgba(0, 208, 132, 0.22);
+}
+
+.date-organizer-status {
+    display: none;
+    color: #f4d59a;
+    background: rgba(235, 175, 55, 0.12);
+    border: 1px solid rgba(235, 175, 55, 0.3);
+}
+
+.date-organizer-status.visible {
+    display: block;
+}
+
+.session-list {
+    grid-column: span 3;
+    display: grid;
+    gap: 10px;
+}
+
+.session-list[hidden] {
+    display: none;
+}
+
+.session-list h3 {
+    margin: 8px 0 0;
+    font-size: 1.05rem;
+}
+
+.session-list > p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.session-row {
+    display: grid;
+    grid-template-columns: minmax(110px, 0.45fr) minmax(210px, 1fr) minmax(140px, 0.55fr);
+    gap: 12px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.session-row strong {
+    font-size: 0.88rem;
+}
+
+.session-row select {
+    width: 100%;
+    border: 1px solid #d5e1f3;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.session-day {
+    color: var(--muted);
+    font-size: 0.84rem;
+}
+
+.date-confirmation {
+    flex-basis: 100%;
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.date-confirmation input {
+    accent-color: var(--brand);
+}
+
+@media (max-width: 760px) {
+    .date-organizer-page .section { padding: 28px 16px; }
+    .date-organizer-note, .date-organizer-status, .session-list { grid-column: span 1; }
+    .session-row { grid-template-columns: 1fr; gap: 7px; }
+}
+
+body.light-theme .date-organizer-note {
+    color: #235244;
+    background: rgba(0, 208, 132, 0.1);
+}
+
+body.light-theme .session-row {
+    border-color: #cbd9e7;
+    background: #f7fafd;
+}
+
 .login-gate {
     position: fixed;
     inset: 0;

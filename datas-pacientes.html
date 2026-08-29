@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Datas de pacientes - Dr. George Fernandes</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        if (localStorage.getItem("clinica-login-liberado") !== "true") window.location.href = "index.html";
+    </script>
+</head>
+<body class="certificate-page date-organizer-page">
+    <section class="section" id="datas-pacientes">
+        <div class="section-head">
+            <h2>Datas de pacientes</h2>
+            <p>Organize e registre somente as datas de atendimentos efetivamente realizados.</p>
+        </div>
+
+        <div class="exam-request-card">
+            <div class="exam-field">
+                <label for="date-paciente">Nome do paciente</label>
+                <input id="date-paciente" type="text" autocomplete="name" placeholder="Nome completo">
+            </div>
+            <div class="exam-field">
+                <label for="date-codigo">Ordem de serviço (código)</label>
+                <input id="date-codigo" type="text" placeholder="Ex.: 50000540">
+            </div>
+            <div class="exam-field">
+                <label for="date-valor">Valor</label>
+                <input id="date-valor" type="text" inputmode="decimal" placeholder="R$ 0,00">
+            </div>
+            <div class="exam-field">
+                <label for="date-liberacao">Data de liberação do pacote</label>
+                <input id="date-liberacao" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off">
+            </div>
+            <div class="exam-field">
+                <label for="date-limite">Data limite para finalizar</label>
+                <input id="date-limite" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off">
+            </div>
+            <div class="exam-field">
+                <label for="date-quantidade">Quantidade de sessões</label>
+                <input id="date-quantidade" type="number" min="1" step="1" placeholder="Ex.: 10">
+            </div>
+            <p class="date-organizer-note">Ao gerar, o sistema sugere uma distribuição equilibrada entre dias permitidos, priorizando segundas, quartas e sextas, mas alternando algumas terças ou quintas para variar a agenda. Revise e confirme as datas reais antes de gerar o documento.</p>
+            <p id="date-status" class="date-organizer-status" role="alert"></p>
+            <div class="exam-actions">
+                <button id="date-generate" type="button">GERAR DATAS</button>
+            </div>
+
+            <div id="session-list" class="session-list" hidden>
+                <h3>DATAS DAS SESSÕES</h3>
+                <p>Revise as sugestões. A lista final fica em ordem cronológica e mostra data seguida do dia da semana.</p>
+                <div id="session-rows"></div>
+            </div>
+            <div id="date-final-actions" class="exam-actions" hidden>
+                <button id="date-save" type="button">SALVAR</button>
+                <button id="date-edit" type="button">EDITAR DATAS</button>
+                <button id="date-document" type="button">GERAR DOCUMENTO</button>
+                <button id="date-print" type="button">IMPRIMIR</button>
+                <label class="date-confirmation"><input id="date-confirm" type="checkbox"> Confirmo que revisei e que estas são as datas reais dos atendimentos.</label>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const fixedNationalHolidays = [
+            [1, 1, "Confraternização Universal"], [4, 21, "Tiradentes"], [5, 1, "Dia Mundial do Trabalho"],
+            [9, 7, "Independência do Brasil"], [10, 12, "Nossa Senhora Aparecida"], [11, 2, "Finados"],
+            [11, 15, "Proclamação da República"], [11, 20, "Dia Nacional de Zumbi e da Consciência Negra"], [12, 25, "Natal"]
+        ];
+        // Adicione aqui feriados estaduais ou municipais: { date: "2026-06-24", name: "Feriado municipal" }.
+        const additionalHolidays = [];
+        let availableDates = [];
+
+        const byId = (id) => document.getElementById(id);
+        const fields = {
+            paciente: byId("date-paciente"), codigo: byId("date-codigo"), valor: byId("date-valor"),
+            liberacao: byId("date-liberacao"), limite: byId("date-limite"), quantidade: byId("date-quantidade")
+        };
+        const status = byId("date-status"), list = byId("session-list"), rows = byId("session-rows"), actions = byId("date-final-actions"), confirmation = byId("date-confirm");
+
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+        }
+        function parseIsoDate(value) { return new Date(`${value}T12:00:00`); }
+        function isoDate(date) { return date.toISOString().slice(0, 10); }
+        function brDateToIso(value) {
+            const match = String(value).trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (!match) return "";
+            const [, day, month, year] = match;
+            const iso = `${year}-${month}-${day}`;
+            const date = parseIsoDate(iso);
+            return !Number.isNaN(date.getTime()) && date.getFullYear() === Number(year) && date.getMonth() + 1 === Number(month) && date.getDate() === Number(day) ? iso : "";
+        }
+        function formatBrDateInput(input) {
+            const numbers = input.value.replace(/\D/g, "").slice(0, 8);
+            input.value = numbers.replace(/(\d{2})(\d)/, "$1/$2").replace(/(\d{2}\/\d{2})(\d)/, "$1/$2");
+        }
+        function dateLabel(value) {
+            const date = parseIsoDate(value);
+            const numericDate = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
+            const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(date);
+            return `${numericDate} — ${weekday}`;
+        }
+        function holidayName(value) {
+            const date = parseIsoDate(value);
+            const fixed = fixedNationalHolidays.find(([month, day]) => month === date.getMonth() + 1 && day === date.getDate());
+            const extra = additionalHolidays.find((holiday) => holiday.date === value);
+            return fixed?.[2] || extra?.name || "";
+        }
+        function isAllowedDate(value) {
+            const day = parseIsoDate(value).getDay();
+            return day !== 0 && day !== 6 && !holidayName(value);
+        }
+        function readBaseData() {
+            return {
+                paciente: fields.paciente.value.trim(), codigo_servico: fields.codigo.value.trim(), valor: fields.valor.value.trim(),
+                data_liberacao: brDateToIso(fields.liberacao.value), data_limite: brDateToIso(fields.limite.value),
+                quantidade_sessoes: Number(fields.quantidade.value)
+            };
+        }
+        function validateBaseData() {
+            const data = readBaseData();
+            if (!data.paciente || !data.codigo_servico || !data.valor || !data.data_liberacao || !data.data_limite || !data.quantidade_sessoes) {
+                showStatus("Preencha todos os dados do paciente e do pacote."); return null;
+            }
+            if (data.data_liberacao > data.data_limite) { showStatus("A data limite deve ser igual ou posterior à data de liberação."); return null; }
+            return data;
+        }
+        function showStatus(message = "") { status.textContent = message; status.classList.toggle("visible", Boolean(message)); }
+        function listAllowedDates(start, end) {
+            const dates = [];
+            for (let date = parseIsoDate(start); date <= parseIsoDate(end); date.setDate(date.getDate() + 1)) {
+                const value = isoDate(date);
+                if (isAllowedDate(value)) dates.push(value);
+            }
+            // Preferência visual: segunda, quarta e sexta antes dos demais dias; não cria nem confirma atendimentos.
+            return dates.sort((a, b) => {
+                const priority = (value) => [1, 3, 5].includes(parseIsoDate(value).getDay()) ? 0 : 1;
+                return priority(a) - priority(b) || a.localeCompare(b);
+            });
+        }
+        function suggestDates(quantity) {
+            const chronological = [...availableDates].sort();
+            const chosen = [];
+            for (let session = 0; session < quantity; session += 1) {
+                const idealPosition = quantity === 1 ? Math.floor((chronological.length - 1) / 2) : session * (chronological.length - 1) / (quantity - 1);
+                const preferAlternativeDay = quantity >= 3 && (session + 1) % 3 === 0;
+                const candidates = chronological.filter((date) => !chosen.includes(date));
+                candidates.sort((a, b) => {
+                    const score = (date) => {
+                        const position = chronological.indexOf(date);
+                        const day = parseIsoDate(date).getDay();
+                        const preferredDay = [1, 3, 5].includes(day);
+                        const alternativeDay = [2, 4].includes(day);
+                        const dayPenalty = preferAlternativeDay ? (alternativeDay ? 0 : 2) : (preferredDay ? 0 : 1);
+                        return Math.abs(position - idealPosition) * 2 + dayPenalty;
+                    };
+                    return score(a) - score(b) || a.localeCompare(b);
+                });
+                chosen.push(candidates[0]);
+            }
+            return chosen.sort();
+        }
+        function renderSessions(quantity, selected = []) {
+            rows.innerHTML = "";
+            for (let index = 0; index < quantity; index += 1) {
+                const row = document.createElement("div"); row.className = "session-row";
+                const select = document.createElement("select"); select.dataset.session = String(index); select.setAttribute("aria-label", `Data real da sessão ${index + 1}`);
+                select.innerHTML = `<option value="">Selecione a data real</option>${availableDates.map((value) => `<option value="${value}"${selected[index] === value ? " selected" : ""}>${escapeHtml(dateLabel(value))}</option>`).join("")}`;
+                const day = document.createElement("span"); day.className = "session-day";
+                const updateDay = () => { day.textContent = select.value ? dateLabel(select.value) : "Aguardando confirmação"; };
+                select.addEventListener("change", updateDay); updateDay();
+                const label = document.createElement("strong"); label.textContent = `Sessão ${String(index + 1).padStart(2, "0")}`;
+                row.append(label, select, day); rows.appendChild(row);
+            }
+            list.hidden = false; actions.hidden = false;
+        }
+        function generateDates() {
+            try {
+                const data = validateBaseData(); if (!data) return;
+                availableDates = listAllowedDates(data.data_liberacao, data.data_limite);
+                if (availableDates.length < data.quantidade_sessoes) {
+                    list.hidden = true; actions.hidden = true;
+                    showStatus(`O período possui apenas ${availableDates.length} dia(s) útil(eis) permitido(s), mas foram solicitadas ${data.quantidade_sessoes} sessões.`); return;
+                }
+                confirmation.checked = false;
+                showStatus("Sugestões criadas. Revise as datas e marque a confirmação antes de gerar o documento.");
+                renderSessions(data.quantidade_sessoes, suggestDates(data.quantidade_sessoes));
+            } catch (error) {
+                showStatus("Não foi possível preparar as datas. Confira o período e tente novamente.");
+                console.error("Erro ao gerar opções de datas:", error);
+            }
+        }
+        function confirmedDates() {
+            const dates = Array.from(rows.querySelectorAll("select")).map((select) => select.value);
+            if (dates.some((date) => !date)) throw new Error("Confirme a data real de todas as sessões.");
+            if (new Set(dates).size !== dates.length) throw new Error("Uma mesma data não pode ser usada em mais de uma sessão.");
+            if (!confirmation.checked) throw new Error("Marque a confirmação de que as datas revisadas correspondem aos atendimentos reais.");
+            const data = validateBaseData(); if (!data) throw new Error("Revise os dados do pacote.");
+            if (dates.some((date) => date < data.data_liberacao || date > data.data_limite || !isAllowedDate(date))) throw new Error("Há uma data fora do período ou em dia não permitido.");
+            return dates.sort();
+        }
+        function recordFromForm() {
+            const base = validateBaseData(); if (!base) throw new Error("Revise os dados do pacote.");
+            return { ...base, datas_sessoes: confirmedDates() };
+        }
+        function saveRecord() {
+            try {
+                recordFromForm();
+                showStatus("Datas reais conferidas. Você já pode gerar ou imprimir o documento.");
+            } catch (error) { showStatus(error.message || "Não foi possível salvar agora. Revise as datas."); }
+        }
+        function documentHtml() {
+            const record = recordFromForm();
+            const dates = record.datas_sessoes.map((date, index) => `<li>Sessão ${String(index + 1).padStart(2, "0")} — ${escapeHtml(dateLabel(date))}</li>`).join("");
+            return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Datas de atendimento - ${escapeHtml(record.paciente)}</title><style>body{font-family:Arial,sans-serif;color:#17212b;padding:42px;line-height:1.55}h1{font-size:22px;text-align:center}table{width:100%;border-collapse:collapse;margin:24px 0}td{padding:9px;border-bottom:1px solid #ccd4dc}td:first-child{font-weight:bold;width:42%}li{margin:8px 0}@media print{body{padding:16px}}</style></head><body><h1>REGISTRO DE DATAS DE ATENDIMENTO</h1><table><tr><td>Paciente</td><td>${escapeHtml(record.paciente)}</td></tr><tr><td>Ordem de serviço (código)</td><td>${escapeHtml(record.codigo_servico)}</td></tr><tr><td>Valor</td><td>${escapeHtml(record.valor)}</td></tr><tr><td>Data de liberação</td><td>${escapeHtml(dateLabel(record.data_liberacao))}</td></tr><tr><td>Data de finalização</td><td>${escapeHtml(dateLabel(record.data_limite))}</td></tr><tr><td>Quantidade de sessões</td><td>${record.quantidade_sessoes}</td></tr></table><h2>Datas das sessões</h2><ol>${dates}</ol></body></html>`;
+        }
+        function openDocument(printNow = false) {
+            try {
+                const windowDocument = window.open("", "_blank");
+                if (!windowDocument) throw new Error("Permita a abertura de janelas para gerar o documento.");
+                windowDocument.document.open(); windowDocument.document.write(documentHtml()); windowDocument.document.close();
+                if (printNow) windowDocument.onload = () => windowDocument.print();
+            } catch (error) { showStatus(error.message || "Não foi possível gerar o documento."); }
+        }
+        function editDates() { list.scrollIntoView({ behavior: "smooth", block: "start" }); rows.querySelector("select")?.focus(); }
+        byId("date-generate").addEventListener("click", generateDates);
+        fields.liberacao.addEventListener("input", () => formatBrDateInput(fields.liberacao));
+        fields.limite.addEventListener("input", () => formatBrDateInput(fields.limite));
+        byId("date-save").addEventListener("click", saveRecord);
+        byId("date-edit").addEventListener("click", editDates);
+        byId("date-document").addEventListener("click", () => openDocument(false));
+        byId("date-print").addEventListener("click", () => openDocument(true));
+    </script>
+</body>
+</html>
