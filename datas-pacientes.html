@@ -222,31 +222,53 @@
                 showStatus(error.message || "Não foi possível salvar agora. Revise as datas.");
             }
         }
+        const signatureSlots = 10;
+
+        function printShell(html, title = "Datas de atendimento") {
+            const windowDocument = window.open("", "_blank");
+            if (!windowDocument) throw new Error("Permita a abertura de janelas para gerar o documento.");
+            windowDocument.document.open();
+            windowDocument.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head><body>${html}</body></html>`);
+            windowDocument.document.close();
+            return windowDocument;
+        }
+
+        function blankFormHtml() {
+            const infoRows = ["Paciente", "Ordem de serviço (código)", "Valor", "Data de liberação", "Data de finalização", "Quantidade de sessões"]
+                .map((label) => `<div class="info-row"><strong>${label}</strong><span></span></div>`).join("");
+            const signatures = Array.from({ length: signatureSlots }, () => '<div class="signature-line"></div>').join("");
+            return `<style>
+                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#061f40;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:11px;line-height:1.35}.print-title{text-align:center;font-size:15px;margin:0 0 28px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:30px;border-bottom:1px solid #c7d0db;align-items:center;padding:4px 6px}.session-title{font-size:16px;margin:20px 0 8px}.session-area{display:grid;grid-template-columns:64% 36%;min-height:132px}.signature-column{padding:0 0 0 14px}.signature-title{margin:0 0 18px;text-align:center;font-size:13px}.signature-line{height:16px;border-bottom:2px solid #111;margin-bottom:1px}@media print{.sheet{padding:18mm 12mm}}</style><main class="sheet"><h1 class="print-title">REGISTRO DE DATAS DE ATENDIMENTO</h1><section>${infoRows}</section><h2 class="session-title">Datas das sessões</h2><section class="session-area"><div></div><div class="signature-column"><h3 class="signature-title">Assinatura</h3>${signatures}</div></section></main>`;
+        }
+
+        function printBlankForm() {
+            try {
+                const windowDocument = printShell(blankFormHtml(), "Ficha em branco para assinatura");
+                windowDocument.onload = () => windowDocument.print();
+            } catch (error) { showStatus(error.message || "Não foi possível imprimir a ficha em branco."); }
+        }
+
         function documentHtml(mode = "normal") {
             const record = recordFromForm();
-            const blank = mode === "blank";
             const overlay = mode === "overlay";
             const rows = [
                 ["Paciente", record.paciente], ["Ordem de serviço (código)", record.codigo_servico], ["Valor", record.valor],
                 ["Data de liberação", dateLabel(record.data_liberacao)], ["Data de finalização", dateLabel(record.data_limite)], ["Quantidade de sessões", record.quantidade_sessoes]
-            ].map(([label, value]) => `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${blank ? "" : escapeHtml(value)}</span></div>`).join("");
+            ].map(([label, value]) => `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join("");
             const sessions = record.datas_sessoes.map((date, index) => {
                 const label = `Sessão ${String(index + 1).padStart(2, "0")} —`;
-                return `<div class="session-row"><strong>${escapeHtml(label)}</strong><span>${blank ? "" : escapeHtml(dateLabel(date))}</span></div>`;
+                return `<div class="session-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(dateLabel(date))}</span></div>`;
             }).join("");
+            const signatures = Array.from({ length: signatureSlots }, () => '<div class="signature-line"></div>').join("");
             const pageClass = overlay ? "overlay" : "";
-            const title = blank ? "FICHA DE DATAS DE ATENDIMENTO" : "REGISTRO DE DATAS DE ATENDIMENTO";
-            return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Datas de atendimento - ${escapeHtml(record.paciente)}</title><style>
-                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#17212b;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:11px;line-height:1.35}.print-title{text-align:center;font-size:15px;margin:0 0 20px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:30px;border-bottom:1px solid #ccd4dc;align-items:center;padding:4px 6px}.info-row strong,.session-row strong{font-weight:700}.session-title{font-size:16px;margin:20px 0 10px}.session-row{display:grid;grid-template-columns:105px 1fr;min-height:25px;align-items:center;padding:3px 10px}.session-row span{border-bottom:1px solid #ccd4dc;min-height:18px}.signature{margin-top:42px;text-align:center}.signature-line{width:260px;border-top:1px solid #17212b;margin:38px auto 6px}.overlay .print-title,.overlay .info-row strong,.overlay .session-title,.overlay .session-row strong,.overlay .signature{visibility:hidden}.overlay .info-row,.overlay .session-row span{border-color:transparent}@media print{body{background:#fff}.sheet{padding:18mm 12mm}}
-            </style></head><body><main class="sheet ${pageClass}"><h1 class="print-title">${title}</h1><section>${rows}</section><h2 class="session-title">Datas das sessões</h2><section>${sessions}</section>${blank ? '<div class="signature"><div class="signature-line"></div><strong>Assinatura do paciente</strong></div>' : ""}</main></body></html>`;
+            return `<style>
+                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#061f40;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:11px;line-height:1.35}.print-title{text-align:center;font-size:15px;margin:0 0 28px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:30px;border-bottom:1px solid #c7d0db;align-items:center;padding:4px 6px}.session-title{font-size:16px;margin:20px 0 8px}.session-area{display:grid;grid-template-columns:64% 36%;min-height:132px}.session-row{display:grid;grid-template-columns:105px 1fr;min-height:17px;align-items:center;padding:1px 10px}.signature-column{padding:0 0 0 14px}.signature-title{margin:0 0 18px;text-align:center;font-size:13px}.signature-line{height:16px;border-bottom:2px solid #111;margin-bottom:1px}.overlay .print-title,.overlay .info-row strong,.overlay .session-title,.overlay .session-row strong,.overlay .signature-column{visibility:hidden}.overlay .info-row{border-color:transparent}@media print{.sheet{padding:18mm 12mm}}</style><main class="sheet ${pageClass}"><h1 class="print-title">REGISTRO DE DATAS DE ATENDIMENTO</h1><section>${rows}</section><h2 class="session-title">Datas das sessões</h2><section class="session-area"><div>${sessions}</div><div class="signature-column"><h3 class="signature-title">Assinatura</h3>${signatures}</div></section></main>`;
         }
         function openDocument(printNow = false, mode = "normal") {
             try {
                 // Monta a ficha antes de abrir a nova aba, evitando uma aba em branco se houver algum campo inválido.
                 const html = documentHtml(mode);
-                const windowDocument = window.open("", "_blank");
-                if (!windowDocument) throw new Error("Permita a abertura de janelas para gerar o documento.");
-                windowDocument.document.open(); windowDocument.document.write(html); windowDocument.document.close();
+                const windowDocument = printShell(html, "Datas de atendimento");
                 if (printNow) windowDocument.onload = () => windowDocument.print();
             } catch (error) { showStatus(error.message || "Não foi possível gerar o documento."); }
         }
@@ -258,7 +280,7 @@
         byId("date-edit").addEventListener("click", editDates);
         byId("date-document").addEventListener("click", () => openDocument(false));
         byId("date-print").addEventListener("click", () => openDocument(true));
-        byId("date-blank-form").addEventListener("click", () => openDocument(true, "blank"));
+        byId("date-blank-form").addEventListener("click", printBlankForm);
         byId("date-print-data").addEventListener("click", () => openDocument(true, "overlay"));
     </script>
 </body>
