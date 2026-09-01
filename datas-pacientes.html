@@ -60,6 +60,8 @@
                 <button id="date-edit" type="button">EDITAR DATAS</button>
                 <button id="date-document" type="button">GERAR DOCUMENTO</button>
                 <button id="date-print" type="button">IMPRIMIR</button>
+                <button id="date-blank-form" type="button">IMPRIMIR FICHA EM BRANCO</button>
+                <button id="date-print-data" type="button">IMPRIMIR SÓ OS DADOS</button>
                 <label class="date-confirmation"><input id="date-confirm" type="checkbox"> Confirmo que revisei e que estas são as datas reais dos atendimentos.</label>
             </div>
         </div>
@@ -220,15 +222,28 @@
                 showStatus(error.message || "Não foi possível salvar agora. Revise as datas.");
             }
         }
-        function documentHtml() {
+        function documentHtml(mode = "normal") {
             const record = recordFromForm();
-            const dates = record.datas_sessoes.map((date, index) => `<li>Sessão ${String(index + 1).padStart(2, "0")} — ${escapeHtml(dateLabel(date))}</li>`).join("");
-            return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Datas de atendimento - ${escapeHtml(record.paciente)}</title><style>body{font-family:Arial,sans-serif;color:#17212b;padding:42px;line-height:1.55}h1{font-size:22px;text-align:center}table{width:100%;border-collapse:collapse;margin:24px 0}td{padding:9px;border-bottom:1px solid #ccd4dc}td:first-child{font-weight:bold;width:42%}li{margin:8px 0}@media print{body{padding:16px}}</style></head><body><h1>REGISTRO DE DATAS DE ATENDIMENTO</h1><table><tr><td>Paciente</td><td>${escapeHtml(record.paciente)}</td></tr><tr><td>Ordem de serviço (código)</td><td>${escapeHtml(record.codigo_servico)}</td></tr><tr><td>Valor</td><td>${escapeHtml(record.valor)}</td></tr><tr><td>Data de liberação</td><td>${escapeHtml(dateLabel(record.data_liberacao))}</td></tr><tr><td>Data de finalização</td><td>${escapeHtml(dateLabel(record.data_limite))}</td></tr><tr><td>Quantidade de sessões</td><td>${record.quantidade_sessoes}</td></tr></table><h2>Datas das sessões</h2><ol>${dates}</ol></body></html>`;
+            const blank = mode === "blank";
+            const overlay = mode === "overlay";
+            const rows = [
+                ["Paciente", record.paciente], ["Ordem de serviço (código)", record.codigo_servico], ["Valor", record.valor],
+                ["Data de liberação", dateLabel(record.data_liberacao)], ["Data de finalização", dateLabel(record.data_limite)], ["Quantidade de sessões", record.quantidade_sessoes]
+            ].map(([label, value]) => `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${blank ? "" : escapeHtml(value)}</span></div>`).join("");
+            const sessions = record.datas_sessoes.map((date, index) => {
+                const label = `Sessão ${String(index + 1).padStart(2, "0")} —`;
+                return `<div class="session-row"><strong>${escapeHtml(label)}</strong><span>${blank ? "" : escapeHtml(dateLabel(date))}</span></div>`;
+            }).join("");
+            const pageClass = overlay ? "overlay" : "";
+            const title = blank ? "FICHA DE DATAS DE ATENDIMENTO" : "REGISTRO DE DATAS DE ATENDIMENTO";
+            return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Datas de atendimento - ${escapeHtml(record.paciente)}</title><style>
+                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#17212b;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:11px;line-height:1.35}.print-title{text-align:center;font-size:15px;margin:0 0 20px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:30px;border-bottom:1px solid #ccd4dc;align-items:center;padding:4px 6px}.info-row strong,.session-row strong{font-weight:700}.session-title{font-size:16px;margin:20px 0 10px}.session-row{display:grid;grid-template-columns:105px 1fr;min-height:25px;align-items:center;padding:3px 10px}.session-row span{border-bottom:1px solid #ccd4dc;min-height:18px}.signature{margin-top:42px;text-align:center}.signature-line{width:260px;border-top:1px solid #17212b;margin:38px auto 6px}.overlay .print-title,.overlay .info-row strong,.overlay .session-title,.overlay .session-row strong,.overlay .signature{visibility:hidden}.overlay .info-row,.overlay .session-row span{border-color:transparent}@media print{body{background:#fff}.sheet{padding:18mm 12mm}}
+            </style></head><body><main class="sheet ${pageClass}"><h1 class="print-title">${title}</h1><section>${rows}</section><h2 class="session-title">Datas das sessões</h2><section>${sessions}</section>${blank ? '<div class="signature"><div class="signature-line"></div><strong>Assinatura do paciente</strong></div>' : ""}</main></body></html>`;
         }
-        function openDocument(printNow = false) {
+        function openDocument(printNow = false, mode = "normal") {
             try {
                 // Monta a ficha antes de abrir a nova aba, evitando uma aba em branco se houver algum campo inválido.
-                const html = documentHtml();
+                const html = documentHtml(mode);
                 const windowDocument = window.open("", "_blank");
                 if (!windowDocument) throw new Error("Permita a abertura de janelas para gerar o documento.");
                 windowDocument.document.open(); windowDocument.document.write(html); windowDocument.document.close();
@@ -243,6 +258,8 @@
         byId("date-edit").addEventListener("click", editDates);
         byId("date-document").addEventListener("click", () => openDocument(false));
         byId("date-print").addEventListener("click", () => openDocument(true));
+        byId("date-blank-form").addEventListener("click", () => openDocument(true, "blank"));
+        byId("date-print-data").addEventListener("click", () => openDocument(true, "overlay"));
     </script>
 </body>
 </html>
