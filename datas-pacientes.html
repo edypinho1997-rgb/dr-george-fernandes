@@ -33,6 +33,10 @@
                 <input id="date-valor" type="text" inputmode="decimal" placeholder="R$ 0,00">
             </div>
             <div class="exam-field">
+                <label for="date-diagnostico">Diagnóstico</label>
+                <input id="date-diagnostico" type="text" placeholder="Ex.: dor lombar">
+            </div>
+            <div class="exam-field">
                 <label for="date-liberacao">Data de liberação do pacote</label>
                 <input id="date-liberacao" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off">
             </div>
@@ -78,7 +82,7 @@
 
         const byId = (id) => document.getElementById(id);
         const fields = {
-            paciente: byId("date-paciente"), codigo: byId("date-codigo"), valor: byId("date-valor"),
+            paciente: byId("date-paciente"), codigo: byId("date-codigo"), valor: byId("date-valor"), diagnostico: byId("date-diagnostico"),
             liberacao: byId("date-liberacao"), limite: byId("date-limite"), quantidade: byId("date-quantidade")
         };
         const status = byId("date-status"), list = byId("session-list"), rows = byId("session-rows"), actions = byId("date-final-actions"), confirmation = byId("date-confirm");
@@ -118,7 +122,7 @@
         }
         function readBaseData() {
             return {
-                paciente: fields.paciente.value.trim(), codigo_servico: fields.codigo.value.trim(), valor: fields.valor.value.trim(),
+                paciente: fields.paciente.value.trim(), codigo_servico: fields.codigo.value.trim(), valor: fields.valor.value.trim(), diagnostico: fields.diagnostico.value.trim(),
                 data_liberacao: brDateToIso(fields.liberacao.value), data_limite: brDateToIso(fields.limite.value),
                 quantidade_sessoes: Number(fields.quantidade.value)
             };
@@ -233,7 +237,7 @@
         }
 
         function blankFormHtml() {
-            const infoRows = ["Paciente", "Ordem de serviço (código)", "Valor", "Data de liberação", "Data de finalização", "Quantidade de sessões"]
+            const infoRows = ["Paciente", "Ordem de serviço (código)", "Valor", "Diagnóstico", "Data de liberação", "Data de finalização", "Quantidade de sessões"]
                 .map((label) => `<div class="info-row"><strong>${label}</strong><span></span></div>`).join("");
             const sessionRows = Array.from({ length: signatureSlots }, () => '<div class="session-row"><span></span></div>').join("");
             const signatures = Array.from({ length: signatureSlots }, () => '<div class="signature-line"></div>').join("");
@@ -252,7 +256,7 @@
             const record = recordFromForm();
             const overlay = mode === "overlay";
             const rows = [
-                ["Paciente", record.paciente], ["Ordem de serviço (código)", record.codigo_servico], ["Valor", record.valor],
+                ["Paciente", record.paciente], ["Ordem de serviço (código)", record.codigo_servico], ["Valor", record.valor], ["Diagnóstico", record.diagnostico],
                 ["Data de liberação", dateLabel(record.data_liberacao)], ["Data de finalização", dateLabel(record.data_limite)], ["Quantidade de sessões", record.quantidade_sessoes]
             ].map(([label, value]) => `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join("");
             const sessions = record.datas_sessoes.map((date, index) => {
