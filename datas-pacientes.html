@@ -59,7 +59,6 @@
                 <button id="date-save" type="button">SALVAR</button>
                 <button id="date-edit" type="button">EDITAR DATAS</button>
                 <button id="date-document" type="button">GERAR DOCUMENTO</button>
-                <button id="date-print" type="button">IMPRIMIR</button>
                 <button id="date-blank-form" type="button">IMPRIMIR FICHA EM BRANCO</button>
                 <button id="date-print-data" type="button">IMPRIMIR SÓ OS DADOS</button>
                 <label class="date-confirmation"><input id="date-confirm" type="checkbox"> Confirmo que revisei e que estas são as datas reais dos atendimentos.</label>
@@ -236,9 +235,10 @@
         function blankFormHtml() {
             const infoRows = ["Paciente", "Ordem de serviço (código)", "Valor", "Data de liberação", "Data de finalização", "Quantidade de sessões"]
                 .map((label) => `<div class="info-row"><strong>${label}</strong><span></span></div>`).join("");
+            const sessionRows = Array.from({ length: signatureSlots }, () => '<div class="session-row"><span></span></div>').join("");
             const signatures = Array.from({ length: signatureSlots }, () => '<div class="signature-line"></div>').join("");
             return `<style>
-                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#061f40;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:11px;line-height:1.35}.print-title{text-align:center;font-size:15px;margin:0 0 28px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:30px;border-bottom:1px solid #c7d0db;align-items:center;padding:4px 6px}.session-title{font-size:16px;margin:20px 0 8px}.session-area{display:grid;grid-template-columns:64% 36%;min-height:132px}.signature-column{padding:0 0 0 14px}.signature-title{margin:0 0 18px;text-align:center;font-size:13px}.signature-line{height:16px;border-bottom:2px solid #111;margin-bottom:1px}@media print{.sheet{padding:18mm 12mm}}</style><main class="sheet"><h1 class="print-title">REGISTRO DE DATAS DE ATENDIMENTO</h1><section>${infoRows}</section><h2 class="session-title">Datas das sessões</h2><section class="session-area"><div></div><div class="signature-column"><h3 class="signature-title">Assinatura</h3>${signatures}</div></section></main>`;
+                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#061f40;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:12px;line-height:1.35}.print-title{text-align:center;font-size:17px;margin:0 0 28px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:32px;border-bottom:1px solid #c7d0db;align-items:center;padding:4px 6px}.session-title{font-size:18px;margin:20px 0 8px}.session-area{display:grid;grid-template-columns:64% 36%;min-height:220px}.session-row{height:22px;border-bottom:1px solid #111;padding:1px 10px}.signature-column{position:relative;padding:0 0 0 14px}.signature-title{position:absolute;left:14px;right:0;top:-24px;margin:0;text-align:center;font-size:14px}.signature-line{height:22px;border-bottom:2px solid #111}@media print{.sheet{padding:18mm 12mm}}</style><main class="sheet"><h1 class="print-title">REGISTRO DE DATAS DE ATENDIMENTO</h1><section>${infoRows}</section><h2 class="session-title">Datas das sessões</h2><section class="session-area"><div>${sessionRows}</div><div class="signature-column"><h3 class="signature-title">Assinatura</h3>${signatures}</div></section></main>`;
         }
 
         function printBlankForm() {
@@ -262,7 +262,7 @@
             const signatures = Array.from({ length: signatureSlots }, () => '<div class="signature-line"></div>').join("");
             const pageClass = overlay ? "overlay" : "";
             return `<style>
-                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#061f40;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:11px;line-height:1.35}.print-title{text-align:center;font-size:15px;margin:0 0 28px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:30px;border-bottom:1px solid #c7d0db;align-items:center;padding:4px 6px}.session-title{font-size:16px;margin:20px 0 8px}.session-area{display:grid;grid-template-columns:64% 36%;min-height:132px}.session-row{display:grid;grid-template-columns:105px 1fr;min-height:17px;align-items:center;padding:1px 10px}.signature-column{padding:0 0 0 14px}.signature-title{margin:0 0 18px;text-align:center;font-size:13px}.signature-line{height:16px;border-bottom:2px solid #111;margin-bottom:1px}.overlay .print-title,.overlay .info-row strong,.overlay .session-title,.overlay .session-row strong,.overlay .signature-column{visibility:hidden}.overlay .info-row{border-color:transparent}@media print{.sheet{padding:18mm 12mm}}</style><main class="sheet ${pageClass}"><h1 class="print-title">REGISTRO DE DATAS DE ATENDIMENTO</h1><section>${rows}</section><h2 class="session-title">Datas das sessões</h2><section class="session-area"><div>${sessions}</div><div class="signature-column"><h3 class="signature-title">Assinatura</h3>${signatures}</div></section></main>`;
+                @page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#061f40;background:#fff}.sheet{width:210mm;min-height:297mm;padding:18mm 12mm;font-size:12px;line-height:1.35}.print-title{text-align:center;font-size:17px;margin:0 0 28px}.info-row{display:grid;grid-template-columns:42% 58%;min-height:32px;border-bottom:1px solid #c7d0db;align-items:center;padding:4px 6px}.session-title{font-size:18px;margin:20px 0 8px}.session-area{display:grid;grid-template-columns:64% 36%;min-height:220px}.session-row{display:grid;grid-template-columns:105px 1fr;height:22px;border-bottom:1px solid #111;align-items:center;padding:1px 10px}.signature-column{position:relative;padding:0 0 0 14px}.signature-title{position:absolute;left:14px;right:0;top:-24px;margin:0;text-align:center;font-size:14px}.signature-line{height:22px;border-bottom:2px solid #111}.overlay .print-title,.overlay .info-row strong,.overlay .session-title,.overlay .signature-column{visibility:hidden}.overlay .info-row{border-color:transparent}.overlay .session-row{grid-template-columns:1fr}.overlay .session-row strong{display:none}@media print{.sheet{padding:18mm 12mm}}</style><main class="sheet ${pageClass}"><h1 class="print-title">REGISTRO DE DATAS DE ATENDIMENTO</h1><section>${rows}</section><h2 class="session-title">Datas das sessões</h2><section class="session-area"><div>${sessions}</div><div class="signature-column"><h3 class="signature-title">Assinatura</h3>${signatures}</div></section></main>`;
         }
         function openDocument(printNow = false, mode = "normal") {
             try {
@@ -279,7 +279,6 @@
         byId("date-save").addEventListener("click", saveRecord);
         byId("date-edit").addEventListener("click", editDates);
         byId("date-document").addEventListener("click", () => openDocument(false));
-        byId("date-print").addEventListener("click", () => openDocument(true));
         byId("date-blank-form").addEventListener("click", printBlankForm);
         byId("date-print-data").addEventListener("click", () => openDocument(true, "overlay"));
     </script>
