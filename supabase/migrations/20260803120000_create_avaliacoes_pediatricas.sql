@@ -36,9 +36,10 @@ grant usage on schema public to authenticated;
 grant select, insert, update, delete on public.avaliacoes_pediatricas to authenticated;
 grant usage, select on sequence public.avaliacoes_pediatricas_id_seq to authenticated;
 
-create policy "Usuário acessa apenas suas avaliações pediátricas"
+-- Usuários autenticados da clínica compartilham as mesmas fichas pediátricas.
+create policy "Usuários autenticados acessam avaliações pediátricas"
 on public.avaliacoes_pediatricas
 for all
 to authenticated
-using (owner_id = auth.uid())
-with check (owner_id = auth.uid());
+using (true)
+with check (true);
