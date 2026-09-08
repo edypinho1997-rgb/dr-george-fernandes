@@ -326,7 +326,39 @@
         const record = { ...payload, id: currentId || `local-${Date.now()}`, created_at:new Date().toISOString() }; records = currentId ? records.map(r => String(r.id) === String(currentId) ? record : r) : [record, ...records]; currentId = record.id; clearDraft(); localSave(); render(); remove.hidden = false;
     });
     function startNewRecord() { const saved = saveDraft(); clear(); if (saved) window.alert("A ficha em andamento foi salva como rascunho neste aparelho."); }
-    el("new-record").onclick = startNewRecord; el("new-record-float").onclick = startNewRecord; el("family-handout").onclick = familyHandout; el("print-record").onclick = () => window.print();
+    function formatDate(value) {
+        if (!value) return "Não informado";
+        const [year, month, day] = value.split("-");
+        return year && month && day ? `${day}/${month}/${year}` : value;
+    }
+    function checkedLabels(sectionIds) {
+        return sectionIds.filter(id => el(id)?.checked).map(id => el(id).closest("label")?.textContent.trim().replace(/\s+/g, " ") || id);
+    }
+    function reportField(label, value) {
+        if (!value || value === "Não informado" || value === "Não observado" || value === "Não classificado") return "";
+        return `<div class="report-field"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`;
+    }
+    function reportSection(title, content) {
+        return content ? `<section class="report-section"><h2>${escapeHtml(title)}</h2><div class="report-content">${content}</div></section>` : "";
+    }
+    function printReport() {
+        calculateIndices();
+        const data = values();
+        if (!data.nome) { window.alert("Preencha ao menos o nome da criança antes de gerar o relatório."); el("nome").focus(); return; }
+        const birth = [reportField("Data de nascimento", formatDate(data.nascimento)), reportField("Sexo", data.sexo), reportField("Responsável", data.responsavel), reportField("Telefone", data.telefone), reportField("Queixa principal", data.queixa)].join("");
+        const neonatalItems = checkedLabels(["gestacao-sem-intercorrencias", "uti-neonatal", "gemeos", "refluxo"]);
+        const neonatal = [reportField("Tipo de parto", data["tipo-parto"]), reportField("Idade gestacional", data["idade-gestacional"]), neonatalItems.length ? `<div class="report-field full"><strong>Informações registradas</strong><span>${escapeHtml(neonatalItems.join(" • "))}</span></div>` : "", reportField("Observações do nascimento", data.gestacao)].join("");
+        const clinicalItems = checkedLabels(["torcicolo", "plagiocefalia", "braquicefalia", "assimetria-face", "limitacao-direita", "limitacao-esquerda", "controle-cervical", "tummy-time"]);
+        const measurements = [reportField("Preferência postural", data.preferencia), reportField("Grau de assimetria", data["grau-assimetria"]), clinicalItems.length ? `<div class="report-field full"><strong>Achados observados</strong><span>${escapeHtml(clinicalItems.join(" • "))}</span></div>` : "", reportField("CVAI", data["cvai-salvo"]), reportField("Índice cefalométrico", data["ci-salvo"]), reportField("Lado predominante", data["lado-plagio"]), reportField("Medidas e observações clínicas", data.cranio)].join("");
+        const developmentItems = checkedLabels(["rola", "senta-apoio", "senta-sem-apoio", "engatinha", "anda", "marcos-adequados"]);
+        const guidanceItems = checkedLabels(["orientacao-olhar-esquerda", "orientacao-olhar-direita", "orientacao-torcicolo-direita", "orientacao-torcicolo-esquerda", "orientacao-torcicolo-alongamento", "orientacao-alternar-colo", "orientacao-tummy", "orientacao-variar-posicoes", "orientacao-reduzir-cadeirinha", "orientacao-estimulos", "orientacao-sono-seguro", "orientacao-retorno"]);
+        const followup = [developmentItems.length ? `<div class="report-field full"><strong>Marcos registrados</strong><span>${escapeHtml(developmentItems.join(" • "))}</span></div>` : "", reportField("Desenvolvimento / observações", data.desenvolvimento), guidanceItems.length ? `<div class="report-field full"><strong>Orientações realizadas</strong><span>${escapeHtml(guidanceItems.join(" • "))}</span></div>` : "", reportField("Outras orientações", data.orientacoes), reportField("Plano terapêutico e retorno", data.plano), reportField("Evolução / observações finais", data.evolucao)].join("");
+        const report = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório de avaliação pediátrica — ${escapeHtml(data.nome)}</title><style>@page{size:A4;margin:16mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#263c50;font-size:11px;line-height:1.5}.report-header{border-bottom:2px solid #bc6f8d;padding-bottom:14px;margin-bottom:18px}.report-header h1{margin:0;color:#8e4f6a;font-size:22px}.report-header p{margin:5px 0 0;color:#6a7b88}.report-section{margin:0 0 17px;break-inside:avoid}.report-section h2{margin:0;background:#f9e7ee;color:#884c68;border-left:4px solid #d987a7;padding:7px 10px;font-size:13px}.report-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #ecd3dd;border-top:0}.report-field{padding:8px 10px;border-bottom:1px solid #f0e2e7;min-width:0}.report-field:nth-last-child(-n+2){border-bottom:0}.report-field strong{display:block;color:#70475c;font-size:10px;margin-bottom:2px}.report-field span{white-space:pre-wrap}.report-field.full{grid-column:1/-1}.signature{margin-top:42px;text-align:center;break-inside:avoid}.signature-line{width:280px;margin:36px auto 6px;border-top:1px solid #445}@media print{body{font-size:10.5px}}</style></head><body><header class="report-header"><h1>Relatório de Avaliação Pediátrica</h1><p><strong>Paciente:</strong> ${escapeHtml(data.nome)} &nbsp; | &nbsp; Emissão: ${new Intl.DateTimeFormat("pt-BR").format(new Date())}</p></header>${reportSection("Identificação e queixa", birth)}${reportSection("Histórico gestacional e neonatal", neonatal)}${reportSection("Avaliação clínica", measurements)}${reportSection("Desenvolvimento, orientações e acompanhamento", followup)}<div class="signature"><div class="signature-line"></div><strong>Profissional responsável</strong></div><script>window.onload=()=>setTimeout(()=>window.print(),250);<\/script></body></html>`;
+        const printWindow = window.open("", "_blank");
+        if (!printWindow) { window.alert("Permita a abertura de nova janela para gerar o relatório."); return; }
+        printWindow.document.open(); printWindow.document.write(report); printWindow.document.close();
+    }
+    el("new-record").onclick = startNewRecord; el("new-record-float").onclick = startNewRecord; el("family-handout").onclick = familyHandout; el("print-record").onclick = printReport;
     remove.onclick = async () => { if (!currentId || !confirm("Apagar esta ficha pediátrica?")) return; if (!localOnly) { const { error } = await client.from(table).delete().eq("id", currentId); if (!error) { clear(); return load(); } } records = records.filter(r => String(r.id) !== String(currentId)); localSave(); clear(); };
     const patientDrawer = el("patient-drawer"), patientToggle = el("patients-toggle");
     function setPatientDrawer(open) { patientDrawer.classList.toggle("open", open); patientToggle.setAttribute("aria-expanded", String(open)); }
