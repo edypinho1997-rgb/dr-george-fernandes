@@ -115,7 +115,7 @@
     <header class="pediatric-hero">
         <div class="hero-copy"><span class="hero-kicker">Crescer, brincar e evoluir</span><h1>Avaliação Pediátrica</h1><p>Um cuidado atento e acolhedor para acompanhar cada pequena conquista.</p><div class="hero-tags"><span>🌱 Desenvolvimento</span><span>🧸 Cuidado leve</span><span>💗 Família junto</span></div></div>
         <div class="hero-illustration" aria-hidden="true"><span class="sun">☀</span><span class="cloud cloud-one">☁</span><span class="cloud cloud-two">☁</span><span class="rainbow"></span><span class="teddy">🧸</span><span class="star star-one">✦</span><span class="star star-two">✦</span></div>
-        <a class="back" href="index.html">&larr; Voltar ao painel</a>
+        <div class="header-actions"><button class="change-account" id="change-account" type="button">Trocar conta</button><a class="back" href="index.html">&larr; Voltar ao painel</a></div>
     </header>
     <nav class="care-path" aria-label="Etapas da avaliação"><span><b>1</b> Boas-vindas</span><i></i><span><b>2</b> Avaliação</span><i></i><span><b>3</b> Orientações</span><i></i><span><b>4</b> Relatório</span></nav>
     <button class="patients-toggle" id="patients-toggle" type="button" aria-label="Abrir crianças avaliadas" aria-controls="patient-drawer" aria-expanded="false"><span>👧🏻👦🏻</span></button>
@@ -221,6 +221,9 @@
     .auth-card button { margin-top:5px; background:linear-gradient(135deg,#cc7595,#ae6383); color:#fff; }
     .auth-card .auth-link { margin-top:0; background:#f5dce6; color:#92546f; }
     .auth-message { min-height:20px; margin:4px 0 0!important; color:#a14d62; }
+    .header-actions { position:relative; z-index:2; display:flex; gap:8px; align-items:center; }
+    .change-account { padding:9px 13px; border-radius:99px; background:#fff7fa; color:#a54a6e; font-weight:600; }
+    @media (max-width:760px) { .header-actions { position:absolute; top:12px; right:12px; }.change-account { padding:6px 8px; font-size:.65rem; } }
 </style>
 <section class="auth-overlay" id="auth-overlay" aria-labelledby="auth-title">
     <div class="auth-card">
@@ -241,7 +244,7 @@
     const table = "avaliacoes_pediatricas", key = "avaliacoes-pediatricas-v1", draftKey = "avaliacoes-pediatricas-draft-v1";
     const ids = ["nome","sexo","nascimento","responsavel","telefone","queixa","tipo-parto","idade-gestacional","gestacao-sem-intercorrencias","uti-neonatal","gemeos","refluxo","gestacao","preferencia","grau-assimetria","torcicolo","plagiocefalia","braquicefalia","assimetria-face","limitacao-direita","limitacao-esquerda","controle-cervical","tummy-time","diagonal-maior","diagonal-menor","largura-biparietal","comprimento-ap","cvai-salvo","ci-salvo","lado-plagio","cranio","rola","senta-apoio","senta-sem-apoio","engatinha","anda","marcos-adequados","orientacao-olhar-esquerda","orientacao-olhar-direita","orientacao-torcicolo-direita","orientacao-torcicolo-esquerda","orientacao-torcicolo-alongamento","orientacao-alternar-colo","orientacao-tummy","orientacao-variar-posicoes","orientacao-reduzir-cadeirinha","orientacao-estimulos","orientacao-sono-seguro","orientacao-retorno","desenvolvimento","orientacoes","plano","evolucao"];
     const form = document.getElementById("pediatric-form"), list = document.getElementById("patient-list"), notice = document.getElementById("notice"), remove = document.getElementById("delete-record");
-    const authOverlay = document.getElementById("auth-overlay"), authForm = document.getElementById("auth-form"), authMessage = document.getElementById("auth-message");
+    const authOverlay = document.getElementById("auth-overlay"), authForm = document.getElementById("auth-form"), authMessage = document.getElementById("auth-message"), changeAccount = document.getElementById("change-account");
     let records = [], currentId = null, localOnly = !client, draftRecord = null;
     const el = id => document.getElementById(id);
     async function checkAuthentication() {
@@ -266,6 +269,13 @@
         authMessage.textContent = "Enviando link...";
         const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
         authMessage.textContent = error ? "Não foi possível enviar o link. Tente novamente." : "Link enviado. Abra seu e-mail e clique nele para entrar.";
+    });
+    changeAccount.addEventListener("click", async () => {
+        if (!client) return;
+        await client.auth.signOut();
+        authForm.reset();
+        authMessage.textContent = "Entre com a outra conta para acessar as fichas.";
+        authOverlay.hidden = false;
     });
     const localRead = () => { try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; } };
     const localSave = () => localStorage.setItem(key, JSON.stringify(records));
