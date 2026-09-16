@@ -237,8 +237,8 @@
         }
 
         function blankFormHtml() {
-            const infoRows = ["Paciente", "Ordem de serviço (código)", "Valor", "Diagnóstico", "Data de liberação", "Data de finalização", "Quantidade de sessões"]
-                .map((label) => `<div class="info-row"><strong>${label}</strong><span></span></div>`).join("");
+            const infoRows = [["Paciente", fields.paciente.value.trim()], ["Ordem de serviço (código)", fields.codigo.value.trim()], ["Valor", fields.valor.value.trim()], ["Diagnóstico", fields.diagnostico.value.trim()]]
+                .map(([label, value]) => `<div class="info-row"><strong>${label}</strong><span>${escapeHtml(value)}</span></div>`).join("");
             const sessionRows = Array.from({ length: signatureSlots }, () => '<div class="session-row"><span></span></div>').join("");
             const signatures = Array.from({ length: signatureSlots }, () => '<div class="signature-line"></div>').join("");
             return `<style>
@@ -247,6 +247,10 @@
 
         function printBlankForm() {
             try {
+                if (!fields.paciente.value.trim() || !fields.codigo.value.trim() || !fields.valor.value.trim() || !fields.diagnostico.value.trim()) {
+                    showStatus("Para imprimir a ficha, preencha nome do paciente, ordem de serviço, valor e diagnóstico.");
+                    return;
+                }
                 const windowDocument = printShell(blankFormHtml(), "Ficha em branco para assinatura");
                 windowDocument.onload = () => windowDocument.print();
             } catch (error) { showStatus(error.message || "Não foi possível imprimir a ficha em branco."); }
@@ -255,10 +259,12 @@
         function documentHtml(mode = "normal") {
             const record = recordFromForm();
             const overlay = mode === "overlay";
-            const rows = [
+            const normalRows = [
                 ["Paciente", record.paciente], ["Ordem de serviço (código)", record.codigo_servico], ["Valor", record.valor], ["Diagnóstico", record.diagnostico],
                 ["Data de liberação", dateLabel(record.data_liberacao)], ["Data de finalização", dateLabel(record.data_limite)], ["Quantidade de sessões", record.quantidade_sessoes]
             ].map(([label, value]) => `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join("");
+            // Na sobreposição, mantém apenas o espaço dos quatro dados já impressos na ficha inicial.
+            const rows = overlay ? Array.from({ length: 4 }, () => '<div class="info-row"><strong></strong><span></span></div>').join("") : normalRows;
             const sessions = record.datas_sessoes.map((date, index) => {
                 const label = `Sessão ${String(index + 1).padStart(2, "0")} —`;
                 return `<div class="session-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(dateLabel(date))}</span></div>`;
