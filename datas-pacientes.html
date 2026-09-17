@@ -237,7 +237,7 @@
         }
 
         function blankFormHtml() {
-            const infoRows = [["Paciente", fields.paciente.value.trim()], ["Ordem de serviço (código)", fields.codigo.value.trim()], ["Valor", fields.valor.value.trim()], ["Diagnóstico", fields.diagnostico.value.trim()]]
+            const infoRows = [["Paciente", fields.paciente.value.trim()], ["Ordem de serviço (código)", fields.codigo.value.trim()], ["Valor", fields.valor.value.trim()], ["Diagnóstico", fields.diagnostico.value.trim()], ["Data de liberação", ""], ["Data de finalização", ""], ["Quantidade de sessões", ""]]
                 .map(([label, value]) => `<div class="info-row"><strong>${label}</strong><span>${escapeHtml(value)}</span></div>`).join("");
             const sessionRows = Array.from({ length: signatureSlots }, () => '<div class="session-row"><span></span></div>').join("");
             const signatures = Array.from({ length: signatureSlots }, () => '<div class="signature-line"></div>').join("");
@@ -263,8 +263,8 @@
                 ["Paciente", record.paciente], ["Ordem de serviço (código)", record.codigo_servico], ["Valor", record.valor], ["Diagnóstico", record.diagnostico],
                 ["Data de liberação", dateLabel(record.data_liberacao)], ["Data de finalização", dateLabel(record.data_limite)], ["Quantidade de sessões", record.quantidade_sessoes]
             ].map(([label, value]) => `<div class="info-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join("");
-            // Na sobreposição, mantém apenas o espaço dos quatro dados já impressos na ficha inicial.
-            const rows = overlay ? Array.from({ length: 4 }, () => '<div class="info-row"><strong></strong><span></span></div>').join("") : normalRows;
+            // Na sobreposição, mantém o espaço das sete linhas já impressas na ficha inicial.
+            const rows = overlay ? Array.from({ length: 7 }, () => '<div class="info-row"><strong></strong><span></span></div>').join("") : normalRows;
             const sessions = record.datas_sessoes.map((date, index) => {
                 const label = `Sessão ${String(index + 1).padStart(2, "0")} —`;
                 return `<div class="session-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(dateLabel(date))}</span></div>`;
