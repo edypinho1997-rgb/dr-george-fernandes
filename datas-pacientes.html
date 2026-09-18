@@ -247,10 +247,11 @@
 
         function printBlankForm() {
             try {
-                if (!fields.paciente.value.trim() || !fields.codigo.value.trim() || !fields.valor.value.trim() || !fields.diagnostico.value.trim()) {
-                    showStatus("Para imprimir a ficha, preencha nome do paciente, ordem de serviço, valor e diagnóstico.");
+                if (!fields.paciente.value.trim() || !fields.codigo.value.trim() || !fields.diagnostico.value.trim()) {
+                    showStatus("Para imprimir a ficha, preencha nome do paciente, ordem de serviço e diagnóstico.");
                     return;
                 }
+                
                 const windowDocument = printShell(blankFormHtml(), "Ficha em branco para assinatura");
                 windowDocument.onload = () => windowDocument.print();
             } catch (error) { showStatus(error.message || "Não foi possível imprimir a ficha em branco."); }
