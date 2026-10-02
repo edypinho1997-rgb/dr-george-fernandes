@@ -179,7 +179,7 @@
             const professional = certProfissional.value.trim() || "Dr. George Fernandes";
             const crefito = certCrefito.value.trim();
             const signatureCrefito = crefito ? `Fisioterapeuta - CREFITO - ${crefito}` : "Fisioterapeuta";
-            const documentTitle = certTipo.value === "afastamento" ? "Atestado" : "Declaracao de comparecimento";
+            const documentTitle = certTipo.value === "afastamento" ? "Atestado" : "Declaração de comparecimento";
             const headerImageUrl = new URL("imagens/cabeçalho.png", window.location.href).href;
             const watermarkImageUrl = new URL("imagens/marca-dagua.png", window.location.href).href;
             const printWindow = window.open("", "_blank", "width=900,height=700");
