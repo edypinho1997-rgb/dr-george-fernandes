@@ -1495,6 +1495,7 @@
         let lastLocalAgendaChangeAt = 0;
         let lastUserInteractionAt = Date.now();
         let lastSharedRefreshAt = 0;
+        // O Realtime atualiza na hora; esta consulta é apenas uma segurança caso a conexão caia.
         const sharedRefreshInterval = 300000;
         const sharedRefreshMinGap = 10000;
         const paymentsSelectColumns = "id, paciente, forma, valor, data, pago_por, sessoes";
@@ -1728,14 +1729,29 @@
             historyMonth.value = month;
             const payload = collectScheduleData();
             if (supabaseClient) {
-                await supabaseClient
+                const { error } = await supabaseClient
                     .from("agendas")
                     .upsert({ month, data: payload }, { onConflict: "month" });
+                if (error) throw error;
             } else {
                 localStorage.setItem(getHistoryKey(month), JSON.stringify(payload));
                 updateHistoryIndex(month);
             }
             renderHistoryList();
+        }
+
+        async function saveAgendaFromConfirmedAction() {
+            if (agendaAutosaveTimer) {
+                clearTimeout(agendaAutosaveTimer);
+                agendaAutosaveTimer = null;
+            }
+            lastLocalAgendaChangeAt = Date.now();
+            try {
+                await saveAgendaForCurrentMonth();
+            } catch (error) {
+                console.error("Falha ao salvar alteração confirmada da agenda", error);
+                window.alert("Não foi possível salvar a alteração da agenda. Verifique sua conexão e tente novamente.");
+            }
         }
 
         function scheduleAgendaAutosave() {
@@ -1830,7 +1846,7 @@
                 setActiveChip(wrapper);
             });
 
-            remove.addEventListener("click", (event) => {
+            remove.addEventListener("click", async (event) => {
                 event.stopPropagation();
                 if (activeChip === wrapper) {
                     clearActiveChip();
@@ -1838,7 +1854,7 @@
                 wrapper.remove();
                 updatePatientSuggestions();
                 updateCounts();
-                scheduleAgendaAutosave();
+                await saveAgendaFromConfirmedAction();
             });
 
             wrapper.appendChild(chip);
@@ -1847,7 +1863,7 @@
             return wrapper;
         }
 
-        function addPatientFromInput(input) {
+        async function addPatientFromInput(input) {
             const name = input.value.trim();
             if (!name || !activeCell) return;
             const chip = createChip(name);
@@ -1857,7 +1873,7 @@
             updatePatientSuggestions([name]);
             setActiveChip(chip);
             updateCounts();
-            scheduleAgendaAutosave();
+            await saveAgendaFromConfirmedAction();
         }
 
         function bindPatientControl(control) {
@@ -1868,14 +1884,14 @@
             button.dataset.bound = "true";
             input.dataset.bound = "true";
 
-            button.addEventListener("click", () => {
-                addPatientFromInput(input);
+            button.addEventListener("click", async () => {
+                await addPatientFromInput(input);
             });
 
-            input.addEventListener("keydown", (event) => {
+            input.addEventListener("keydown", async (event) => {
                 if (event.key === "Enter") {
                     event.preventDefault();
-                    addPatientFromInput(input);
+                    await addPatientFromInput(input);
                 }
             });
 
@@ -1935,8 +1951,13 @@
             if (!Array.isArray(data)) return;
             isApplyingScheduleData = true;
             const months = getVisibleMonths();
+            // Remove apenas uma semana duplicada antiga (mesmo título consecutivo),
+            // preservando a primeira, que contém os pacientes corretos.
+            const scheduleData = data.length > months.length && data[0]?.title && data[0].title === data[1]?.title
+                ? [data[0], ...data.slice(2)]
+                : data;
             months.forEach((month, monthIndex) => {
-                const monthData = data[monthIndex];
+                const monthData = scheduleData[monthIndex];
                 const cells = Array.from(month.querySelectorAll(".cell"));
                 cells.forEach((cell, cellIndex) => {
                     cell.innerHTML = "";
@@ -2074,7 +2095,7 @@
 
             const firstWeekStart = new Date(firstDay);
             while (firstWeekStart.getDay() !== 1) {
-                firstWeekStart.setDate(firstWeekStart.getDate() - 1);
+                firstWeekStart.setDate(firstWeekStart.getDate() + 1);
             }
 
             const cursor = new Date(firstWeekStart);
@@ -2083,21 +2104,10 @@
                 const end = new Date(cursor);
                 end.setDate(end.getDate() + 5);
 
-                let daysInTargetMonth = 0;
-                for (let i = 0; i < 6; i += 1) {
-                    const day = new Date(start);
-                    day.setDate(start.getDate() + i);
-                    if (day.getMonth() === monthIndex) {
-                        daysInTargetMonth += 1;
-                    }
-                }
-
-                if (daysInTargetMonth >= 3) {
-                    ranges.push({
-                        start: start.getDate(),
-                        end: end.getDate()
-                    });
-                }
+                ranges.push({
+                    start: start.getDate(),
+                    end: end.getDate()
+                });
 
                 cursor.setDate(cursor.getDate() + 7);
             }
@@ -4568,15 +4578,18 @@ ${finalNotes}`;
         async function refreshAgendaFromRemote() {
             if (!supabaseClient || document.hidden || agendaAutosaveTimer) return;
             const now = Date.now();
-            const recentlyChangedAgenda = now - lastLocalAgendaChangeAt < 5000;
-            const userIsActiveHere = document.hasFocus() && now - lastUserInteractionAt < 5000;
-            if (recentlyChangedAgenda || userIsActiveHere) return;
+            const recentlyChangedAgenda = now - lastLocalAgendaChangeAt < 1500;
+            if (recentlyChangedAgenda) return;
             const month = viewMonth.value || normalizeViewMonth();
             const { data } = await supabaseClient
                 .from("agendas")
                 .select("data")
                 .eq("month", month)
                 .maybeSingle();
+
+            // Uma resposta sem registro não pode limpar a agenda já aberta.
+            // Isso pode acontecer durante reconexão ou antes de o mês existir no banco.
+            if (!data) return;
 
             const remoteData = data?.data || [];
             const localData = collectScheduleData();
